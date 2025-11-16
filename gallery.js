@@ -1,5 +1,54 @@
 // gallery.js
 
+const LIKE_STORAGE_KEY = "mugMapLikes_v1";
+
+function loadLikedMap() {
+  try {
+    const raw = localStorage.getItem(LIKE_STORAGE_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveLikedMap(map) {
+  try {
+    localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(map));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+let likedMap = loadLikedMap();
+
+function isLiked(photoId) {
+  return !!likedMap[photoId];
+}
+
+function toggleLike(photoId) {
+  if (isLiked(photoId)) {
+    delete likedMap[photoId];
+  } else {
+    likedMap[photoId] = true;
+  }
+  saveLikedMap(likedMap);
+}
+
+function getBaseLikes(photoId) {
+  if (typeof BASE_LIKES !== "undefined" && BASE_LIKES[photoId] != null) {
+    return BASE_LIKES[photoId];
+  }
+  return 0;
+}
+
+function getTotalLikes(photoId) {
+  return getBaseLikes(photoId) + (isLiked(photoId) ? 1 : 0);
+}
+
+// Expose this so popular.html can sort by likes
+window.getTotalLikes = getTotalLikes;
+
 // Renders a simple grid gallery into a container element
 function renderGallery(container, photos, context = {}) {
   container.innerHTML = "";
@@ -20,13 +69,57 @@ function renderGallery(container, photos, context = {}) {
 
     const tagSpan = document.createElement("span");
     tagSpan.className = "gallery-item-tag";
-    tagSpan.textContent = photo.tag || (photo.year ? photo.year : "");
+
+    // If caller already passed a tag (e.g., "23 likes") use it;
+    // otherwise fall back to the photo's tag or year.
+    if (photo.tag) {
+      tagSpan.textContent = photo.tag;
+    } else if (photo.year) {
+      tagSpan.textContent = photo.year;
+    } else {
+      tagSpan.textContent = "";
+    }
 
     info.appendChild(labelSpan);
     info.appendChild(tagSpan);
 
+    // Like button
+    const likeBtn = document.createElement("button");
+    likeBtn.type = "button";
+    likeBtn.className = "like-btn";
+    likeBtn.dataset.photoId = photo.id;
+
+    const heart = document.createElement("span");
+    heart.className = "heart";
+    heart.textContent = "❤";
+
+    const count = document.createElement("span");
+    const totalLikes = getTotalLikes(photo.id);
+    count.textContent = totalLikes;
+
+    if (isLiked(photo.id)) {
+      likeBtn.classList.add("liked");
+    }
+
+    likeBtn.appendChild(heart);
+    likeBtn.appendChild(count);
+
+    likeBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // don't open lightbox
+      toggleLike(photo.id);
+      const newTotal = getTotalLikes(photo.id);
+      count.textContent = newTotal;
+      likeBtn.classList.toggle("liked", isLiked(photo.id));
+
+      // Optional hook so a page can resort (e.g. popular.html)
+      if (typeof context.onLikesChanged === "function") {
+        context.onLikesChanged();
+      }
+    });
+
     item.appendChild(img);
     item.appendChild(info);
+    item.appendChild(likeBtn);
     container.appendChild(item);
 
     item.addEventListener("click", () => {
@@ -113,8 +206,8 @@ function updateLightbox() {
   imgEl.src = photo.src;
   imgEl.alt = photo.label || "Mug photo";
 
-  const city = context.city || "";
-  const marketName = context.marketName || "";
+  const city = context.city || photo.city || "";
+  const marketName = context.marketName || photo.marketName || "";
   const year = photo.year ? ` · ${photo.year}` : "";
 
   titleEl.textContent = photo.label || "Mug Photo";
@@ -134,10 +227,16 @@ function updateLightbox() {
     chip.textContent = city;
     chipsEl.appendChild(chip);
   }
-  if (year) {
+  if (photo.year) {
     const chip = document.createElement("span");
     chip.className = "chip";
     chip.textContent = photo.year;
     chipsEl.appendChild(chip);
   }
+
+  // Show likes in the meta chips as well
+  const likesChip = document.createElement("span");
+  likesChip.className = "chip";
+  likesChip.textContent = `${getTotalLikes(photo.id)} likes`;
+  chipsEl.appendChild(likesChip);
 }
