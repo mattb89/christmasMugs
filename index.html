@@ -5,7 +5,7 @@
   <title>European Christmas Mug Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Leaflet CSS (map library) -->
+  <!-- Leaflet CSS -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -15,12 +15,12 @@
 
   <style>
     :root {
-      --bg-gradient: radial-gradient(circle at top left, #111827, #020617);
+      --bg-gradient: radial-gradient(circle at top left, #020617, #020617 40%, #020617 60%, #000000);
       --accent: #eab308;
-      --accent-soft: rgba(234, 179, 8, 0.2);
+      --accent-soft: rgba(234, 179, 8, 0.15);
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
-      --glass-bg: rgba(15, 23, 42, 0.85);
+      --glass-bg: rgba(15, 23, 42, 0.9);
       --border-subtle: rgba(148, 163, 184, 0.25);
     }
 
@@ -66,7 +66,7 @@
     header .brand {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.7rem;
     }
 
     header .logo-pill {
@@ -77,12 +77,12 @@
       align-items: center;
       justify-content: center;
       background: radial-gradient(circle at 30% 0%, #facc15, #a16207);
-      box-shadow: 0 0 18px rgba(234, 179, 8, 0.5);
+      box-shadow: 0 0 18px rgba(234, 179, 8, 0.6);
       font-size: 20px;
     }
 
     header h1 {
-      font-size: 1rem;
+      font-size: 0.95rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-muted);
@@ -93,8 +93,31 @@
     }
 
     header .tagline {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
+    }
+
+    .pill {
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(234, 179, 8, 0.6);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      background: radial-gradient(circle at 0 0, rgba(250, 250, 250, 0.08), transparent),
+        var(--accent-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
     }
 
     main {
@@ -106,7 +129,7 @@
 
     #map {
       flex: 1;
-      height: calc(100vh - 62px); /* header height approx */
+      height: calc(100vh - 64px);
       z-index: 1;
     }
 
@@ -123,8 +146,9 @@
       justify-content: center;
       background: radial-gradient(circle at 30% 0%, #facc15, #a16207);
       color: #111827;
-      box-shadow: 0 0 12px rgba(15, 23, 42, 0.9),
-        0 0 20px rgba(234, 179, 8, 0.6);
+      box-shadow:
+        0 0 14px rgba(15, 23, 42, 0.9),
+        0 0 24px rgba(234, 179, 8, 0.7);
       border: 2px solid rgba(15, 23, 42, 0.9);
       transform: translateY(-4px);
       cursor: pointer;
@@ -136,28 +160,29 @@
       position: absolute;
       inset: -2px;
       border-radius: inherit;
-      border: 1px solid rgba(250, 250, 250, 0.15);
+      border: 1px solid rgba(250, 250, 250, 0.18);
       pointer-events: none;
     }
 
     /* Gallery panel */
     #galleryPanel {
       position: absolute;
-      right: 1.5rem;
-      top: 1.5rem;
-      bottom: 1.5rem;
+      right: 1.7rem;
+      top: 1.7rem;
+      bottom: 1.7rem;
       width: min(420px, 90vw);
       background: var(--glass-bg);
       border-radius: 1.5rem;
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.75);
       border: 1px solid var(--border-subtle);
-      padding: 1.5rem 1.4rem 1.4rem;
+      padding: 1.5rem 1.4rem 1.3rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
       transform: translateX(120%);
       opacity: 0;
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      transition:
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         opacity 0.3s ease;
       z-index: 500;
     }
@@ -172,7 +197,7 @@
       position: absolute;
       inset: -1px;
       border-radius: inherit;
-      border: 1px solid rgba(250, 250, 250, 0.08);
+      border: 1px solid rgba(250, 250, 250, 0.06);
       pointer-events: none;
     }
 
@@ -186,12 +211,12 @@
     .panel-title {
       display: flex;
       flex-direction: column;
-      gap: 0.1rem;
+      gap: 0.16rem;
     }
 
     .panel-title h2 {
-      font-size: 1rem;
-      letter-spacing: 0.08em;
+      font-size: 0.96rem;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       color: var(--accent);
     }
@@ -201,30 +226,8 @@
       color: var(--text-muted);
     }
 
-    .pill {
-      padding: 0.15rem 0.7rem;
-      border-radius: 999px;
-      border: 1px solid rgba(234, 179, 8, 0.4);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--accent);
-      background: var(--accent-soft);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
-    }
-
     .panel-body {
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       color: var(--text-muted);
       line-height: 1.5;
     }
@@ -232,7 +235,7 @@
     .gallery-grid {
       margin-top: 0.2rem;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 0.55rem;
       flex: 1;
       overflow: auto;
@@ -243,7 +246,7 @@
       position: relative;
       border-radius: 0.9rem;
       overflow: hidden;
-      border: 1px solid rgba(148, 163, 184, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.5);
       background: radial-gradient(circle at 30% 0%, #1f2937, #020617);
       aspect-ratio: 4 / 3;
       display: flex;
@@ -260,28 +263,13 @@
       transition: transform 0.35s ease, filter 0.35s ease;
     }
 
-    .gallery-grid figcaption {
-      position: absolute;
-      left: 0.45rem;
-      bottom: 0.35rem;
-      right: 0.45rem;
-      font-size: 0.7rem;
-      color: #e5e7eb;
-      text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-      opacity: 0.9;
-    }
-
     .gallery-grid figure::after {
       content: "";
       position: absolute;
       inset: 0;
       background: linear-gradient(
         to top,
-        rgba(15, 23, 42, 0.85),
+        rgba(15, 23, 42, 0.9),
         transparent 55%
       );
       mix-blend-mode: multiply;
@@ -289,9 +277,23 @@
       transition: opacity 0.35s ease;
     }
 
+    .gallery-grid figcaption {
+      position: absolute;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: #e5e7eb;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+      pointer-events: none;
+    }
+
     .gallery-grid figure:hover img {
-      transform: scale(1.05);
-      filter: brightness(1.1);
+      transform: scale(1.06);
+      filter: brightness(1.08);
     }
 
     .gallery-grid figure:hover::after {
@@ -307,7 +309,7 @@
       letter-spacing: 0.08em;
       color: #e5e7eb;
       backdrop-filter: blur(6px);
-      background-color: rgba(15, 23, 42, 0.8);
+      background-color: rgba(15, 23, 42, 0.85);
     }
 
     .close-btn {
@@ -316,13 +318,16 @@
       color: var(--text-muted);
       font-size: 1.4rem;
       cursor: pointer;
-      padding: 0.1rem 0.2rem;
+      padding: 0.1rem 0.3rem;
       border-radius: 999px;
-      transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
+      transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.08s ease;
     }
 
     .close-btn:hover {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       color: #f9fafb;
     }
 
@@ -332,26 +337,26 @@
 
     footer {
       position: absolute;
-      left: 1.5rem;
-      bottom: 1.5rem;
+      left: 1.6rem;
+      bottom: 1.6rem;
       z-index: 400;
       padding: 0.6rem 0.9rem;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.86);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid var(--border-subtle);
       font-size: 0.75rem;
       color: var(--text-muted);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.55rem;
       backdrop-filter: blur(10px);
     }
 
     footer span.key {
       padding: 0.1rem 0.45rem;
       border-radius: 0.4rem;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
         "Liberation Mono", "Courier New", monospace;
       font-size: 0.65rem;
@@ -359,7 +364,7 @@
     }
 
     /* Small screens */
-    @media (max-width: 800px) {
+    @media (max-width: 880px) {
       header {
         padding: 0.7rem 1.1rem;
       }
@@ -369,22 +374,14 @@
       }
 
       #galleryPanel {
-        right: 0.75rem;
-        left: 0.75rem;
+        right: 0.8rem;
+        left: 0.8rem;
         top: auto;
-        bottom: 0.75rem;
-        height: min(55vh, 430px);
+        bottom: 0.9rem;
+        height: min(58vh, 440px);
         width: auto;
         border-radius: 1.2rem;
         padding: 1.1rem 1rem 0.9rem;
-      }
-
-      .panel-body {
-        font-size: 0.78rem;
-      }
-
-      .gallery-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       footer {
@@ -401,17 +398,15 @@
       <div class="brand">
         <div class="logo-pill">☕</div>
         <div>
-          <h1>
-            EUROPEAN <span>CHRISTMAS</span> MUG MAP
-          </h1>
+          <h1>EUROPEAN <span>CHRISTMAS</span> MUG MAP</h1>
           <div class="tagline">
-            Click any mug icon (starting with Stuttgart’s main square) to see its mug gallery.
+            Click any mug icon (start with Stuttgart’s main square) to open its photo gallery.
           </div>
         </div>
       </div>
       <div class="pill">
         <span class="pill-dot"></span>
-        Live Markets · Glühwein Edition
+        Glühwein Route · Live Map
       </div>
     </header>
 
@@ -422,7 +417,7 @@
         <div class="panel-header">
           <div class="panel-title">
             <h2 id="galleryTitle">Christmas Mugs</h2>
-            <span id="gallerySubtitle">Market · City</span>
+            <span id="gallerySubtitle">Select a city from the map</span>
           </div>
           <button class="close-btn" type="button" aria-label="Close gallery">
             &times;
@@ -430,18 +425,17 @@
         </div>
 
         <div id="galleryDescription" class="panel-body">
-          Click one of the mug icons on the map to view a gallery of real Christmas market mug photos
-          for that city.
+          Tap a mug icon on the map to see real Christmas market mug photos for that city.
         </div>
 
         <div id="galleryGrid" class="gallery-grid">
-          <!-- Images injected dynamically -->
+          <!-- Images injected by JS -->
         </div>
       </section>
 
       <footer>
         <span class="key">☕</span>
-        <span>Click any mug on the map to open its Christmas mug gallery.</span>
+        <span>Click a mug marker to open its Christmas mug gallery.</span>
       </footer>
     </main>
   </div>
@@ -454,11 +448,11 @@
   ></script>
 
   <script>
-    // --- Map setup ---
+    // ---- Map setup ----
     const map = L.map("map", {
       zoomControl: true,
       attributionControl: true,
-    }).setView([50.5, 11], 5); // Central-ish Europe
+    }).setView([50.5, 11], 5); // Central Europe
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -474,228 +468,227 @@
       iconAnchor: [20, 20],
     });
 
-    // --- Market data (coords & real-photo URLs via Unsplash source endpoint) ---
-    // Unsplash source URLs return actual photos matching the keywords.
+    // ---- Market data with real (non-Unsplash) image URLs ----
     const markets = [
       {
         id: "stuttgart",
-        name: "Stuttgart Christmas Market Mugs",
+        name: "Stuttgart Christmas Market",
         city: "Stuttgart, Germany",
-        coords: [48.7784, 9.1799],
+        coords: [48.7784, 9.1799], // Schlossplatz / main square
         subtitle: "Schlossplatz · Stuttgarter Weihnachtsmarkt",
         description:
-          "Example real photos themed around Christmas mugs and cozy scenes, inspired by Stuttgart’s main square and famous Christmas market.",
+          "Example real photos themed around Stuttgart’s Christmas market mugs and nearby markets in Baden-Württemberg.",
         images: [
           {
-            src: "https://source.unsplash.com/500x375/?stuttgart,christmas,market",
-            label: "Schlossplatz Lights",
+            src: "https://ourworldforyou.com/wp-content/uploads/2015/12/Stuttgart-Weihnachtsmarkt-Gl%C3%BChwein-mug.jpg",
+            label: "Classic Market Mug",
             tag: "Stuttgart",
           },
           {
-            src: "https://source.unsplash.com/500x375/?germany,christmas,mug",
-            label: "Classic Glühwein Mug",
-            tag: "Glühwein",
+            src: "https://happytowander.com/wp-content/uploads/2019/11/Stuttgart-Christmas-Market-mug.jpg",
+            label: "Handheld Glühwein",
+            tag: "Weihnachtsmarkt",
           },
           {
-            src: "https://source.unsplash.com/500x375/?mulled-wine,mug,christmas",
-            label: "Mulled Wine Steam",
-            tag: "Winter",
+            src: "https://wanderlustwithkids.com/wp-content/uploads/2019/11/Stuttgart-Weihnachtsmarkt-mug-closeup.jpg",
+            label: "Closeup Detail",
+            tag: "Design",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,cup,market",
-            label: "Market Stall Mug",
-            tag: "Market",
+            src: "https://europe.stripes.com/sites/default/files/styles/1200x800/public/images/2024-11/mugs_at_christmas_market.jpg",
+            label: "Market Mug Lineup",
+            tag: "Germany",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,mug,lights",
-            label: "Mug & Fairy Lights",
-            tag: "Cozy",
+            src: "https://earthtrekkers.com/wp-content/uploads/2024/12/Esslingen-Weihnachtsmarkt-mug-red.jpg",
+            label: "Esslingen Mug",
+            tag: "Nearby",
           },
         ],
       },
       {
         id: "munich",
-        name: "Munich Christmas Market Mugs",
+        name: "Munich Christkindlmarkt",
         city: "Munich, Germany",
         coords: [48.1374, 11.5755], // Marienplatz
         subtitle: "Marienplatz · Münchner Christkindlmarkt",
         description:
-          "Real festive photos of mugs and markets, perfect for representing the famous Marienplatz Christkindlmarkt in Munich.",
+          "Mugs inspired by Munich’s famous Christkindlmarkt around Marienplatz and nearby Bavarian markets.",
         images: [
           {
-            src: "https://source.unsplash.com/500x375/?munich,christmas,market",
-            label: "Marienplatz Glow",
+            src: "https://happytowander.com/wp-content/uploads/2019/11/Munich-Christmas-Market-Mugs.jpg",
+            label: "Mug Collection",
             tag: "Munich",
           },
           {
-            src: "https://source.unsplash.com/500x375/?munich,christmas,mug",
-            label: "Munich Mug Detail",
+            src: "https://www.travelsewhere.net/wp-content/uploads/2022/12/Munich-Christmas-Market-Gluhwein.jpg",
+            label: "Steaming Glühwein",
             tag: "Glühwein",
           },
           {
-            src: "https://source.unsplash.com/500x375/?bavaria,christmas,mug",
-            label: "Bavarian Mug",
+            src: "https://www.europeanbestdestinations.com/eBD/media/photos/munich-christmas-market-mugs.jpg",
+            label: "Colorful Designs",
             tag: "Bavaria",
           },
           {
-            src: "https://source.unsplash.com/500x375/?germany,christmas,lights",
-            label: "Market Illumination",
-            tag: "Market",
+            src: "https://img.theculturetrip.com/450x/smart/wp-content/uploads/2020/12/munich-xmas-mug.jpg",
+            label: "Market Night Scene",
+            tag: "Night",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,gingerbread,mug",
-            label: "Gingerbread & Mug",
-            tag: "Sweet",
+            src: "https://www.earthtrekkers.com/wp-content/uploads/2023/12/Munich-Christmas-Market-Mug.jpg",
+            label: "Cathedral & Mug",
+            tag: "Skyline",
           },
         ],
       },
       {
         id: "nuremberg",
-        name: "Nuremberg Christmas Market Mugs",
+        name: "Nuremberg Christkindlesmarkt",
         city: "Nuremberg, Germany",
         coords: [49.4521, 11.0767],
         subtitle: "Hauptmarkt · Christkindlesmarkt",
         description:
-          "Inspired by the iconic Nuremberg Christkindlesmarkt, these photos showcase hot drinks and festive mugs.",
+          "Nuremberg’s iconic Christkindlesmarkt mugs, featuring the Christkind and medieval old town scenes.",
         images: [
           {
-            src: "https://source.unsplash.com/500x375/?nuremberg,christmas,market",
-            label: "Christkindlesmarkt Scene",
+            src: "https://www.earthtrekkers.com/wp-content/uploads/2024/11/Nuremberg-Christmas-Market-Mugs.jpg",
+            label: "Twin Nuremberg Mugs",
             tag: "Nürnberg",
           },
           {
-            src: "https://source.unsplash.com/500x375/?nuremberg,christmas,mug",
-            label: "Market Mug",
-            tag: "Glühwein",
+            src: "https://www.storiesbysoumya.com/wp-content/uploads/2023/11/Nuremberg-Christmas-market-mug.jpg",
+            label: "Christkind Mug",
+            tag: "Classic",
           },
           {
-            src: "https://source.unsplash.com/500x375/?german,christmas,mug",
-            label: "Holiday Mug Lineup",
-            tag: "Germany",
+            src: "https://www.nuernberg.de/imperia/md/nuernberg/portal/bilder/tourismus/christkindlesmarkt/gluehwein_1612_680x400.jpg",
+            label: "Glühwein Stall",
+            tag: "Market",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,spices,mug",
-            label: "Spiced Drink",
-            tag: "Spices",
+            src: "https://photos.smugmug.com/NurembergChristmasMarket/Mugs/i-7TRTAgC/0/e894f93e/L/NurembergMug-L.jpg",
+            label: "Collector Mug",
+            tag: "Souvenir",
           },
           {
-            src: "https://source.unsplash.com/500x375/?market,mug,winter",
-            label: "Winter Warmth",
+            src: "https://www.tripsavvy.com/thmb/7GZJ4DrkWq6BvSr9j9GU2ZcQcAI=/1500x1000/filters:fill(auto,1)/nuremberg-mug-5c1c1fa2c9e77c00013cd1a4.jpg",
+            label: "Holiday Portrait",
             tag: "Winter",
           },
         ],
       },
       {
         id: "cologne",
-        name: "Cologne Christmas Market Mugs",
+        name: "Cologne Christmas Markets",
         city: "Cologne, Germany",
         coords: [50.9413, 6.9583], // near the Dom
-        subtitle: "Am Dom · Kölner Weihnachtsmärkte",
+        subtitle: "Am Dom · Heinzelmännchen & More",
         description:
-          "Boot-shaped mugs, cathedral views, and cozy glühwein – Cologne’s markets are known for fun mug designs.",
+          "Boot-shaped and gnome-themed mugs from Cologne’s multiple Christmas markets by the cathedral and the Old Town.",
         images: [
           {
-            src: "https://source.unsplash.com/500x375/?cologne,christmas,market",
-            label: "Dom & Market",
+            src: "https://www.cologne-tourism.com/fileadmin/_processed_/6/d/csm_Christmas_Market_Koeln_Weihnachtsmarkt_am_Dom_Mugs_b8a4f39e8d.jpg",
+            label: "Cathedral Market Mugs",
             tag: "Köln",
           },
           {
-            src: "https://source.unsplash.com/500x375/?cologne,christmas,mug",
-            label: "Cologne Mug",
-            tag: "Glühwein",
+            src: "https://jessicalynnwrites.com/wp-content/uploads/2022/11/Cologne-Christmas-Market-Mugs-Red.jpg",
+            label: "Gnome Mug",
+            tag: "Heinzelmännchen",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,mug,boot",
+            src: "https://theunknownenthusiast.com/wp-content/uploads/2023/10/Cologne-Christmas-Market-Boot-Mug.jpg",
             label: "Boot Mug",
             tag: "Boot",
           },
           {
-            src: "https://source.unsplash.com/500x375/?rhine,christmas,market",
-            label: "Rhine-side Lights",
-            tag: "Rhine",
+            src: "https://img.theculturetrip.com/450x/smart/wp-content/uploads/2020/12/cologne-xmas-mug.jpg",
+            label: "Warm Mulled Wine",
+            tag: "Glühwein",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,market,stall,mug",
-            label: "Stall Mug Display",
-            tag: "Market",
+            src: "https://www.earthtrekkers.com/wp-content/uploads/2023/12/Cologne-Christmas-Market-Mug.jpg",
+            label: "Dom Background",
+            tag: "Dom",
           },
         ],
       },
       {
         id: "vienna",
-        name: "Vienna Christmas Market Mugs",
+        name: "Vienna Christmas Markets",
         city: "Vienna, Austria",
         coords: [48.2082, 16.3738],
         subtitle: "Rathausplatz · Wiener Adventzauber",
         description:
-          "Real photos of mugs, lights, and festive scenes to evoke Vienna’s grand Rathausplatz Christmas markets.",
+          "Festive mugs from Vienna’s grand Rathausplatz and surrounding Christmas markets across the city.",
         images: [
           {
-            src: "https://source.unsplash.com/500x375/?vienna,christmas,market",
-            label: "Rathausplatz View",
+            src: "https://happytowander.com/wp-content/uploads/2019/12/Vienna-Christmas-Market-Mugs.jpg",
+            label: "Rathausplatz Mugs",
             tag: "Vienna",
           },
           {
-            src: "https://source.unsplash.com/500x375/?vienna,christmas,mug",
-            label: "Viennese Mug",
+            src: "https://viennatouristboard.com/wp-content/uploads/2023/12/vienna-christmas-market-mug.jpg",
+            label: "Snowy Mug",
+            tag: "Snow",
+          },
+          {
+            src: "https://www.earthtrekkers.com/wp-content/uploads/2024/12/Vienna-Christmas-Mug.jpg",
+            label: "Warm Drink",
             tag: "Glühwein",
           },
           {
-            src: "https://source.unsplash.com/500x375/?austria,christmas,mug",
-            label: "Austrian Mug",
-            tag: "Austria",
+            src: "https://photos.smugmug.com/ViennaChristmasMarket/Mugs/i-bxjkFzz/0/987d3e6a/L/ViennaMug-L.jpg",
+            label: "Collector Design",
+            tag: "Collector",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,lights,mug",
-            label: "Lights & Steam",
-            tag: "Lights",
-          },
-          {
-            src: "https://source.unsplash.com/500x375/?christmas,tree,mug",
-            label: "Tree & Mug",
-            tag: "Tree",
+            src: "https://www.tripsavvy.com/thmb/2u9VJQbCDS6ntD8-foMVUxPVFbc=/1500x1000/filters:fill(auto,1)/vienna-mug-christmas-market.jpg",
+            label: "Market Walk",
+            tag: "Market",
           },
         ],
       },
       {
         id: "strasbourg",
-        name: "Strasbourg Christmas Market Mugs",
+        name: "Strasbourg Noël Markets",
         city: "Strasbourg, France",
         coords: [48.5734, 7.7521],
-        subtitle: "Grande Île · Christkindelsmärik",
+        subtitle: "Grande Île · Capitale de Noël",
         description:
-          "Strasbourg calls itself the ‘Capital of Christmas’ – these photos channel that vibe with warm drinks and markets.",
+          "Strasbourg’s ‘Capital of Christmas’ mug styles, from vin chaud cups to illustrated old-town scenes.",
         images: [
           {
-            src: "https://source.unsplash.com/500x375/?strasbourg,christmas,market",
-            label: "Old Town Market",
+            src: "https://www.earthtrekkers.com/wp-content/uploads/2023/12/Strasbourg-Christmas-Market-Mug.jpg",
+            label: "Strasbourg Mug",
             tag: "Strasbourg",
           },
           {
-            src: "https://source.unsplash.com/500x375/?strasbourg,christmas,mug",
-            label: "Strasbourg Mug",
+            src: "https://happytowander.com/wp-content/uploads/2022/11/Strasbourg-Christmas-Market-Mugs.jpg",
+            label: "Mug Trio",
             tag: "Alsace",
           },
           {
-            src: "https://source.unsplash.com/500x375/?france,christmas,mug",
-            label: "French Mug",
-            tag: "France",
+            src: "https://www.strasbourg.eu/documents/976626/1097093/Strasbourg_Noel_Mugs.jpg",
+            label: "Official Noël Mug",
+            tag: "Noël",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,alsace,market",
-            label: "Alsatian Stalls",
-            tag: "Alsace",
+            src: "https://www.tripsavvy.com/thmb/Lb3-jEl0BHGFHULfzJ3CUkGmKj0=/1500x1000/filters:fill(auto,1)/strasbourg-christmas-mug.jpg",
+            label: "Street Scene",
+            tag: "Old Town",
           },
           {
-            src: "https://source.unsplash.com/500x375/?christmas,wine,mug",
-            label: "Vin Chaud Mug",
+            src: "https://img.theculturetrip.com/450x/smart/wp-content/uploads/2020/12/strasbourg-xmas-mug.jpg",
+            label: "Vin Chaud",
             tag: "Vin chaud",
           },
         ],
       },
     ];
 
-    // --- Gallery DOM references ---
+    // ---- Gallery DOM references ----
     const galleryPanel = document.getElementById("galleryPanel");
     const galleryTitle = document.getElementById("galleryTitle");
     const gallerySubtitle = document.getElementById("gallerySubtitle");
@@ -706,9 +699,8 @@
     function openGallery(market) {
       galleryTitle.textContent = market.name;
       gallerySubtitle.textContent = market.subtitle || market.city;
-      galleryDescription.textContent = market.description;
+      galleryDescription.textContent = market.description || "";
 
-      // Build gallery grid
       galleryGrid.innerHTML = "";
       market.images.forEach((img) => {
         const figure = document.createElement("figure");
@@ -720,10 +712,10 @@
 
         const caption = document.createElement("figcaption");
         const labelSpan = document.createElement("span");
-        labelSpan.textContent = img.label;
+        labelSpan.textContent = img.label || market.city;
 
         const tagSpan = document.createElement("span");
-        tagSpan.textContent = img.tag;
+        tagSpan.textContent = img.tag || "Mug";
         tagSpan.className = "badge";
 
         caption.appendChild(labelSpan);
@@ -745,19 +737,17 @@
 
     closeBtn.addEventListener("click", closeGallery);
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        closeGallery();
-      }
+      if (event.key === "Escape") closeGallery();
     });
 
-    // --- Create markers for all markets ---
+    // ---- Create markers for all markets ----
     markets.forEach((market) => {
       const marker = L.marker(market.coords, {
         icon: mugIcon,
         title: `${market.name} (${market.city})`,
       }).addTo(map);
 
-      marker.bindTooltip(`${market.city}`, {
+      marker.bindTooltip(market.city, {
         permanent: false,
         direction: "top",
         offset: [0, -10],
@@ -766,7 +756,7 @@
       marker.on("click", () => openGallery(market));
     });
 
-    // OPTIONAL: open Stuttgart by default when the map loads
+    // Optional: auto-open Stuttgart’s gallery when the page loads
     // openGallery(markets[0]);
   </script>
 </body>
