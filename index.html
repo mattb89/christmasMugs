@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stuttgart Christmas Mug Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Leaflet CSS (map library) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at top left, #111827, #020617);
+      --accent: #eab308;
+      --accent-soft: rgba(234, 179, 8, 0.2);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --glass-bg: rgba(15, 23, 42, 0.85);
+      --border-subtle: rgba(148, 163, 184, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(
+        to right,
+        rgba(15, 23, 42, 0.95),
+        rgba(15, 23, 42, 0.7),
+        transparent
+      );
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: 1000;
+      position: relative;
+    }
+
+    header .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    header .logo-pill {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 0%, #facc15, #a16207);
+      box-shadow: 0 0 18px rgba(234, 179, 8, 0.5);
+      font-size: 20px;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    header h1 span {
+      color: var(--accent);
+    }
+
+    header .tagline {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #map {
+      flex: 1;
+      height: calc(100vh - 62px); /* header height approx */
+      z-index: 1;
+    }
+
+    /* Mug icon styling (Leaflet divIcon) */
+    .mug-icon {
+      font-size: 1.7rem;
+      line-height: 1;
+      text-align: center;
+      border-radius: 999px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 0%, #facc15, #a16207);
+      color: #111827;
+      box-shadow: 0 0 12px rgba(15, 23, 42, 0.9),
+        0 0 20px rgba(234, 179, 8, 0.6);
+      border: 2px solid rgba(15, 23, 42, 0.9);
+      transform: translateY(-4px);
+      cursor: pointer;
+    }
+
+    .mug-icon::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      border: 1px solid rgba(250, 250, 250, 0.15);
+      pointer-events: none;
+    }
+
+    /* Gallery panel */
+    #galleryPanel {
+      position: absolute;
+      right: 1.5rem;
+      top: 1.5rem;
+      bottom: 1.5rem;
+      width: min(420px, 90vw);
+      background: var(--glass-bg);
+      border-radius: 1.5rem;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65);
+      border: 1px solid var(--border-subtle);
+      padding: 1.5rem 1.4rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transform: translateX(120%);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.3s ease;
+      z-index: 500;
+    }
+
+    #galleryPanel.visible {
+      transform: translateX(0%);
+      opacity: 1;
+    }
+
+    #galleryPanel::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      border: 1px solid rgba(250, 250, 250, 0.08);
+      pointer-events: none;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .panel-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .panel-title h2 {
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .panel-title span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      padding: 0.15rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(234, 179, 8, 0.4);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
+    }
+
+    .panel-body {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .gallery-grid {
+      margin-top: 0.2rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.55rem;
+      flex: 1;
+      overflow: auto;
+      padding-right: 0.15rem;
+    }
+
+    .gallery-grid figure {
+      position: relative;
+      border-radius: 0.9rem;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at 30% 0%, #1f2937, #020617);
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+      isolation: isolate;
+    }
+
+    .gallery-grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease, filter 0.35s ease;
+    }
+
+    .gallery-grid figcaption {
+      position: absolute;
+      left: 0.45rem;
+      bottom: 0.35rem;
+      right: 0.45rem;
+      font-size: 0.7rem;
+      color: #e5e7eb;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .gallery-grid figure::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(15, 23, 42, 0.85),
+        transparent 55%
+      );
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+      transition: opacity 0.35s ease;
+    }
+
+    .gallery-grid figure:hover img {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    .gallery-grid figure:hover::after {
+      opacity: 0.4;
+    }
+
+    .badge {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      padding: 0.05rem 0.4rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #e5e7eb;
+      backdrop-filter: blur(6px);
+      background-color: rgba(15, 23, 42, 0.8);
+    }
+
+    .close-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 0.1rem 0.2rem;
+      border-radius: 999px;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(15, 23, 42, 0.8);
+      color: #f9fafb;
+    }
+
+    .close-btn:active {
+      transform: scale(0.96);
+    }
+
+    footer {
+      position: absolute;
+      left: 1.5rem;
+      bottom: 1.5rem;
+      z-index: 400;
+      padding: 0.6rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    footer span.key {
+      padding: 0.1rem 0.45rem;
+      border-radius: 0.4rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.8);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.65rem;
+      color: #e5e7eb;
+    }
+
+    /* Small screens */
+    @media (max-width: 800px) {
+      header {
+        padding: 0.7rem 1.1rem;
+      }
+
+      #map {
+        height: calc(100vh - 56px);
+      }
+
+      #galleryPanel {
+        right: 0.75rem;
+        left: 0.75rem;
+        top: auto;
+        bottom: 0.75rem;
+        height: min(55vh, 430px);
+        width: auto;
+        border-radius: 1.2rem;
+        padding: 1.1rem 1rem 0.9rem;
+      }
+
+      .panel-body {
+        font-size: 0.78rem;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      footer {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand">
+        <div class="logo-pill">☕</div>
+        <div>
+          <h1>
+            STUTTGART <span>CHRISTMAS</span> MUG MAP
+          </h1>
+          <div class="tagline">
+            Click the mug icon on Stuttgart to open the photo gallery.
+          </div>
+        </div>
+      </div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        Live on Map of Europe
+      </div>
+    </header>
+
+    <main>
+      <div id="map"></div>
+
+      <section id="galleryPanel" aria-hidden="true">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Stuttgart Christmas Mugs</h2>
+            <span>Main Platz · Weihnachtsmarkt Edition</span>
+          </div>
+          <button class="close-btn" type="button" aria-label="Close gallery">
+            &times;
+          </button>
+        </div>
+
+        <div class="panel-body">
+          These are example photos for the gallery that appears when you click
+          the mug icon located on Stuttgart’s main square.
+        </div>
+
+        <div class="gallery-grid">
+          <figure>
+            <img
+              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+1"
+              alt="Stuttgart Christmas market mug, design 1"
+              loading="lazy"
+            />
+            <figcaption>
+              <span>Classic Glühwein</span>
+              <span class="badge">2025</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img
+              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+2"
+              alt="Stuttgart Christmas market mug, design 2"
+              loading="lazy"
+            />
+            <figcaption>
+              <span>Schlossplatz Skyline</span>
+              <span class="badge">Limited</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img
+              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+3"
+              alt="Stuttgart Christmas market mug, design 3"
+              loading="lazy"
+            />
+            <figcaption>
+              <span>Snowy Marktplatz</span>
+              <span class="badge">Collector</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img
+              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+4"
+              alt="Stuttgart Christmas market mug, design 4"
+              loading="lazy"
+            />
+            <figcaption>
+              <span>Festive Stall Art</span>
+              <span class="badge">2024</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img
+              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+5"
+              alt="Stuttgart Christmas market mug, design 5"
+              loading="lazy"
+            />
+            <figcaption>
+              <span>Stuttgarter Riesenrad</span>
+              <span class="badge">Exclusive</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <footer>
+        <span class="key">☕</span>
+        <span>Click the mug on Stuttgart to open the Christmas mug gallery.</span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // Initialize map centered on Europe
+    const map = L.map("map", {
+      zoomControl: true,
+      attributionControl: true,
+    }).setView([51, 10], 5); // Roughly central Europe
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    // Coordinates: Stuttgart city center / main square area
+    const stuttgartCoords = [48.7784, 9.1799];
+
+    // Custom mug icon using a divIcon
+    const mugIcon = L.divIcon({
+      html: "☕",
+      className: "mug-icon",
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+    });
+
+    const mugMarker = L.marker(stuttgartCoords, {
+      icon: mugIcon,
+      title: "Stuttgart Christmas Market Mug",
+    }).addTo(map);
+
+    // Gallery panel behavior
+    const galleryPanel = document.getElementById("galleryPanel");
+    const closeBtn = galleryPanel.querySelector(".close-btn");
+
+    function openGallery() {
+      galleryPanel.classList.add("visible");
+      galleryPanel.setAttribute("aria-hidden", "false");
+    }
+
+    function closeGallery() {
+      galleryPanel.classList.remove("visible");
+      galleryPanel.setAttribute("aria-hidden", "true");
+    }
+
+    mugMarker.on("click", openGallery);
+    closeBtn.addEventListener("click", closeGallery);
+
+    // Optional: close gallery on ESC key
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeGallery();
+      }
+    });
+  </script>
+</body>
+</html>
