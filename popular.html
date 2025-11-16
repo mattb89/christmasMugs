@@ -33,7 +33,8 @@
         </div>
         <h2 style="margin-top:0.2rem; font-size:1.2rem;">Most Popular Mugs</h2>
         <p style="margin-top:0.4rem; font-size:0.85rem; color:var(--text-muted);">
-          Demo ordering based on a mocked like count. Clicking any mug opens the lightbox.
+          Sorted by total likes (mocked base count + your likes on this device).
+          Click a mug to open the lightbox, or tap the heart to add your like.
         </p>
 
         <div class="gallery-grid" id="popularGallery"></div>
@@ -70,24 +71,48 @@
 
   const galleryEl = document.getElementById("popularGallery");
 
-  // Sort by likes desc for demo
-  const sortedPopular = [...popularMugs].sort((a, b) => b.likes - a.likes);
+  function buildPopularPhotos() {
+    const list = [];
+    markets.forEach((m) => {
+      m.photos.forEach((p) => {
+        const totalLikes = getTotalLikes(p.id);
+        list.push({
+          ...p,
+          totalLikes,
+          city: m.city,
+          marketName: m.name,
+        });
+      });
+    });
+    // Sort by likes desc, then newest year first
+    list.sort((a, b) => {
+      if (b.totalLikes !== a.totalLikes) return b.totalLikes - a.totalLikes;
+      return (b.year || 0) - (a.year || 0);
+    });
+    return list;
+  }
 
-  // Map to photo objects compatible with renderGallery
-  const photos = sortedPopular.map((m) => ({
-    id: m.id,
-    src: m.src,
-    label: m.label,
-    tag: `${m.likes} likes`,
-    year: m.year,
-    city: m.location,
-    marketName: m.market,
-  }));
+  function renderPopular() {
+    const raw = buildPopularPhotos();
 
-  renderGallery(galleryEl, photos, {
-    city: "Various",
-    marketName: "Most Popular",
-  });
+    const photosForGallery = raw.map((p) => ({
+      id: p.id,
+      src: p.src,
+      label: p.label,
+      tag: `${p.totalLikes} likes`,
+      year: p.year,
+      city: p.city,
+      marketName: p.marketName,
+    }));
+
+    renderGallery(galleryEl, photosForGallery, {
+      city: "Various",
+      marketName: "Most Popular",
+      onLikesChanged: renderPopular,
+    });
+  }
+
+  renderPopular();
 </script>
 </body>
 </html>
