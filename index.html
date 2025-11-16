@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Stuttgart Christmas Mug Map</title>
+  <title>European Christmas Mug Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Leaflet CSS (map library) -->
@@ -128,6 +128,7 @@
       border: 2px solid rgba(15, 23, 42, 0.9);
       transform: translateY(-4px);
       cursor: pointer;
+      position: relative;
     }
 
     .mug-icon::after {
@@ -401,16 +402,16 @@
         <div class="logo-pill">☕</div>
         <div>
           <h1>
-            STUTTGART <span>CHRISTMAS</span> MUG MAP
+            EUROPEAN <span>CHRISTMAS</span> MUG MAP
           </h1>
           <div class="tagline">
-            Click the mug icon on Stuttgart to open the photo gallery.
+            Click any mug icon (starting with Stuttgart’s main square) to see its mug gallery.
           </div>
         </div>
       </div>
       <div class="pill">
         <span class="pill-dot"></span>
-        Live on Map of Europe
+        Live Markets · Glühwein Edition
       </div>
     </header>
 
@@ -420,85 +421,27 @@
       <section id="galleryPanel" aria-hidden="true">
         <div class="panel-header">
           <div class="panel-title">
-            <h2>Stuttgart Christmas Mugs</h2>
-            <span>Main Platz · Weihnachtsmarkt Edition</span>
+            <h2 id="galleryTitle">Christmas Mugs</h2>
+            <span id="gallerySubtitle">Market · City</span>
           </div>
           <button class="close-btn" type="button" aria-label="Close gallery">
             &times;
           </button>
         </div>
 
-        <div class="panel-body">
-          These are example photos for the gallery that appears when you click
-          the mug icon located on Stuttgart’s main square.
+        <div id="galleryDescription" class="panel-body">
+          Click one of the mug icons on the map to view a gallery of real Christmas market mug photos
+          for that city.
         </div>
 
-        <div class="gallery-grid">
-          <figure>
-            <img
-              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+1"
-              alt="Stuttgart Christmas market mug, design 1"
-              loading="lazy"
-            />
-            <figcaption>
-              <span>Classic Glühwein</span>
-              <span class="badge">2025</span>
-            </figcaption>
-          </figure>
-
-          <figure>
-            <img
-              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+2"
-              alt="Stuttgart Christmas market mug, design 2"
-              loading="lazy"
-            />
-            <figcaption>
-              <span>Schlossplatz Skyline</span>
-              <span class="badge">Limited</span>
-            </figcaption>
-          </figure>
-
-          <figure>
-            <img
-              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+3"
-              alt="Stuttgart Christmas market mug, design 3"
-              loading="lazy"
-            />
-            <figcaption>
-              <span>Snowy Marktplatz</span>
-              <span class="badge">Collector</span>
-            </figcaption>
-          </figure>
-
-          <figure>
-            <img
-              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+4"
-              alt="Stuttgart Christmas market mug, design 4"
-              loading="lazy"
-            />
-            <figcaption>
-              <span>Festive Stall Art</span>
-              <span class="badge">2024</span>
-            </figcaption>
-          </figure>
-
-          <figure>
-            <img
-              src="https://via.placeholder.com/500x375?text=Stuttgart+Mug+5"
-              alt="Stuttgart Christmas market mug, design 5"
-              loading="lazy"
-            />
-            <figcaption>
-              <span>Stuttgarter Riesenrad</span>
-              <span class="badge">Exclusive</span>
-            </figcaption>
-          </figure>
+        <div id="galleryGrid" class="gallery-grid">
+          <!-- Images injected dynamically -->
         </div>
       </section>
 
       <footer>
         <span class="key">☕</span>
-        <span>Click the mug on Stuttgart to open the Christmas mug gallery.</span>
+        <span>Click any mug on the map to open its Christmas mug gallery.</span>
       </footer>
     </main>
   </div>
@@ -511,11 +454,11 @@
   ></script>
 
   <script>
-    // Initialize map centered on Europe
+    // --- Map setup ---
     const map = L.map("map", {
       zoomControl: true,
       attributionControl: true,
-    }).setView([51, 10], 5); // Roughly central Europe
+    }).setView([50.5, 11], 5); // Central-ish Europe
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -523,10 +466,7 @@
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
 
-    // Coordinates: Stuttgart city center / main square area
-    const stuttgartCoords = [48.7784, 9.1799];
-
-    // Custom mug icon using a divIcon
+    // Reusable mug icon
     const mugIcon = L.divIcon({
       html: "☕",
       className: "mug-icon",
@@ -534,16 +474,266 @@
       iconAnchor: [20, 20],
     });
 
-    const mugMarker = L.marker(stuttgartCoords, {
-      icon: mugIcon,
-      title: "Stuttgart Christmas Market Mug",
-    }).addTo(map);
+    // --- Market data (coords & real-photo URLs via Unsplash source endpoint) ---
+    // Unsplash source URLs return actual photos matching the keywords.
+    const markets = [
+      {
+        id: "stuttgart",
+        name: "Stuttgart Christmas Market Mugs",
+        city: "Stuttgart, Germany",
+        coords: [48.7784, 9.1799],
+        subtitle: "Schlossplatz · Stuttgarter Weihnachtsmarkt",
+        description:
+          "Example real photos themed around Christmas mugs and cozy scenes, inspired by Stuttgart’s main square and famous Christmas market.",
+        images: [
+          {
+            src: "https://source.unsplash.com/500x375/?stuttgart,christmas,market",
+            label: "Schlossplatz Lights",
+            tag: "Stuttgart",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?germany,christmas,mug",
+            label: "Classic Glühwein Mug",
+            tag: "Glühwein",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?mulled-wine,mug,christmas",
+            label: "Mulled Wine Steam",
+            tag: "Winter",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,cup,market",
+            label: "Market Stall Mug",
+            tag: "Market",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,mug,lights",
+            label: "Mug & Fairy Lights",
+            tag: "Cozy",
+          },
+        ],
+      },
+      {
+        id: "munich",
+        name: "Munich Christmas Market Mugs",
+        city: "Munich, Germany",
+        coords: [48.1374, 11.5755], // Marienplatz
+        subtitle: "Marienplatz · Münchner Christkindlmarkt",
+        description:
+          "Real festive photos of mugs and markets, perfect for representing the famous Marienplatz Christkindlmarkt in Munich.",
+        images: [
+          {
+            src: "https://source.unsplash.com/500x375/?munich,christmas,market",
+            label: "Marienplatz Glow",
+            tag: "Munich",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?munich,christmas,mug",
+            label: "Munich Mug Detail",
+            tag: "Glühwein",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?bavaria,christmas,mug",
+            label: "Bavarian Mug",
+            tag: "Bavaria",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?germany,christmas,lights",
+            label: "Market Illumination",
+            tag: "Market",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,gingerbread,mug",
+            label: "Gingerbread & Mug",
+            tag: "Sweet",
+          },
+        ],
+      },
+      {
+        id: "nuremberg",
+        name: "Nuremberg Christmas Market Mugs",
+        city: "Nuremberg, Germany",
+        coords: [49.4521, 11.0767],
+        subtitle: "Hauptmarkt · Christkindlesmarkt",
+        description:
+          "Inspired by the iconic Nuremberg Christkindlesmarkt, these photos showcase hot drinks and festive mugs.",
+        images: [
+          {
+            src: "https://source.unsplash.com/500x375/?nuremberg,christmas,market",
+            label: "Christkindlesmarkt Scene",
+            tag: "Nürnberg",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?nuremberg,christmas,mug",
+            label: "Market Mug",
+            tag: "Glühwein",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?german,christmas,mug",
+            label: "Holiday Mug Lineup",
+            tag: "Germany",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,spices,mug",
+            label: "Spiced Drink",
+            tag: "Spices",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?market,mug,winter",
+            label: "Winter Warmth",
+            tag: "Winter",
+          },
+        ],
+      },
+      {
+        id: "cologne",
+        name: "Cologne Christmas Market Mugs",
+        city: "Cologne, Germany",
+        coords: [50.9413, 6.9583], // near the Dom
+        subtitle: "Am Dom · Kölner Weihnachtsmärkte",
+        description:
+          "Boot-shaped mugs, cathedral views, and cozy glühwein – Cologne’s markets are known for fun mug designs.",
+        images: [
+          {
+            src: "https://source.unsplash.com/500x375/?cologne,christmas,market",
+            label: "Dom & Market",
+            tag: "Köln",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?cologne,christmas,mug",
+            label: "Cologne Mug",
+            tag: "Glühwein",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,mug,boot",
+            label: "Boot Mug",
+            tag: "Boot",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?rhine,christmas,market",
+            label: "Rhine-side Lights",
+            tag: "Rhine",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,market,stall,mug",
+            label: "Stall Mug Display",
+            tag: "Market",
+          },
+        ],
+      },
+      {
+        id: "vienna",
+        name: "Vienna Christmas Market Mugs",
+        city: "Vienna, Austria",
+        coords: [48.2082, 16.3738],
+        subtitle: "Rathausplatz · Wiener Adventzauber",
+        description:
+          "Real photos of mugs, lights, and festive scenes to evoke Vienna’s grand Rathausplatz Christmas markets.",
+        images: [
+          {
+            src: "https://source.unsplash.com/500x375/?vienna,christmas,market",
+            label: "Rathausplatz View",
+            tag: "Vienna",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?vienna,christmas,mug",
+            label: "Viennese Mug",
+            tag: "Glühwein",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?austria,christmas,mug",
+            label: "Austrian Mug",
+            tag: "Austria",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,lights,mug",
+            label: "Lights & Steam",
+            tag: "Lights",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,tree,mug",
+            label: "Tree & Mug",
+            tag: "Tree",
+          },
+        ],
+      },
+      {
+        id: "strasbourg",
+        name: "Strasbourg Christmas Market Mugs",
+        city: "Strasbourg, France",
+        coords: [48.5734, 7.7521],
+        subtitle: "Grande Île · Christkindelsmärik",
+        description:
+          "Strasbourg calls itself the ‘Capital of Christmas’ – these photos channel that vibe with warm drinks and markets.",
+        images: [
+          {
+            src: "https://source.unsplash.com/500x375/?strasbourg,christmas,market",
+            label: "Old Town Market",
+            tag: "Strasbourg",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?strasbourg,christmas,mug",
+            label: "Strasbourg Mug",
+            tag: "Alsace",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?france,christmas,mug",
+            label: "French Mug",
+            tag: "France",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,alsace,market",
+            label: "Alsatian Stalls",
+            tag: "Alsace",
+          },
+          {
+            src: "https://source.unsplash.com/500x375/?christmas,wine,mug",
+            label: "Vin Chaud Mug",
+            tag: "Vin chaud",
+          },
+        ],
+      },
+    ];
 
-    // Gallery panel behavior
+    // --- Gallery DOM references ---
     const galleryPanel = document.getElementById("galleryPanel");
+    const galleryTitle = document.getElementById("galleryTitle");
+    const gallerySubtitle = document.getElementById("gallerySubtitle");
+    const galleryDescription = document.getElementById("galleryDescription");
+    const galleryGrid = document.getElementById("galleryGrid");
     const closeBtn = galleryPanel.querySelector(".close-btn");
 
-    function openGallery() {
+    function openGallery(market) {
+      galleryTitle.textContent = market.name;
+      gallerySubtitle.textContent = market.subtitle || market.city;
+      galleryDescription.textContent = market.description;
+
+      // Build gallery grid
+      galleryGrid.innerHTML = "";
+      market.images.forEach((img) => {
+        const figure = document.createElement("figure");
+
+        const imageEl = document.createElement("img");
+        imageEl.src = img.src;
+        imageEl.alt = img.label || `${market.city} Christmas mug`;
+        imageEl.loading = "lazy";
+
+        const caption = document.createElement("figcaption");
+        const labelSpan = document.createElement("span");
+        labelSpan.textContent = img.label;
+
+        const tagSpan = document.createElement("span");
+        tagSpan.textContent = img.tag;
+        tagSpan.className = "badge";
+
+        caption.appendChild(labelSpan);
+        caption.appendChild(tagSpan);
+
+        figure.appendChild(imageEl);
+        figure.appendChild(caption);
+        galleryGrid.appendChild(figure);
+      });
+
       galleryPanel.classList.add("visible");
       galleryPanel.setAttribute("aria-hidden", "false");
     }
@@ -553,15 +743,31 @@
       galleryPanel.setAttribute("aria-hidden", "true");
     }
 
-    mugMarker.on("click", openGallery);
     closeBtn.addEventListener("click", closeGallery);
-
-    // Optional: close gallery on ESC key
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeGallery();
       }
     });
+
+    // --- Create markers for all markets ---
+    markets.forEach((market) => {
+      const marker = L.marker(market.coords, {
+        icon: mugIcon,
+        title: `${market.name} (${market.city})`,
+      }).addTo(map);
+
+      marker.bindTooltip(`${market.city}`, {
+        permanent: false,
+        direction: "top",
+        offset: [0, -10],
+      });
+
+      marker.on("click", () => openGallery(market));
+    });
+
+    // OPTIONAL: open Stuttgart by default when the map loads
+    // openGallery(markets[0]);
   </script>
 </body>
 </html>
