@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Map – Current Year</title>
+  <title>Mug Map – Previous Years</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link
     rel="stylesheet"
@@ -17,12 +17,12 @@
       <div class="logo-pill">☕</div>
       <div>
         <h1>EUROPEAN <span>MUG MAP</span></h1>
-        <div class="tagline">Current year mugs · click a mug icon to view photos.</div>
+        <div class="tagline">Browse mugs from previous years.</div>
       </div>
     </div>
     <nav class="nav-links">
-      <a href="index.html" class="active">Current Year</a>
-      <a href="previous.html">Previous Years</a>
+      <a href="index.html">Current Year</a>
+      <a href="previous.html" class="active">Previous Years</a>
       <a href="popular.html">Popular Mugs</a>
       <a href="leaderboard.html">Leaderboard</a>
       <a href="upload.html">Upload Mug</a>
@@ -34,10 +34,10 @@
 
     <div class="footer-hint">
       <span class="key">☕</span>
-      <span>Click a mug marker to open the gallery.</span>
+      <span>Select a year, then click a mug marker.</span>
     </div>
 
-    <!-- Shared lightbox -->
+    <!-- Lightbox -->
     <div class="lightbox" id="lightbox">
       <div class="lightbox-controls">
         <button class="lightbox-btn lightbox-prev" type="button">&#10094;</button>
@@ -55,14 +55,13 @@
           <div class="lightbox-subtitle" id="lightbox-subtitle"></div>
           <div class="lightbox-chips" id="lightbox-chips"></div>
           <p style="margin-top:0.5rem;">
-            Use the arrow buttons or your keyboard (← →) to browse through all mugs
-            for this location.
+            Use ← → or the arrow buttons to browse mugs from that year.
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Right-side gallery panel -->
+    <!-- Right panel -->
     <section id="galleryPanel" class="card" style="
       position:absolute;
       right:1.4rem;
@@ -74,14 +73,25 @@
       gap:0.7rem;
       z-index:500;">
       <div>
-        <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent);">
-          Current Year Gallery
-        </div>
-        <h2 id="panelTitle" style="font-size:1rem; margin-top:0.15rem;">
-          Select a city on the map
-        </h2>
-        <div id="panelSubtitle" style="font-size:0.8rem; color:var(--text-muted);">
-          When you click a mug icon, mugs from this year will show up here.
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+          <div>
+            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent);">
+              Previous Years Gallery
+            </div>
+            <h2 id="panelTitle" style="font-size:1rem; margin-top:0.15rem;">
+              Choose a year
+            </h2>
+            <div id="panelSubtitle" style="font-size:0.8rem; color:var(--text-muted);">
+              Select a year, then click a city on the map.
+            </div>
+          </div>
+          <div>
+            <label for="yearSelect" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">
+              Year
+            </label>
+            <select id="yearSelect" style="margin-top:0.2rem; background:var(--bg-soft); color:var(--text-main); border-radius:999px; border:1px solid var(--border-subtle); padding:0.2rem 0.6rem; font-size:0.78rem;">
+            </select>
+          </div>
         </div>
       </div>
       <div id="panelGallery" class="gallery-grid"></div>
@@ -93,9 +103,7 @@
 <script src="data.js"></script>
 <script src="gallery.js"></script>
 <script>
-  // Initialize map
   const map = L.map("map").setView([50.5, 11], 5);
-
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
   }).addTo(map);
@@ -110,15 +118,32 @@
   const panelTitle = document.getElementById("panelTitle");
   const panelSubtitle = document.getElementById("panelSubtitle");
   const panelGallery = document.getElementById("panelGallery");
+  const yearSelect = document.getElementById("yearSelect");
 
   setupLightbox();
 
-  function showMarketGallery(market) {
-    const photos = market.photos.filter(p => p.year === CURRENT_YEAR);
-    panelTitle.textContent = market.name;
+  const years = getAvailableYears().filter((y) => y !== CURRENT_YEAR);
+  years.forEach((year) => {
+    const opt = document.createElement("option");
+    opt.value = year;
+    opt.textContent = year;
+    yearSelect.appendChild(opt);
+  });
+
+  if (years.length) {
+    yearSelect.value = years[0];
+  }
+
+  function getSelectedYear() {
+    return parseInt(yearSelect.value, 10);
+  }
+
+  function showMarketGallery(market, year) {
+    const photos = market.photos.filter((p) => p.year === year);
+    panelTitle.textContent = `${market.name}`;
     panelSubtitle.textContent = photos.length
-      ? `${market.city} · ${CURRENT_YEAR}`
-      : `No mugs uploaded for ${CURRENT_YEAR} yet.`;
+      ? `${market.city} · ${year}`
+      : `No mugs uploaded for ${year} at this market yet.`;
 
     if (!photos.length) {
       panelGallery.innerHTML = "";
@@ -134,7 +159,16 @@
   markets.forEach((market) => {
     const marker = L.marker(market.coords, { icon: mugIcon }).addTo(map);
     marker.bindTooltip(market.city, { direction: "top", offset: [0, -10] });
-    marker.on("click", () => showMarketGallery(market));
+    marker.on("click", () => {
+      const year = getSelectedYear();
+      showMarketGallery(market, year);
+    });
+  });
+
+  yearSelect.addEventListener("change", () => {
+    panelTitle.textContent = "Choose a city on the map";
+    panelSubtitle.textContent = `Year: ${yearSelect.value}`;
+    panelGallery.innerHTML = "";
   });
 </script>
 </body>

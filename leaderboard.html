@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mug Map – Leaderboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="brand">
+      <div class="logo-pill">☕</div>
+      <div>
+        <h1>EUROPEAN <span>MUG MAP</span></h1>
+        <div class="tagline">Top contributors across all years.</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Current Year</a>
+      <a href="previous.html">Previous Years</a>
+      <a href="popular.html">Popular Mugs</a>
+      <a href="leaderboard.html" class="active">Leaderboard</a>
+      <a href="upload.html">Upload Mug</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="main-container">
+      <div class="card">
+        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent);">
+          Community Leaderboard
+        </div>
+        <h2 style="margin-top:0.2rem; font-size:1.2rem;">Top Mug Hunters</h2>
+        <p style="margin-top:0.4rem; font-size:0.85rem; color:var(--text-muted);">
+          Demo data only – in a real setup this would be calculated from actual uploads & likes.
+        </p>
+
+        <div class="table-like" id="leaderboardTable">
+          <div class="table-like-header">
+            <div>User</div>
+            <div style="text-align:right;">Mugs</div>
+            <div style="text-align:right;">Likes</div>
+          </div>
+          <!-- rows inserted by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Lightbox markup included for consistency; unused here but harmless -->
+    <div class="lightbox" id="lightbox">
+      <div class="lightbox-controls">
+        <button class="lightbox-btn lightbox-prev" type="button">&#10094;</button>
+        <button class="lightbox-btn lightbox-next" type="button">&#10095;</button>
+        <button class="lightbox-btn lightbox-close" type="button">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="lightbox-inner">
+        <div class="lightbox-img-wrapper">
+          <img id="lightbox-image" src="" alt="Mug photo" />
+        </div>
+        <div class="lightbox-meta">
+          <div class="lightbox-title" id="lightbox-title"></div>
+          <div class="lightbox-subtitle" id="lightbox-subtitle"></div>
+          <div class="lightbox-chips" id="lightbox-chips"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="gallery.js"></script>
+<script>
+  setupLightbox(); // does nothing visible here, but safe
+
+  const table = document.getElementById("leaderboardTable");
+
+  // Sort demo users by likes desc, then mugs desc
+  const sortedUsers = [...users].sort((a, b) => {
+    if (b.totalLikes !== a.totalLikes) return b.totalLikes - a.totalLikes;
+    return b.mugsUploaded - a.mugsUploaded;
+  });
+
+  sortedUsers.forEach((u) => {
+    const row = document.createElement("div");
+    row.className = "table-like-row";
+    row.innerHTML = `
+      <div>${u.name}</div>
+      <div style="text-align:right;">${u.mugsUploaded}</div>
+      <div style="text-align:right;">${u.totalLikes}</div>
+    `;
+    table.appendChild(row);
+  });
+</script>
+</body>
+</html>

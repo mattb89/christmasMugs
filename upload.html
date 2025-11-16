@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mug Map – Upload Mug</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="brand">
+      <div class="logo-pill">☕</div>
+      <div>
+        <h1>EUROPEAN <span>MUG MAP</span></h1>
+        <div class="tagline">Submit your mug photos to the map (demo UI only).</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Current Year</a>
+      <a href="previous.html">Previous Years</a>
+      <a href="popular.html">Popular Mugs</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="upload.html" class="active">Upload Mug</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="main-container">
+      <div class="card">
+        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent);">
+          Upload Mug Photo
+        </div>
+        <h2 style="margin-top:0.2rem; font-size:1.2rem;">Share Your Mug</h2>
+        <p style="margin-top:0.4rem; font-size:0.85rem; color:var(--text-muted);">
+          This is a front-end mock. In a real app this would send to your backend, store
+          the image, and create a mug record for moderation.
+        </p>
+
+        <form style="margin-top:1rem; display:flex; flex-direction:column; gap:0.7rem;">
+          <div>
+            <label style="font-size:0.8rem;">Your name</label>
+            <input type="text" placeholder="e.g. Matt"
+              style="width:100%; margin-top:0.2rem; padding:0.4rem 0.6rem; border-radius:0.6rem; border:1px solid var(--border-subtle); background:var(--bg-soft); color:var(--text-main);" />
+          </div>
+
+          <div>
+            <label style="font-size:0.8rem;">Location / Market</label>
+            <select
+              style="width:100%; margin-top:0.2rem; padding:0.4rem 0.6rem; border-radius:0.6rem; border:1px solid var(--border-subtle); background:var(--bg-soft); color:var(--text-main);">
+              <option value="">Select a market</option>
+              <option value="stuttgart">Stuttgart Christmas Market</option>
+              <option value="munich">Munich Christkindlmarkt</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:0.8rem;">Year of this mug</label>
+            <input type="number" min="2010" max="2100" value="2025"
+              style="width:100%; margin-top:0.2rem; padding:0.4rem 0.6rem; border-radius:0.6rem; border:1px solid var(--border-subtle); background:var(--bg-soft); color:var(--text-main);" />
+          </div>
+
+          <div>
+            <label style="font-size:0.8rem;">Photo file</label>
+            <input type="file" accept="image/*"
+              style="width:100%; margin-top:0.2rem; padding:0.3rem 0.4rem; border-radius:0.6rem; border:1px solid var(--border-subtle); background:var(--bg-soft); color:var(--text-main);" />
+          </div>
+
+          <div>
+            <label style="font-size:0.8rem;">Caption (optional)</label>
+            <textarea rows="3"
+              style="width:100%; margin-top:0.2rem; padding:0.4rem 0.6rem; border-radius:0.6rem; border:1px solid var(--border-subtle); background:var(--bg-soft); color:var(--text-main);"></textarea>
+          </div>
+
+          <label style="font-size:0.8rem;">
+            <input type="checkbox" style="margin-right:0.4rem;" />
+            I give permission for this photo to be displayed on the site.
+          </label>
+
+          <button type="button"
+            style="margin-top:0.4rem; align-self:flex-start; padding:0.45rem 0.9rem; border-radius:999px; border:1px solid rgba(234,179,8,0.8); background:var(--accent-soft); color:var(--accent); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.12em; cursor:pointer;">
+            Submit (demo only)
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lightbox for consistency -->
+    <div class="lightbox" id="lightbox">
+      <div class="lightbox-controls">
+        <button class="lightbox-btn lightbox-prev" type="button">&#10094;</button>
+        <button class="lightbox-btn lightbox-next" type="button">&#10095;</button>
+        <button class="lightbox-btn lightbox-close" type="button">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="lightbox-inner">
+        <div class="lightbox-img-wrapper">
+          <img id="lightbox-image" src="" alt="Mug photo" />
+        </div>
+        <div class="lightbox-meta">
+          <div class="lightbox-title" id="lightbox-title"></div>
+          <div class="lightbox-subtitle" id="lightbox-subtitle"></div>
+          <div class="lightbox-chips" id="lightbox-chips"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="gallery.js"></script>
+<script>
+  setupLightbox();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mug Map – Popular Mugs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="brand">
+      <div class="logo-pill">☕</div>
+      <div>
+        <h1>EUROPEAN <span>MUG MAP</span></h1>
+        <div class="tagline">Most-liked mugs across all markets.</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Current Year</a>
+      <a href="previous.html">Previous Years</a>
+      <a href="popular.html" class="active">Popular Mugs</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="upload.html">Upload Mug</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="main-container">
+      <div class="card">
+        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent);">
+          Top Mugs
+        </div>
+        <h2 style="margin-top:0.2rem; font-size:1.2rem;">Most Popular Mugs</h2>
+        <p style="margin-top:0.4rem; font-size:0.85rem; color:var(--text-muted);">
+          Demo ordering based on a mocked like count. Clicking any mug opens the lightbox.
+        </p>
+
+        <div class="gallery-grid" id="popularGallery"></div>
+      </div>
+    </div>
+
+    <!-- Shared lightbox -->
+    <div class="lightbox" id="lightbox">
+      <div class="lightbox-controls">
+        <button class="lightbox-btn lightbox-prev" type="button">&#10094;</button>
+        <button class="lightbox-btn lightbox-next" type="button">&#10095;</button>
+        <button class="lightbox-btn lightbox-close" type="button">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="lightbox-inner">
+        <div class="lightbox-img-wrapper">
+          <img id="lightbox-image" src="" alt="Mug photo" />
+        </div>
+        <div class="lightbox-meta">
+          <div class="lightbox-title" id="lightbox-title"></div>
+          <div class="lightbox-subtitle" id="lightbox-subtitle"></div>
+          <div class="lightbox-chips" id="lightbox-chips"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="gallery.js"></script>
+<script>
+  setupLightbox();
+
+  const galleryEl = document.getElementById("popularGallery");
+
+  // Sort by likes desc for demo
+  const sortedPopular = [...popularMugs].sort((a, b) => b.likes - a.likes);
+
+  // Map to photo objects compatible with renderGallery
+  const photos = sortedPopular.map((m) => ({
+    id: m.id,
+    src: m.src,
+    label: m.label,
+    tag: `${m.likes} likes`,
+    year: m.year,
+    city: m.location,
+    marketName: m.market,
+  }));
+
+  renderGallery(galleryEl, photos, {
+    city: "Various",
+    marketName: "Most Popular",
+  });
+</script>
+</body>
+</html>
