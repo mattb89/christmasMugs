@@ -2,13 +2,280 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Map – Current Year</title>
+  <title>Mug Map – European Christmas Mugs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Leaflet CSS -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
   />
-  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.2fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+    @media (max-width: 900px) {
+      .map-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .map-card {
+      position: relative;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #020617 100%);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1rem 0.4rem 1rem;
+      z-index: 2;
+    }
+    .map-header h2 {
+      font-size: 1rem;
+      margin: 0;
+    }
+    .map-header .sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    #map {
+      flex: 1;
+      margin: 0.4rem 0.75rem 0.8rem 0.75rem;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      min-height: 340px;
+    }
+
+    /* Leaflet overrides to keep rounded corners */
+    .leaflet-container {
+      background: #020617;
+    }
+    .leaflet-control-attribution {
+      font-size: 0.65rem !important;
+    }
+
+    /* Custom mug marker */
+    .mug-marker {
+      background: radial-gradient(circle at 30% 0%, #facc15, #b45309);
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(251,191,36,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 1px rgba(15,23,42,0.9), 0 10px 20px rgba(15,23,42,0.8);
+      color: #111827;
+      font-size: 15px;
+    }
+    .mug-marker span {
+      transform: translateY(1px);
+    }
+
+    .map-empty-overlay {
+      position: absolute;
+      inset: 2.8rem 1.1rem 1.1rem 1.1rem;
+      border-radius: 1rem;
+      border: 1px dashed rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      z-index: 5;
+    }
+    .map-empty-inner {
+      max-width: 280px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .panel-card {
+      border-radius: 1.25rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 0.9rem 1rem 1rem;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9) 0, #020617 55%);
+      display: flex;
+      flex-direction: column;
+      min-height: 260px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .panel-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .selected-meta {
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .selected-meta strong {
+      color: var(--text-main);
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.4rem;
+    }
+    .chip-pill {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.8);
+      color: var(--text-muted);
+    }
+
+    .gallery-grid {
+      margin-top: 0.8rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 0.4rem;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .gallery-item {
+      position: relative;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid rgba(30,64,175,0.6);
+      cursor: pointer;
+      background: #020617;
+    }
+    .gallery-item img {
+      display: block;
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      transition: transform 0.18s ease-out;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.03);
+    }
+    .gallery-item-meta {
+      position: absolute;
+      left: 0.35rem;
+      bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.7rem;
+      color: #facc15;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+    .gallery-item-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+    }
+
+    /* Lightbox (similar to previous pages) */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .lightbox.open {
+      display: flex;
+    }
+    .lightbox-inner {
+      max-width: 900px;
+      width: 100%;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+    @media (max-width: 800px) {
+      .lightbox-inner {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .lightbox-img-wrapper {
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: #020617;
+    }
+    .lightbox-img-wrapper img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: 460px;
+      object-fit: contain;
+      background: radial-gradient(circle at top, #020617, #020617);
+    }
+    .lightbox-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .lightbox-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .lightbox-subtitle {
+      font-size: 0.85rem;
+    }
+    .lightbox-controls {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.8rem;
+      display: flex;
+      gap: 0.4rem;
+    }
+    .lightbox-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+    }
+    .lightbox-btn span {
+      font-size: 1rem;
+      line-height: 1;
+    }
+  </style>
 </head>
 <body>
 <div class="page">
@@ -16,8 +283,8 @@
     <div class="brand">
       <div class="logo-pill">☕</div>
       <div>
-        <h1>EUROPEAN <span>MUG MAP v1</span></h1>
-        <div class="tagline">Current year mugs · click a mug icon to view photos.</div>
+        <h1>EUROPEAN <span>MUG MAP</span></h1>
+        <div class="tagline">Discover and log Christmas market mugs across Europe.</div>
       </div>
     </div>
     <nav class="nav-links">
@@ -30,112 +297,319 @@
   </header>
 
   <main>
-    <div id="map"></div>
+    <div class="main-container map-layout">
+      <!-- MAP CARD -->
+      <section class="map-card">
+        <div class="map-header">
+          <div>
+            <h2>Map of Mugs</h2>
+            <div class="sub">Only markets with approved photos show a mug icon.</div>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">
+            <span id="markerCount">Loading...</span>
+          </div>
+        </div>
+        <div id="map"></div>
+        <div class="map-empty-overlay" id="mapEmptyOverlay" style="display:none;">
+          <div class="map-empty-inner">
+            <strong>No mugs yet.</strong><br/>
+            Once people upload photos and they’re approved, you’ll see mug icons appear on the map for those markets.
+          </div>
+        </div>
+      </section>
 
-    <div class="footer-hint">
-      <span class="key">☕</span>
-      <span>Click a mug marker to open the gallery.</span>
+      <!-- SIDE PANEL / GALLERY -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title" id="panelTitle">Select a mug on the map</div>
+            <div class="panel-sub" id="panelSubtitle">
+              Click any mug icon to view photos from that market.
+            </div>
+          </div>
+        </div>
+
+        <div class="selected-meta" id="selectedMeta" style="display:none;">
+          <div><strong>Location:</strong> <span id="metaLocation"></span></div>
+          <div><strong>Photos:</strong> <span id="metaPhotoCount">0</span> approved mug(s)</div>
+          <div class="chip-row">
+            <span class="chip-pill" id="metaCountryChip"></span>
+            <span class="chip-pill" id="metaCityChip"></span>
+          </div>
+        </div>
+
+        <div id="galleryEmpty" style="margin-top:0.9rem; font-size:0.82rem; color:var(--text-muted);">
+          No market selected yet. Choose a mug icon on the map to see its gallery.
+        </div>
+
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </section>
     </div>
 
-    <!-- Shared lightbox -->
+    <!-- Lightbox -->
     <div class="lightbox" id="lightbox">
       <div class="lightbox-controls">
-        <button class="lightbox-btn lightbox-prev" type="button">&#10094;</button>
-        <button class="lightbox-btn lightbox-next" type="button">&#10095;</button>
-        <button class="lightbox-btn lightbox-close" type="button">
-          <span>&times;</span>
-        </button>
+        <button class="lightbox-btn" id="lightboxPrev">&#10094;</button>
+        <button class="lightbox-btn" id="lightboxNext">&#10095;</button>
+        <button class="lightbox-btn" id="lightboxClose"><span>&times;</span></button>
       </div>
       <div class="lightbox-inner">
         <div class="lightbox-img-wrapper">
-          <img id="lightbox-image" src="" alt="Mug photo" />
+          <img id="lightboxImage" src="" alt="Mug photo" />
         </div>
         <div class="lightbox-meta">
-          <div class="lightbox-title" id="lightbox-title"></div>
-          <div class="lightbox-subtitle" id="lightbox-subtitle"></div>
-          <div class="lightbox-chips" id="lightbox-chips"></div>
-          <p style="margin-top:0.5rem;">
-            Use the arrow buttons or your keyboard (← →) to browse through all mugs
-            for this location.
-          </p>
+          <div class="lightbox-title" id="lightboxTitle"></div>
+          <div class="lightbox-subtitle" id="lightboxSubtitle"></div>
+          <div id="lightboxExtra"></div>
         </div>
       </div>
     </div>
-
-    <!-- Right-side gallery panel -->
-    <section id="galleryPanel" class="card" style="
-      position:absolute;
-      right:1.4rem;
-      top:1.4rem;
-      bottom:1.4rem;
-      width:min(380px, 90vw);
-      display:flex;
-      flex-direction:column;
-      gap:0.7rem;
-      z-index:500;">
-      <div>
-        <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent);">
-          Current Year Gallery
-        </div>
-        <h2 id="panelTitle" style="font-size:1rem; margin-top:0.15rem;">
-          Select a city on the map
-        </h2>
-        <div id="panelSubtitle" style="font-size:0.8rem; color:var(--text-muted);">
-          When you click a mug icon, mugs from this year will show up here.
-        </div>
-      </div>
-      <div id="panelGallery" class="gallery-grid"></div>
-    </section>
   </main>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="data.js"></script>
-<script src="gallery.js"></script>
-<script>
-  // Initialize map
-  const map = L.map("map").setView([50.5, 11], 5);
+<!-- Leaflet JS -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+
+<!-- Supabase + app logic -->
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // DOM refs
+  const markerCountEl   = document.getElementById("markerCount");
+  const mapEmptyOverlay = document.getElementById("mapEmptyOverlay");
+  const panelTitleEl    = document.getElementById("panelTitle");
+  const panelSubtitleEl = document.getElementById("panelSubtitle");
+  const selectedMetaEl  = document.getElementById("selectedMeta");
+  const metaLocationEl  = document.getElementById("metaLocation");
+  const metaPhotoCount  = document.getElementById("metaPhotoCount");
+  const metaCountryChip = document.getElementById("metaCountryChip");
+  const metaCityChip    = document.getElementById("metaCityChip");
+  const galleryGrid     = document.getElementById("galleryGrid");
+  const galleryEmpty    = document.getElementById("galleryEmpty");
+
+  const lightbox        = document.getElementById("lightbox");
+  const lightboxImage   = document.getElementById("lightboxImage");
+  const lightboxTitle   = document.getElementById("lightboxTitle");
+  const lightboxSubtitle= document.getElementById("lightboxSubtitle");
+  const lightboxExtra   = document.getElementById("lightboxExtra");
+  const lightboxPrev    = document.getElementById("lightboxPrev");
+  const lightboxNext    = document.getElementById("lightboxNext");
+  const lightboxClose   = document.getElementById("lightboxClose");
+
+  // Lightbox state
+  let currentMarket = null;
+  let currentPhotos = [];
+  let currentIndex  = 0;
+
+  // Init Leaflet map (centered roughly on Europe)
+  const map = L.map("map", {
+    zoomControl: true,
+  }).setView([51, 10], 4); // lat, lng, zoom
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
+    maxZoom: 18,
+    attribution: "&copy; OpenStreetMap contributors"
   }).addTo(map);
 
   const mugIcon = L.divIcon({
-    html: "☕",
-    className: "mug-icon",
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
+    className: "mug-marker",
+    html: "<span>☕</span>",
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
   });
 
-  const panelTitle = document.getElementById("panelTitle");
-  const panelSubtitle = document.getElementById("panelSubtitle");
-  const panelGallery = document.getElementById("panelGallery");
+  async function loadActiveMarkets() {
+    // 1) Get markets that actually have approved photos
+    const { data: photoRows, error: photoError } = await supabase
+      .from("mug_photos")
+      .select("market_id")
+      .eq("status", "approved");
 
-  setupLightbox();
-
-  function showMarketGallery(market) {
-    const photos = market.photos.filter(p => p.year === CURRENT_YEAR);
-    panelTitle.textContent = market.name;
-    panelSubtitle.textContent = photos.length
-      ? `${market.city} · ${CURRENT_YEAR}`
-      : `No mugs uploaded for ${CURRENT_YEAR} yet.`;
-
-    if (!photos.length) {
-      panelGallery.innerHTML = "";
+    if (photoError) {
+      console.error("Error loading mug_photos:", photoError);
+      markerCountEl.textContent = "Error loading markers";
+      mapEmptyOverlay.style.display = "flex";
       return;
     }
 
-    renderGallery(panelGallery, photos, {
-      city: market.city,
-      marketName: market.name,
+    if (!photoRows || photoRows.length === 0) {
+      markerCountEl.textContent = "0 markets with mugs";
+      mapEmptyOverlay.style.display = "flex";
+      return;
+    }
+
+    const marketIdSet = new Set(photoRows.map((row) => row.market_id).filter((id) => id != null));
+    const marketIds = Array.from(marketIdSet);
+
+    if (!marketIds.length) {
+      markerCountEl.textContent = "0 markets with mugs";
+      mapEmptyOverlay.style.display = "flex";
+      return;
+    }
+
+    // 2) Load only those markets (needs lat/lng)
+    const { data: markets, error: marketsError } = await supabase
+      .from("markets")
+      .select("id, country, city, market_name, lat, lng")
+      .in("id", marketIds);
+
+    if (marketsError) {
+      console.error("Error loading markets:", marketsError);
+      markerCountEl.textContent = "Error loading markers";
+      mapEmptyOverlay.style.display = "flex";
+      return;
+    }
+
+    const validMarkets = (markets || []).filter((m) => m.lat != null && m.lng != null);
+
+    markerCountEl.textContent = `${validMarkets.length} market(s) with mugs`;
+    mapEmptyOverlay.style.display = validMarkets.length ? "none" : "flex";
+
+    if (validMarkets.length) {
+      renderMarkers(validMarkets);
+      fitMapToMarkers(validMarkets);
+    }
+  }
+
+  function renderMarkers(markets) {
+    markets.forEach((m) => {
+      const marker = L.marker([m.lat, m.lng], { icon: mugIcon })
+        .addTo(map)
+        .bindTooltip(`${m.market_name}<br>${m.city}, ${m.country}`, { direction: "top" });
+
+      marker.on("click", () => {
+        onMarkerClick(m);
+      });
     });
   }
 
-  markets.forEach((market) => {
-    const marker = L.marker(market.coords, { icon: mugIcon }).addTo(map);
-    marker.bindTooltip(market.city, { direction: "top", offset: [0, -10] });
-    marker.on("click", () => showMarketGallery(market));
+  function fitMapToMarkers(markets) {
+    if (!markets.length) return;
+    const bounds = L.latLngBounds(
+      markets.map((m) => [m.lat, m.lng])
+    );
+    map.fitBounds(bounds, { padding: [40, 40] });
+  }
+
+  async function onMarkerClick(market) {
+    currentMarket = market;
+
+    panelTitleEl.textContent = market.market_name;
+    panelSubtitleEl.textContent = `${market.city}, ${market.country}`;
+    selectedMetaEl.style.display = "block";
+    metaLocationEl.textContent = `${market.city}, ${market.country}`;
+    metaCountryChip.textContent = `Country: ${market.country}`;
+    metaCityChip.textContent = `City: ${market.city}`;
+
+    galleryEmpty.style.display = "none";
+    galleryGrid.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">Loading photos...</div>`;
+
+    const { data: photos, error } = await supabase
+      .from("mug_photos")
+      .select("id, public_url, caption, year, likes_count")
+      .eq("market_id", market.id)
+      .eq("status", "approved")
+      .order("likes_count", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading photos:", error);
+      galleryGrid.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">Error loading photos.</div>`;
+      metaPhotoCount.textContent = "0";
+      return;
+    }
+
+    if (!photos || photos.length === 0) {
+      galleryGrid.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">No approved photos yet for this market.</div>`;
+      metaPhotoCount.textContent = "0";
+      return;
+    }
+
+    currentPhotos = photos;
+    metaPhotoCount.textContent = String(photos.length);
+
+    renderGallery(photos, market);
+  }
+
+  function renderGallery(photos, market) {
+    galleryGrid.innerHTML = "";
+    photos.forEach((photo, idx) => {
+      const card = document.createElement("div");
+      card.className = "gallery-item";
+      card.dataset.index = idx;
+
+      const img = document.createElement("img");
+      img.src = photo.public_url;
+      img.alt = photo.caption || `Mug photo from ${market.market_name}`;
+      card.appendChild(img);
+
+      const meta = document.createElement("div");
+      meta.className = "gallery-item-meta";
+      const year = document.createElement("span");
+      year.textContent = photo.year || "";
+      const likes = document.createElement("span");
+      likes.textContent = `★ ${photo.like_count ?? 0}`;
+      meta.appendChild(year);
+      meta.appendChild(likes);
+      card.appendChild(meta);
+
+      card.addEventListener("click", () => {
+        openLightbox(idx, market);
+      });
+
+      galleryGrid.appendChild(card);
+    });
+  }
+
+  function openLightbox(index, market) {
+    if (!currentPhotos.length) return;
+    currentIndex = index;
+    const photo = currentPhotos[currentIndex];
+
+    lightboxImage.src = photo.public_url;
+    lightboxTitle.textContent = market.market_name;
+    lightboxSubtitle.textContent = `${market.city}, ${market.country} · ${photo.year || "Year unknown"} · ★ ${photo.like_count ?? 0} likes`;
+    lightboxExtra.textContent = photo.caption || "";
+
+    lightbox.classList.add("open");
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+  }
+
+  function stepLightbox(delta) {
+    if (!currentPhotos.length) return;
+    currentIndex = (currentIndex + delta + currentPhotos.length) % currentPhotos.length;
+    openLightbox(currentIndex, currentMarket);
+  }
+
+  lightboxPrev.addEventListener("click", () => stepLightbox(-1));
+  lightboxNext.addEventListener("click", () => stepLightbox(1));
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
   });
+  document.addEventListener("keydown", (e) => {
+    if (!lightbox.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") stepLightbox(-1);
+    if (e.key === "ArrowRight") stepLightbox(1);
+  });
+
+  (async function init() {
+    await loadActiveMarkets();
+  })();
 </script>
+
 </body>
 </html>

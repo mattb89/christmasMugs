@@ -2,9 +2,197 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Map – Popular Mugs</title>
+  <title>Mug Map – Most Popular Mugs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .popular-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .card-main {
+      border-radius: 1.25rem;
+      border: 1px solid rgba(148,163,184,0.35);
+      padding: 1rem 1.1rem 1.1rem;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9) 0, #020617 55%);
+      min-height: 300px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .card-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      margin-top: 0.7rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .filter-select {
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-soft);
+      color: var(--text-main);
+      font-size: 0.8rem;
+    }
+
+    .popular-grid {
+      margin-top: 0.9rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .popular-card {
+      position: relative;
+      border-radius: 0.9rem;
+      overflow: hidden;
+      border: 1px solid rgba(30,64,175,0.65);
+      background: #020617;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+    }
+    .popular-card img {
+      display: block;
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      transition: transform 0.18s ease-out;
+    }
+    .popular-card:hover img {
+      transform: scale(1.03);
+    }
+    .popular-card-body {
+      padding: 0.4rem 0.5rem 0.45rem;
+      font-size: 0.8rem;
+    }
+    .popular-name {
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+    .popular-location {
+      margin-top: 0.1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .popular-meta-row {
+      margin-top: 0.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .badge-year {
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      font-size: 0.72rem;
+    }
+    .badge-likes {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.75rem;
+      color: #facc15;
+    }
+
+    /* Lightbox (reuse style as index) */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .lightbox.open {
+      display: flex;
+    }
+    .lightbox-inner {
+      max-width: 900px;
+      width: 100%;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+    @media (max-width: 800px) {
+      .lightbox-inner {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .lightbox-img-wrapper {
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: #020617;
+    }
+    .lightbox-img-wrapper img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: 460px;
+      object-fit: contain;
+      background: radial-gradient(circle at top, #020617, #020617);
+    }
+    .lightbox-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .lightbox-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .lightbox-subtitle {
+      font-size: 0.85rem;
+    }
+    .lightbox-controls {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.8rem;
+      display: flex;
+      gap: 0.4rem;
+    }
+    .lightbox-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+    }
+    .lightbox-btn span {
+      font-size: 1rem;
+      line-height: 1;
+    }
+  </style>
 </head>
 <body>
 <div class="page">
@@ -13,7 +201,7 @@
       <div class="logo-pill">☕</div>
       <div>
         <h1>EUROPEAN <span>MUG MAP</span></h1>
-        <div class="tagline">Most-liked mugs across all markets.</div>
+        <div class="tagline">See the most-loved Christmas market mugs.</div>
       </div>
     </div>
     <nav class="nav-links">
@@ -26,93 +214,245 @@
   </header>
 
   <main>
-    <div class="main-container">
-      <div class="card">
-        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent);">
-          Top Mugs
+    <div class="main-container popular-layout">
+      <section class="card-main">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Most Popular Mugs</div>
+            <div class="card-sub">
+              Ranked by likes across all approved photos. Click a mug to view it larger.
+            </div>
+          </div>
+          <div id="countSummary" style="font-size:0.78rem; color:var(--text-muted);">
+            Loading...
+          </div>
         </div>
-        <h2 style="margin-top:0.2rem; font-size:1.2rem;">Most Popular Mugs</h2>
-        <p style="margin-top:0.4rem; font-size:0.85rem; color:var(--text-muted);">
-          Sorted by total likes (mocked base count + your likes on this device).
-          Click a mug to open the lightbox, or tap the heart to add your like.
-        </p>
 
-        <div class="gallery-grid" id="popularGallery"></div>
-      </div>
+        <div class="filter-row">
+          <span>Filter by year:</span>
+          <select id="yearFilter" class="filter-select">
+            <option value="all">All years</option>
+          </select>
+        </div>
+
+        <div id="popularEmpty" style="margin-top:0.8rem; font-size:0.82rem; color:var(--text-muted);">
+          Loading popular mugs...
+        </div>
+        <div class="popular-grid" id="popularGrid"></div>
+      </section>
     </div>
 
-    <!-- Shared lightbox -->
+    <!-- Lightbox -->
     <div class="lightbox" id="lightbox">
       <div class="lightbox-controls">
-        <button class="lightbox-btn lightbox-prev" type="button">&#10094;</button>
-        <button class="lightbox-btn lightbox-next" type="button">&#10095;</button>
-        <button class="lightbox-btn lightbox-close" type="button">
-          <span>&times;</span>
-        </button>
+        <button class="lightbox-btn" id="lightboxPrev">&#10094;</button>
+        <button class="lightbox-btn" id="lightboxNext">&#10095;</button>
+        <button class="lightbox-btn" id="lightboxClose"><span>&times;</span></button>
       </div>
       <div class="lightbox-inner">
         <div class="lightbox-img-wrapper">
-          <img id="lightbox-image" src="" alt="Mug photo" />
+          <img id="lightboxImage" src="" alt="Mug photo" />
         </div>
         <div class="lightbox-meta">
-          <div class="lightbox-title" id="lightbox-title"></div>
-          <div class="lightbox-subtitle" id="lightbox-subtitle"></div>
-          <div class="lightbox-chips" id="lightbox-chips"></div>
+          <div class="lightbox-title" id="lightboxTitle"></div>
+          <div class="lightbox-subtitle" id="lightboxSubtitle"></div>
+          <div id="lightboxExtra"></div>
         </div>
       </div>
     </div>
   </main>
 </div>
 
-<script src="data.js"></script>
-<script src="gallery.js"></script>
-<script>
-  setupLightbox();
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  const galleryEl = document.getElementById("popularGallery");
+  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
 
-  function buildPopularPhotos() {
-    const list = [];
-    markets.forEach((m) => {
-      m.photos.forEach((p) => {
-        const totalLikes = getTotalLikes(p.id);
-        list.push({
-          ...p,
-          totalLikes,
-          city: m.city,
-          marketName: m.name,
-        });
-      });
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const popularGrid   = document.getElementById("popularGrid");
+  const popularEmpty  = document.getElementById("popularEmpty");
+  const countSummary  = document.getElementById("countSummary");
+  const yearFilter    = document.getElementById("yearFilter");
+
+  const lightbox      = document.getElementById("lightbox");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const lightboxTitle = document.getElementById("lightboxTitle");
+  const lightboxSubtitle = document.getElementById("lightboxSubtitle");
+  const lightboxExtra = document.getElementById("lightboxExtra");
+  const lightboxPrev  = document.getElementById("lightboxPrev");
+  const lightboxNext  = document.getElementById("lightboxNext");
+  const lightboxClose = document.getElementById("lightboxClose");
+
+  let allPopular = [];   // all mugs loaded from Supabase
+  let filteredPopular = []; // filtered by year
+  let marketsMap = new Map(); // market_id -> market
+  let currentIndex = 0;
+
+  async function loadPopularMugs() {
+    // 1) Load top mugs
+    const { data: mugs, error: mugsError } = await supabase
+      .from("mug_photos")
+      .select("id, market_id, public_url, caption, year, like_count, created_at")
+      .eq("status", "approved")
+      .order("like_count", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(60);
+
+    if (mugsError) {
+      console.error("Error loading popular mugs:", mugsError);
+      popularEmpty.textContent = "Error loading popular mugs.";
+      return;
+    }
+
+    if (!mugs || mugs.length === 0) {
+      popularEmpty.textContent = "No approved mugs yet. Once users like photos, they'll show up here.";
+      return;
+    }
+
+    allPopular = mugs;
+
+    // 2) Load associated markets
+    const marketIds = Array.from(new Set(mugs.map((m) => m.market_id).filter((id) => id != null)));
+    if (marketIds.length) {
+      const { data: markets, error: marketsError } = await supabase
+        .from("markets")
+        .select("id, country, city, market_name")
+        .in("id", marketIds);
+
+      if (marketsError) {
+        console.error("Error loading markets for popular mugs:", marketsError);
+      } else {
+        markets.forEach((m) => marketsMap.set(m.id, m));
+      }
+    }
+
+    // 3) Populate year filter
+    const years = Array.from(new Set(mugs.map((m) => m.year).filter((y) => !!y)));
+    years.sort((a, b) => b - a);
+    years.forEach((y) => {
+      const opt = document.createElement("option");
+      opt.value = String(y);
+      opt.textContent = y;
+      yearFilter.appendChild(opt);
     });
-    // Sort by likes desc, then newest year first
-    list.sort((a, b) => {
-      if (b.totalLikes !== a.totalLikes) return b.totalLikes - a.totalLikes;
-      return (b.year || 0) - (a.year || 0);
-    });
-    return list;
+
+    countSummary.textContent = `${mugs.length} top mugs loaded`;
+
+    applyFilterAndRender();
+  }
+
+  function applyFilterAndRender() {
+    const yearValue = yearFilter.value;
+    if (yearValue === "all") {
+      filteredPopular = allPopular.slice();
+    } else {
+      const yearInt = parseInt(yearValue, 10);
+      filteredPopular = allPopular.filter((m) => m.year === yearInt);
+    }
+
+    renderPopular();
   }
 
   function renderPopular() {
-    const raw = buildPopularPhotos();
+    popularGrid.innerHTML = "";
+    if (!filteredPopular.length) {
+      popularEmpty.style.display = "block";
+      popularEmpty.textContent = "No mugs found for this filter.";
+      return;
+    }
+    popularEmpty.style.display = "none";
 
-    const photosForGallery = raw.map((p) => ({
-      id: p.id,
-      src: p.src,
-      label: p.label,
-      tag: `${p.totalLikes} likes`,
-      year: p.year,
-      city: p.city,
-      marketName: p.marketName,
-    }));
+    filteredPopular.forEach((photo, idx) => {
+      const market = marketsMap.get(photo.market_id);
+      const card = document.createElement("div");
+      card.className = "popular-card";
+      card.dataset.index = idx;
 
-    renderGallery(galleryEl, photosForGallery, {
-      city: "Various",
-      marketName: "Most Popular",
-      onLikesChanged: renderPopular,
+      const img = document.createElement("img");
+      img.src = photo.public_url;
+      img.alt = photo.caption || (market ? `Mug at ${market.market_name}` : "Mug photo");
+      card.appendChild(img);
+
+      const body = document.createElement("div");
+      body.className = "popular-card-body";
+
+      const title = document.createElement("div");
+      title.className = "popular-name";
+      title.textContent = market ? market.market_name : "Unknown market";
+      body.appendChild(title);
+
+      const loc = document.createElement("div");
+      loc.className = "popular-location";
+      loc.textContent = market ? `${market.city}, ${market.country}` : "";
+      body.appendChild(loc);
+
+      const metaRow = document.createElement("div");
+      metaRow.className = "popular-meta-row";
+
+      const yearBadge = document.createElement("div");
+      yearBadge.className = "badge-year";
+      yearBadge.textContent = photo.year || "Year ?";
+      metaRow.appendChild(yearBadge);
+
+      const likesBadge = document.createElement("div");
+      likesBadge.className = "badge-likes";
+      likesBadge.textContent = `★ ${photo.like_count ?? 0}`;
+      metaRow.appendChild(likesBadge);
+
+      body.appendChild(metaRow);
+      card.appendChild(body);
+
+      card.addEventListener("click", () => openLightbox(idx));
+      popularGrid.appendChild(card);
     });
   }
 
-  renderPopular();
+  function openLightbox(index) {
+    if (!filteredPopular.length) return;
+    currentIndex = index;
+    const photo = filteredPopular[currentIndex];
+    const market = marketsMap.get(photo.market_id);
+
+    lightboxImage.src = photo.public_url;
+    lightboxTitle.textContent = market ? market.market_name : "Mug photo";
+    const locationText = market ? `${market.city}, ${market.country}` : "Unknown location";
+    const yearText = photo.year || "Year unknown";
+    const likeText = `★ ${photo.like_count ?? 0} likes`;
+    lightboxSubtitle.textContent = `${locationText} · ${yearText} · ${likeText}`;
+    lightboxExtra.textContent = photo.caption || "";
+
+    lightbox.classList.add("open");
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+  }
+
+  function stepLightbox(delta) {
+    if (!filteredPopular.length) return;
+    currentIndex = (currentIndex + delta + filteredPopular.length) % filteredPopular.length;
+    openLightbox(currentIndex);
+  }
+
+  yearFilter.addEventListener("change", applyFilterAndRender);
+  lightboxPrev.addEventListener("click", () => stepLightbox(-1));
+  lightboxNext.addEventListener("click", () => stepLightbox(1));
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!lightbox.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") stepLightbox(-1);
+    if (e.key === "ArrowRight") stepLightbox(1);
+  });
+
+  (async function init() {
+    await loadPopularMugs();
+  })();
 </script>
 </body>
 </html>

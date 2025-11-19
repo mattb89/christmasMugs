@@ -2,9 +2,126 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Map – Leaderboard</title>
+  <title>Mug Map – Market Leaderboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .leaderboard-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .board-card {
+      border-radius: 1.25rem;
+      border: 1px solid rgba(148,163,184,0.35);
+      padding: 1rem 1.1rem;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9) 0, #020617 55%);
+      min-height: 260px;
+    }
+
+    .board-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .board-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .board-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .board-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.7rem;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .board-select {
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-soft);
+      color: var(--text-main);
+      font-size: 0.8rem;
+    }
+
+    .board-table-wrapper {
+      margin-top: 0.8rem;
+      max-height: 420px;
+      overflow: auto;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(30,64,175,0.5);
+      background: rgba(15,23,42,0.7);
+    }
+
+    table.board-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    table.board-table thead {
+      position: sticky;
+      top: 0;
+      background: rgba(15,23,42,0.98);
+      backdrop-filter: blur(6px);
+      z-index: 1;
+    }
+    table.board-table th,
+    table.board-table td {
+      padding: 0.4rem 0.6rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+    }
+    table.board-table th {
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    table.board-table tbody tr:nth-child(even) {
+      background: rgba(15,23,42,0.5);
+    }
+    table.board-table tbody tr:hover {
+      background: rgba(30,64,175,0.28);
+    }
+    .rank-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.7rem;
+      height: 1.4rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(234,179,8,0.7);
+      color: #facc15;
+    }
+    .market-col-main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .market-name {
+      font-weight: 500;
+      font-size: 0.82rem;
+    }
+    .market-city {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .numeric {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
 </head>
 <body>
 <div class="page">
@@ -13,7 +130,7 @@
       <div class="logo-pill">☕</div>
       <div>
         <h1>EUROPEAN <span>MUG MAP</span></h1>
-        <div class="tagline">Top contributors across all years.</div>
+        <div class="tagline">Which markets have the strongest mug game?</div>
       </div>
     </div>
     <nav class="nav-links">
@@ -26,73 +143,215 @@
   </header>
 
   <main>
-    <div class="main-container">
-      <div class="card">
-        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent);">
-          Community Leaderboard
-        </div>
-        <h2 style="margin-top:0.2rem; font-size:1.2rem;">Top Mug Hunters</h2>
-        <p style="margin-top:0.4rem; font-size:0.85rem; color:var(--text-muted);">
-          Demo data only – in a real setup this would be calculated from actual uploads & likes.
-        </p>
-
-        <div class="table-like" id="leaderboardTable">
-          <div class="table-like-header">
-            <div>User</div>
-            <div style="text-align:right;">Mugs</div>
-            <div style="text-align:right;">Likes</div>
+    <div class="main-container leaderboard-layout">
+      <section class="board-card">
+        <div class="board-header">
+          <div>
+            <div class="board-title">Market Leaderboard</div>
+            <div class="board-sub">
+              Ranked by total likes across all approved mugs for each market.
+            </div>
           </div>
-          <!-- rows inserted by JS -->
+          <div id="boardSummary" style="font-size:0.78rem; color:var(--text-muted);">
+            Loading...
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Lightbox markup included for consistency; unused here but harmless -->
-    <div class="lightbox" id="lightbox">
-      <div class="lightbox-controls">
-        <button class="lightbox-btn lightbox-prev" type="button">&#10094;</button>
-        <button class="lightbox-btn lightbox-next" type="button">&#10095;</button>
-        <button class="lightbox-btn lightbox-close" type="button">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="lightbox-inner">
-        <div class="lightbox-img-wrapper">
-          <img id="lightbox-image" src="" alt="Mug photo" />
+        <div class="board-filters">
+          <span>Sort by:</span>
+          <select id="sortSelect" class="board-select">
+            <option value="likes">Total likes (desc)</option>
+            <option value="photos">Number of photos (desc)</option>
+          </select>
+
+          <span>· Limit:</span>
+          <select id="limitSelect" class="board-select">
+            <option value="25">Top 25</option>
+            <option value="50" selected>Top 50</option>
+            <option value="100">Top 100</option>
+          </select>
         </div>
-        <div class="lightbox-meta">
-          <div class="lightbox-title" id="lightbox-title"></div>
-          <div class="lightbox-subtitle" id="lightbox-subtitle"></div>
-          <div class="lightbox-chips" id="lightbox-chips"></div>
+
+        <div id="boardEmpty" style="margin-top:0.8rem; font-size:0.82rem; color:var(--text-muted);">
+          Loading leaderboard...
         </div>
-      </div>
+
+        <div class="board-table-wrapper" id="boardTableWrapper" style="display:none;">
+          <table class="board-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Market</th>
+                <th class="numeric">Photos</th>
+                <th class="numeric">Total Likes</th>
+                <th class="numeric">Best Year</th>
+              </tr>
+            </thead>
+            <tbody id="boardBody"></tbody>
+          </table>
+        </div>
+      </section>
     </div>
   </main>
 </div>
 
-<script src="data.js"></script>
-<script src="gallery.js"></script>
-<script>
-  setupLightbox(); // does nothing visible here, but safe
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  const table = document.getElementById("leaderboardTable");
+  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
 
-  // Sort demo users by likes desc, then mugs desc
-  const sortedUsers = [...users].sort((a, b) => {
-    if (b.totalLikes !== a.totalLikes) return b.totalLikes - a.totalLikes;
-    return b.mugsUploaded - a.mugsUploaded;
-  });
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  sortedUsers.forEach((u) => {
-    const row = document.createElement("div");
-    row.className = "table-like-row";
-    row.innerHTML = `
-      <div>${u.name}</div>
-      <div style="text-align:right;">${u.mugsUploaded}</div>
-      <div style="text-align:right;">${u.totalLikes}</div>
-    `;
-    table.appendChild(row);
-  });
+  const boardSummary   = document.getElementById("boardSummary");
+  const boardEmpty     = document.getElementById("boardEmpty");
+  const boardTableWrap = document.getElementById("boardTableWrapper");
+  const boardBody      = document.getElementById("boardBody");
+  const sortSelect     = document.getElementById("sortSelect");
+  const limitSelect    = document.getElementById("limitSelect");
+
+  let leaderboardRows = []; // aggregated stats per market
+  let marketsMap = new Map();
+
+  async function loadLeaderboard() {
+    // 1) Load all approved photos' minimal stats
+    const { data: photos, error: photosError } = await supabase
+      .from("mug_photos")
+      .select("market_id, like_count, year")
+      .eq("status", "approved");
+
+    if (photosError) {
+      console.error("Error loading mug_photos:", photosError);
+      boardEmpty.textContent = "Error loading leaderboard.";
+      return;
+    }
+
+    if (!photos || photos.length === 0) {
+      boardEmpty.textContent = "No approved mugs yet. Once users start liking photos, markets will appear here.";
+      return;
+    }
+
+    // 2) Aggregate by market_id in JS
+    const byMarket = new Map();
+
+    for (const p of photos) {
+      if (p.market_id == null) continue;
+      const key = p.market_id;
+      if (!byMarket.has(key)) {
+        byMarket.set(key, {
+          market_id: key,
+          photoCount: 0,
+          totalLikes: 0,
+          bestYear: null,
+          bestLikes: -1,
+        });
+      }
+      const entry = byMarket.get(key);
+      const likes = p.like_count || 0;
+      entry.photoCount += 1;
+      entry.totalLikes += likes;
+
+      // Track "best" year as the year of the photo with highest likes
+      if (likes > entry.bestLikes) {
+        entry.bestLikes = likes;
+        entry.bestYear = p.year || entry.bestYear;
+      } else if (likes === entry.bestLikes && p.year && (!entry.bestYear || p.year > entry.bestYear)) {
+        // tie-break by most recent year
+        entry.bestYear = p.year;
+      }
+    }
+
+    const marketIds = Array.from(byMarket.keys());
+
+    // 3) Load markets
+    const { data: markets, error: marketsError } = await supabase
+      .from("markets")
+      .select("id, country, city, market_name")
+      .in("id", marketIds);
+
+    if (marketsError) {
+      console.error("Error loading markets:", marketsError);
+      boardEmpty.textContent = "Error loading markets for leaderboard.";
+      return;
+    }
+
+    markets.forEach((m) => marketsMap.set(m.id, m));
+
+    leaderboardRows = Array.from(byMarket.values()).filter((row) => marketsMap.has(row.market_id));
+
+    boardSummary.textContent = `${leaderboardRows.length} markets with approved mugs`;
+    boardEmpty.style.display = "none";
+    boardTableWrap.style.display = "block";
+
+    renderLeaderboard();
+  }
+
+  function renderLeaderboard() {
+    boardBody.innerHTML = "";
+
+    const sortBy = sortSelect.value;
+    let rows = leaderboardRows.slice();
+
+    if (sortBy === "likes") {
+      rows.sort((a, b) => (b.totalLikes - a.totalLikes) || (b.photoCount - a.photoCount));
+    } else {
+      // photos
+      rows.sort((a, b) => (b.photoCount - a.photoCount) || (b.totalLikes - a.totalLikes));
+    }
+
+    const limit = parseInt(limitSelect.value, 10) || 50;
+    rows = rows.slice(0, limit);
+
+    rows.forEach((row, idx) => {
+      const market = marketsMap.get(row.market_id);
+      const tr = document.createElement("tr");
+
+      const rankTd = document.createElement("td");
+      const rankSpan = document.createElement("span");
+      rankSpan.className = "rank-pill";
+      rankSpan.textContent = idx + 1;
+      rankTd.appendChild(rankSpan);
+      tr.appendChild(rankTd);
+
+      const marketTd = document.createElement("td");
+      const container = document.createElement("div");
+      container.className = "market-col-main";
+      const nameEl = document.createElement("div");
+      nameEl.className = "market-name";
+      nameEl.textContent = market ? market.market_name : "Unknown market";
+      const cityEl = document.createElement("div");
+      cityEl.className = "market-city";
+      cityEl.textContent = market ? `${market.city}, ${market.country}` : "";
+      container.appendChild(nameEl);
+      container.appendChild(cityEl);
+      marketTd.appendChild(container);
+      tr.appendChild(marketTd);
+
+      const photosTd = document.createElement("td");
+      photosTd.className = "numeric";
+      photosTd.textContent = row.photoCount;
+      tr.appendChild(photosTd);
+
+      const likesTd = document.createElement("td");
+      likesTd.className = "numeric";
+      likesTd.textContent = row.totalLikes;
+      tr.appendChild(likesTd);
+
+      const yearTd = document.createElement("td");
+      yearTd.className = "numeric";
+      yearTd.textContent = row.bestYear || "—";
+      tr.appendChild(yearTd);
+
+      boardBody.appendChild(tr);
+    });
+  }
+
+  sortSelect.addEventListener("change", renderLeaderboard);
+  limitSelect.addEventListener("change", renderLeaderboard);
+
+  (async function init() {
+    await loadLeaderboard();
+  })();
 </script>
 </body>
 </html>
