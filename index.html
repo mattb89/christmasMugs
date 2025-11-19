@@ -2,9 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Map – European Christmas Mugs</title>
+  <title>Mug Mapper – European Christmas Mugs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WPNN83NG');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W5Y61D082"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1W5Y61D082');
+  </script>
 
   <!-- Leaflet CSS -->
   <link
@@ -278,12 +296,18 @@
   </style>
 </head>
 <body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPNN83NG"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <div class="page">
   <header>
     <div class="brand">
       <div class="logo-pill">☕</div>
       <div>
-        <h1>EUROPEAN <span>MUG MAP</span></h1>
+        <h1>EUROPEAN <span>MUG MAPPER</span></h1>
         <div class="tagline">Discover and log Christmas market mugs across Europe.</div>
       </div>
     </div>
@@ -294,6 +318,15 @@
       <a href="leaderboard.html">Leaderboard</a>
       <a href="upload.html">Upload Mug</a>
     </nav>
+    <div class="auth-bar">
+      <span id="authUserLabel" class="auth-user">Not signed in</span>
+      <div class="auth-buttons">
+        <button id="loginGoogleButton" class="auth-btn">Sign in with Google</button>
+        <button id="loginEmailButton" class="auth-btn">Sign in with Email</button>
+        <button id="logoutButton" class="auth-btn" style="display:none;">Sign out</button>
+      </div>
+    </div>
+
   </header>
 
   <main>
