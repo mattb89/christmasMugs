@@ -16,9 +16,9 @@
       color: #f9fafb;
       font-family: system-ui, -apple-system, sans-serif;
 
-      /* space for header & footer */
-      padding-top: 58px;
-      padding-bottom: 48px;
+      /* space for sticky header & footer */
+      padding-top: 58px;  /* header height */
+      padding-bottom: 48px; /* footer height */
     }
 
     .mm-container {
@@ -34,13 +34,20 @@
       padding: 18px 20px 26px;
     }
 
+    h2 {
+      margin-top: 0;
+    }
+
     label {
       font-size: 0.9rem;
-      margin-top: 10px;
+      margin-top: 12px;
       display: block;
     }
 
-    select, input[type="number"], input[type="file"], textarea {
+    select,
+    input[type="number"],
+    input[type="file"],
+    textarea {
       width: 100%;
       padding: 10px 12px;
       margin-top: 4px;
@@ -49,9 +56,13 @@
       background: #0f172a;
       color: #f9fafb;
       font-size: 0.9rem;
+      box-sizing: border-box;
     }
 
-    textarea { min-height: 70px; resize: vertical; }
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
 
     .mm-submit-btn {
       background: #0ea5e9;
@@ -79,12 +90,30 @@
       color: #e5e7eb;
       font-size: 0.85rem;
       cursor: pointer;
-      margin-top: 6px;
+      margin-top: 8px;
+      display: inline-block;
     }
 
     .mm-msg {
       margin-top: 10px;
       font-size: 0.9rem;
+    }
+
+    /* Sticky footer */
+    .mm-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #1f2937;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9980;
+      font-size: 0.9rem;
+      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
     }
 
     /* Modal */
@@ -127,69 +156,70 @@
       cursor: pointer;
     }
 
-    .mm-modal-close:hover { color: #fff; }
+    .mm-modal-close:hover {
+      color: #fff;
+    }
 
-    .mm-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 48px;
-      background: #1f2937;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9980;
-      font-size: 0.9rem;
-      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
+    @media (min-width: 640px) {
+      /* Optional: tighten form spacing on larger screens */
+      .mm-card {
+        padding: 22px 26px 28px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<!-- Sticky Header -->
+<!-- Sticky Header (injected) -->
 <div id="mm-header"></div>
 
 <div class="mm-container">
   <div class="mm-card">
-    <h2 style="margin-top:0;">Upload Mug Photos</h2>
-    <p>Share up to <strong>3 photos</strong> of your Christmas market mug.  
-       If your market isn't listed, you can add it as a pending suggestion.</p>
+    <h2>Upload Mug Photos</h2>
+    <p>
+      Upload up to <strong>3 mug photos</strong>. If a market isn’t listed, suggest a new one.
+    </p>
 
-    <div id="authHint" style="color:#94a3b8; margin-bottom:12px;">Please sign in to upload.</div>
+    <div id="authHint" style="color:#94a3b8; margin-bottom:12px;">
+      Please sign in to upload.
+    </div>
 
     <div id="uploadMessage" class="mm-msg"></div>
 
     <form id="uploadForm" style="display:none;">
-
-      <label>Country</label>
+      <label for="countrySelect">Country</label>
       <select id="countrySelect"></select>
 
-      <label>City</label>
+      <label for="citySelect">City</label>
       <select id="citySelect"></select>
 
-      <label>Market</label>
+      <label for="marketSelect">Market</label>
       <select id="marketSelect"></select>
 
-      <button type="button" id="addMarketButton" class="mm-link-btn">+ My market is missing</button>
+      <!-- My Market Is Missing button on its own row -->
+      <button type="button" id="addMarketButton" class="mm-link-btn">
+        + My Market Is Missing
+      </button>
 
-      <label>Year</label>
+      <!-- Year stacked BELOW the button so nothing overlaps -->
+      <label for="yearInput">Year</label>
       <input type="number" id="yearInput" min="2000" max="2100" />
 
-      <label>Upload photos (max 3)</label>
+      <label for="fileInput">Photos (max 3)</label>
       <input type="file" id="fileInput" accept="image/*" multiple />
 
-      <label>Caption (optional)</label>
+      <label for="captionInput">Caption (optional)</label>
       <textarea id="captionInput"></textarea>
 
       <label style="margin-top:10px;">
         <input type="checkbox" id="consentCheckbox" />
-        I allow these photos to be displayed publicly.
+        I agree to display these photos publicly.
       </label>
 
-      <button id="submitButton" type="submit" class="mm-submit-btn">Submit</button>
+      <button id="submitButton" type="submit" class="mm-submit-btn">
+        Submit Photos
+      </button>
     </form>
   </div>
 </div>
@@ -197,7 +227,7 @@
 <!-- Sticky Footer -->
 <footer class="mm-footer">© 2025 Mug Mapper</footer>
 
-<!-- ADD MARKET MODAL -->
+<!-- Add Market Modal -->
 <div id="addMarketModal" class="mm-modal-backdrop">
   <div class="mm-modal">
     <div class="mm-modal-header">
@@ -212,16 +242,16 @@
     <div id="modalMessage" class="mm-msg"></div>
 
     <form id="marketSuggestionForm" style="margin-top:12px;">
-      <label>Country</label>
+      <label for="suggestionCountry">Country</label>
       <input type="text" id="suggestionCountry" required />
 
-      <label>City</label>
+      <label for="suggestionCity">City</label>
       <input type="text" id="suggestionCity" required />
 
-      <label>Market Name</label>
+      <label for="suggestionMarketName">Market Name</label>
       <input type="text" id="suggestionMarketName" required />
 
-      <label>Description (optional)</label>
+      <label for="suggestionDescription">Description (optional)</label>
       <textarea id="suggestionDescription"></textarea>
 
       <button type="submit" id="submitSuggestionButton" class="mm-submit-btn" style="margin-top:14px;">
@@ -231,17 +261,16 @@
   </div>
 </div>
 
-<!-- SCRIPT -->
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  /* ---------------------------
-     1. Load Sticky Header
-  --------------------------- */
-  const headerHTML = await fetch("header.html").then(r => r.text());
+  // ---------------------------
+  // 1. Load Sticky Header
+  // ---------------------------
+  const headerHTML = await fetch("header.html").then((r) => r.text());
   document.getElementById("mm-header").innerHTML = headerHTML;
 
-  // Now attach menu events
+  // Attach menu events after injection
   const mmHamburger  = document.getElementById("mmHamburger");
   const mmNavOverlay = document.getElementById("mmNavOverlay");
   const mmNavClose   = document.getElementById("mmNavClose");
@@ -256,11 +285,11 @@
 
   mmHamburger.addEventListener("click", openNav);
   mmNavClose.addEventListener("click", closeNav);
-  navLinks.forEach(a => a.addEventListener("click", closeNav));
+  navLinks.forEach((a) => a.addEventListener("click", closeNav));
 
-  /* ---------------------------
-     2. Supabase Init + Auth
-  --------------------------- */
+  // ---------------------------
+  // 2. Supabase Init + Auth
+  // ---------------------------
   const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
   const SUPABASE_ANON_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
@@ -284,17 +313,17 @@
     if (currentUser) {
       authUserLabel.textContent = currentUser.email;
       uploadForm.style.display = "block";
-      authHint.style.display = "none";
+      authHint.style.display   = "none";
 
-      logoutButton.style.display = "block";
+      logoutButton.style.display      = "block";
       loginGoogleButton.style.display = "none";
       loginEmailButton.style.display  = "none";
     } else {
       authUserLabel.textContent = "Not signed in";
       uploadForm.style.display = "none";
-      authHint.style.display = "block";
+      authHint.style.display   = "block";
 
-      logoutButton.style.display = "none";
+      logoutButton.style.display      = "none";
       loginGoogleButton.style.display = "block";
       loginEmailButton.style.display  = "block";
     }
@@ -314,7 +343,7 @@
   loginGoogleButton?.addEventListener("click", async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.href }
+      options: { redirectTo: window.location.href },
     });
   });
 
@@ -323,7 +352,7 @@
     if (!email) return;
     await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.href }
+      options: { emailRedirectTo: window.location.href },
     });
   });
 
@@ -333,11 +362,9 @@
 
   await initAuth();
 
-
-  /* ---------------------------
-     3. Load Markets for Form
-  --------------------------- */
-
+  // ---------------------------
+  // 3. Market Dropdown Logic
+  // ---------------------------
   const countrySelect = document.getElementById("countrySelect");
   const citySelect    = document.getElementById("citySelect");
   const marketSelect  = document.getElementById("marketSelect");
@@ -374,9 +401,9 @@
   }
 
   function populateCountryDropdown() {
-    const countries = [...new Set(allMarkets.map(m => m.country))].sort();
+    const countries = [...new Set(allMarkets.map((m) => m.country))].sort();
     countrySelect.innerHTML = `<option value="">Select country</option>`;
-    countries.forEach(c => {
+    countries.forEach((c) => {
       const o = document.createElement("option");
       o.value = c;
       o.textContent = c;
@@ -389,16 +416,17 @@
   countrySelect.addEventListener("change", () => {
     const country = countrySelect.value;
     if (!country) {
-      citySelect.innerHTML = `<option value="">Select country first</option>`;
+      citySelect.innerHTML   = `<option value="">Select country first</option>`;
+      marketSelect.innerHTML = `<option value="">Select city first</option>`;
       return;
     }
 
     const cities = [
-      ...new Set(allMarkets.filter(m => m.country === country).map(m => m.city))
+      ...new Set(allMarkets.filter((m) => m.country === country).map((m) => m.city)),
     ].sort();
 
     citySelect.innerHTML = `<option value="">Select city</option>`;
-    cities.forEach(c => {
+    cities.forEach((c) => {
       const o = document.createElement("option");
       o.value = c;
       o.textContent = c;
@@ -410,41 +438,42 @@
 
   citySelect.addEventListener("change", () => {
     const country = countrySelect.value;
-    const city = citySelect.value;
+    const city    = citySelect.value;
 
-    const markets = allMarkets.filter(m => m.country === country && m.city === city);
+    const markets = allMarkets.filter(
+      (m) => m.country === country && m.city === city
+    );
 
     marketSelect.innerHTML = `<option value="">Select market</option>`;
-    markets.forEach(m => {
+    markets.forEach((m) => {
       const o = document.createElement("option");
       o.value = m.id;
-      o.textContent = m.status === "pending" ? `${m.market_name} (pending)` : m.market_name;
+      o.textContent = m.status === "pending"
+        ? `${m.market_name} (pending)`
+        : m.market_name;
       marketSelect.appendChild(o);
     });
   });
 
-
-  /* ---------------------------
-     4. Add Market (Modal)
-  --------------------------- */
-
-  const addMarketButton = document.getElementById("addMarketButton");
-  const addMarketModal  = document.getElementById("addMarketModal");
-  const closeModalButton = document.getElementById("closeModalButton");
+  // ---------------------------
+  // 4. Add Market Modal
+  // ---------------------------
+  const addMarketButton      = document.getElementById("addMarketButton");
+  const addMarketModal       = document.getElementById("addMarketModal");
+  const closeModalButton     = document.getElementById("closeModalButton");
   const marketSuggestionForm = document.getElementById("marketSuggestionForm");
-  const modalMessage = document.getElementById("modalMessage");
-
-  const suggestionCountry = document.getElementById("suggestionCountry");
-  const suggestionCity = document.getElementById("suggestionCity");
+  const modalMessage         = document.getElementById("modalMessage");
+  const suggestionCountry    = document.getElementById("suggestionCountry");
+  const suggestionCity       = document.getElementById("suggestionCity");
   const suggestionMarketName = document.getElementById("suggestionMarketName");
-  const suggestionDescription = document.getElementById("suggestionDescription");
+  const suggestionDescription= document.getElementById("suggestionDescription");
 
   addMarketButton.addEventListener("click", () => {
-    suggestionCountry.value = countrySelect.value || "";
-    suggestionCity.value    = citySelect.value || "";
+    suggestionCountry.value    = countrySelect.value || "";
+    suggestionCity.value       = citySelect.value || "";
     suggestionMarketName.value = "";
-    suggestionDescription.value = "";
-    modalMessage.textContent = "";
+    suggestionDescription.value= "";
+    modalMessage.textContent   = "";
     addMarketModal.style.display = "flex";
   });
 
@@ -463,13 +492,13 @@
     }
 
     const country = suggestionCountry.value.trim();
-    const city = suggestionCity.value.trim();
-    const name = suggestionMarketName.value.trim();
-    const desc = suggestionDescription.value.trim();
+    const city    = suggestionCity.value.trim();
+    const name    = suggestionMarketName.value.trim();
+    const desc    = suggestionDescription.value.trim();
 
     if (!country || !city || !name) {
       modalMessage.style.color = "#fecaca";
-      modalMessage.textContent = "All required fields must be filled.";
+      modalMessage.textContent = "Country, city, and market name are required.";
       return;
     }
 
@@ -481,7 +510,7 @@
         market_name: name,
         description: desc || null,
         status: "pending",
-        created_by: currentUser.id
+        created_by: currentUser.id,
       })
       .select()
       .single();
@@ -502,22 +531,22 @@
     marketSelect.value = data.id;
 
     modalMessage.style.color = "#bbf7d0";
-    modalMessage.textContent = "Market added!";
-    setTimeout(() => addMarketModal.style.display = "none", 800);
+    modalMessage.textContent = "Market added as pending.";
+    setTimeout(() => (addMarketModal.style.display = "none"), 800);
   });
 
-
-  /* ---------------------------
-     5. Upload Photos
-  --------------------------- */
-
+  // ---------------------------
+  // 5. Upload Photos
+  // ---------------------------
   function getExtension(filename) {
     return filename.split(".").pop().toLowerCase();
   }
 
   function generateStoragePath(marketId, year, file, i) {
-    const ext = getExtension(file.name);
-    const id = crypto.randomUUID ? crypto.randomUUID() : Date.now() + "_" + i;
+    const ext = getExtension(file.name || "jpg");
+    const id =
+      (crypto.randomUUID && crypto.randomUUID()) ||
+      `${Date.now()}_${i}`;
     return `${marketId}/${year}/${id}.${ext}`;
   }
 
@@ -532,19 +561,19 @@
       return;
     }
 
-    const country = countrySelect.value;
-    const city = citySelect.value;
+    const country  = countrySelect.value;
+    const city     = citySelect.value;
     const marketId = marketSelect.value;
-    const year = parseInt(yearInput.value);
-    const files = Array.from(fileInput.files || []);
-    const caption = captionInput.value.trim();
+    const year     = parseInt(yearInput.value, 10);
+    const files    = Array.from(fileInput.files || []);
+    const caption  = captionInput.value.trim();
 
     if (!country || !city || !marketId) {
       uploadMsg.style.color = "#fecaca";
       uploadMsg.textContent = "Please select a valid market.";
       return;
     }
-    if (!year) {
+    if (!year || isNaN(year)) {
       uploadMsg.style.color = "#fecaca";
       uploadMsg.textContent = "Enter a valid year.";
       return;
@@ -578,7 +607,9 @@
 
         if (uploadRes.error) throw uploadRes.error;
 
-        const { data: pub } = supabase.storage.from("mugs").getPublicUrl(path);
+        const { data: pub } = supabase.storage
+          .from("mugs")
+          .getPublicUrl(path);
         const publicUrl = pub.publicUrl;
 
         const { error: insertErr } = await supabase
@@ -592,7 +623,7 @@
             caption: caption || null,
             year,
             status: "pending",
-            like_count: 0
+            like_count: 0,
           });
 
         if (insertErr) throw insertErr;
@@ -600,7 +631,7 @@
 
       uploadMsg.style.color = "#bbf7d0";
       uploadMsg.textContent =
-        "Upload complete! Photos are pending approval.";
+        "Upload complete! Your photos are pending approval.";
 
       fileInput.value = "";
       captionInput.value = "";
@@ -608,19 +639,16 @@
     } catch (err) {
       console.error(err);
       uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "Upload failed. Try again.";
+      uploadMsg.textContent = "Upload failed. Please try again.";
     } finally {
       submitButton.disabled = false;
     }
   });
 
-
-  /* ---------------------------
-     INIT PAGE
-  --------------------------- */
-
+  // ---------------------------
+  // 6. Init page
+  // ---------------------------
   await loadMarkets(currentUser);
-
   yearInput.value = new Date().getFullYear();
 </script>
 
