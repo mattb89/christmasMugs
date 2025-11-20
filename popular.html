@@ -2,457 +2,704 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Map – Most Popular Mugs</title>
+  <title>Mug Mapper – Most Popular Mugs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- W3CSS + global styles -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
   <link rel="stylesheet" href="styles.css" />
+
   <style>
-    .popular-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 1rem;
+    body {
+      margin: 0;
+      background: #111827;
+      color: #f9fafb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding-top: 58px;    /* sticky header space */
+      padding-bottom: 48px; /* sticky footer space */
     }
 
-    .card-main {
-      border-radius: 1.25rem;
-      border: 1px solid rgba(148,163,184,0.35);
-      padding: 1rem 1.1rem 1.1rem;
-      background: radial-gradient(circle at top, rgba(15,23,42,0.9) 0, #020617 55%);
-      min-height: 300px;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-    }
-    .card-sub {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      align-items: center;
-      margin-top: 0.7rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-    .filter-select {
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-soft);
-      color: var(--text-main);
-      font-size: 0.8rem;
-    }
-
-    .popular-grid {
-      margin-top: 0.9rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 0.6rem;
+    .popular-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 16px 80px;
     }
 
     .popular-card {
-      position: relative;
-      border-radius: 0.9rem;
-      overflow: hidden;
-      border: 1px solid rgba(30,64,175,0.65);
-      background: #020617;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      min-height: 180px;
-    }
-    .popular-card img {
-      display: block;
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      transition: transform 0.18s ease-out;
-    }
-    .popular-card:hover img {
-      transform: scale(1.03);
-    }
-    .popular-card-body {
-      padding: 0.4rem 0.5rem 0.45rem;
-      font-size: 0.8rem;
-    }
-    .popular-name {
-      font-weight: 600;
-      font-size: 0.82rem;
-    }
-    .popular-location {
-      margin-top: 0.1rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-    .popular-meta-row {
-      margin-top: 0.25rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-    .badge-year {
-      padding: 0.1rem 0.45rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.5);
-      font-size: 0.72rem;
-    }
-    .badge-likes {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-      font-size: 0.75rem;
-      color: #facc15;
+      background: #1f2937;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.25);
+      padding: 18px 18px 26px;
     }
 
-    /* Lightbox (reuse style as index) */
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-    .lightbox.open {
+    .popular-header {
       display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
     }
-    .lightbox-inner {
-      max-width: 900px;
-      width: 100%;
-      padding: 1rem;
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      gap: 1rem;
-      align-items: stretch;
+
+    .popular-title {
+      font-size: 1.4rem;
+      font-weight: 600;
     }
-    @media (max-width: 800px) {
-      .lightbox-inner {
-        grid-template-columns: minmax(0, 1fr);
-      }
+
+    .popular-subtitle {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: 2px;
     }
-    .lightbox-img-wrapper {
-      border-radius: 1rem;
-      overflow: hidden;
-      border: 1px solid rgba(148, 163, 184, 0.4);
+
+    .popular-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .popular-filters label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-right: 4px;
+    }
+
+    .popular-filters select {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #374151;
       background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
     }
-    .lightbox-img-wrapper img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      max-height: 460px;
-      object-fit: contain;
-      background: radial-gradient(circle at top, #020617, #020617);
+
+    .popular-info {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 4px;
     }
-    .lightbox-meta {
+
+    .popular-error {
+      margin-top: 8px;
+      color: #fecaca;
+      font-size: 0.85rem;
+      white-space: pre-line;
+    }
+
+    .gallery-grid {
+      margin-top: 14px;
+    }
+
+    .gallery-item {
+      background: #020617;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(55,65,81,0.7);
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
     }
-    .lightbox-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-main);
+
+    .gallery-item img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
     }
-    .lightbox-subtitle {
-      font-size: 0.85rem;
-    }
-    .lightbox-controls {
-      position: absolute;
-      top: 0.6rem;
-      right: 0.8rem;
+
+    .gallery-item-info {
       display: flex;
-      gap: 0.4rem;
-    }
-    .lightbox-btn {
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
-      background: rgba(15,23,42,0.9);
-      color: #e5e7eb;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px 9px;
       font-size: 0.8rem;
-      padding: 0.25rem 0.6rem;
-      cursor: pointer;
+      color: #e5e7eb;
+      gap: 6px;
     }
-    .lightbox-btn span {
+
+    .gallery-item-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .gallery-item-meta-main {
+      font-weight: 500;
+    }
+
+    .gallery-item-meta-sub {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .like-button {
+      cursor: pointer;
+      font-size: 0.9rem;
+      user-select: none;
+      border: none;
+      background: transparent;
+      color: #fbbf24;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .like-button.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .like-button span {
       font-size: 1rem;
-      line-height: 1;
+    }
+
+    .mm-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #1f2937;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9980;
+      font-size: 0.9rem;
+      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
+    }
+
+    /* Lightbox tweaks */
+    @media (max-width: 640px) {
+      .lightbox-inner {
+        grid-template-columns: 1fr;
+      }
+      .lightbox-img-wrapper img {
+        height: 50vh;
+      }
     }
   </style>
 </head>
+
 <body>
-<div class="page">
-  <header>
-    <div class="brand">
-      <div class="logo-pill">☕</div>
+
+<!-- Sticky Header -->
+<div id="mm-header"></div>
+
+<div class="popular-container">
+  <div class="popular-card">
+    <div class="popular-header">
       <div>
-        <h1>EUROPEAN <span>MUG MAP</span></h1>
-        <div class="tagline">See the most-loved Christmas market mugs.</div>
-      </div>
-    </div>
-    <nav class="nav-links">
-      <a href="index.html">Current Year</a>
-      <a href="previous.html">Previous Years</a>
-      <a href="popular.html" class="active">Popular Mugs</a>
-      <a href="leaderboard.html">Leaderboard</a>
-      <a href="upload.html">Upload Mug</a>
-    </nav>
-  </header>
-
-  <main>
-    <div class="main-container popular-layout">
-      <section class="card-main">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Most Popular Mugs</div>
-            <div class="card-sub">
-              Ranked by likes across all approved photos. Click a mug to view it larger.
-            </div>
-          </div>
-          <div id="countSummary" style="font-size:0.78rem; color:var(--text-muted);">
-            Loading...
-          </div>
+        <div class="popular-title">Most Popular Mugs</div>
+        <div class="popular-subtitle">
+          Sorted by likes. Filter by country and year.
         </div>
+      </div>
 
-        <div class="filter-row">
-          <span>Filter by year:</span>
-          <select id="yearFilter" class="filter-select">
+      <div class="popular-filters">
+        <div>
+          <label for="countryFilter">Country</label>
+          <select id="countryFilter">
+            <option value="all">All countries</option>
+          </select>
+        </div>
+        <div>
+          <label for="yearFilter">Year</label>
+          <select id="yearFilter">
             <option value="all">All years</option>
           </select>
         </div>
-
-        <div id="popularEmpty" style="margin-top:0.8rem; font-size:0.82rem; color:var(--text-muted);">
-          Loading popular mugs...
-        </div>
-        <div class="popular-grid" id="popularGrid"></div>
-      </section>
-    </div>
-
-    <!-- Lightbox -->
-    <div class="lightbox" id="lightbox">
-      <div class="lightbox-controls">
-        <button class="lightbox-btn" id="lightboxPrev">&#10094;</button>
-        <button class="lightbox-btn" id="lightboxNext">&#10095;</button>
-        <button class="lightbox-btn" id="lightboxClose"><span>&times;</span></button>
-      </div>
-      <div class="lightbox-inner">
-        <div class="lightbox-img-wrapper">
-          <img id="lightboxImage" src="" alt="Mug photo" />
-        </div>
-        <div class="lightbox-meta">
-          <div class="lightbox-title" id="lightboxTitle"></div>
-          <div class="lightbox-subtitle" id="lightboxSubtitle"></div>
-          <div id="lightboxExtra"></div>
-        </div>
       </div>
     </div>
-  </main>
+
+    <div id="popularInfo" class="popular-info">Loading popular mugs…</div>
+    <div id="popularError" class="popular-error"></div>
+
+    <div id="galleryGrid" class="gallery-grid"></div>
+  </div>
 </div>
+
+<!-- Lightbox (uses same classes as styles.css / index) -->
+<div id="lightbox" class="lightbox">
+  <div class="lightbox-inner">
+    <div class="lightbox-img-wrapper">
+      <img id="lightboxImg" src="" alt="Mug photo" />
+    </div>
+    <div class="lightbox-meta">
+      <div class="lightbox-title" id="lightboxTitle"></div>
+      <div class="lightbox-subtitle" id="lightboxSubtitle"></div>
+      <div class="lightbox-chips">
+        <div class="chip" id="lightboxYear"></div>
+        <div class="chip" id="lightboxLocation"></div>
+      </div>
+      <button id="lightboxLike" class="like-button">
+        ❤️ <span id="lightboxLikeCount">0</span>
+      </button>
+    </div>
+
+    <div class="lightbox-controls">
+      <button id="lightboxPrev" class="lightbox-btn lightbox-prev">&#10094;</button>
+      <button id="lightboxNext" class="lightbox-btn lightbox-next">&#10095;</button>
+      <button id="lightboxClose" class="lightbox-btn lightbox-close">&#10005;</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sticky Footer -->
+<footer class="mm-footer">
+  <div class="mm-footer-inner">© 2025 Mug Mapper</div>
+</footer>
 
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+  // ---------------------------
+  // 1. Load shared header
+  // ---------------------------
+  const headerHTML = await fetch("header.html").then((r) => r.text());
+  document.getElementById("mm-header").innerHTML = headerHTML;
+
+  // Hamburger / overlay wiring
+  const mmHamburger  = document.getElementById("mmHamburger");
+  const mmNavOverlay = document.getElementById("mmNavOverlay");
+  const mmNavClose   = document.getElementById("mmNavClose");
+  const navLinks     = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
+
+  function openNav() {
+    mmNavOverlay.style.display = "block";
+    mmNavOverlay.setAttribute("aria-hidden", "false");
+  }
+  function closeNav() {
+    mmNavOverlay.style.display = "none";
+    mmNavOverlay.setAttribute("aria-hidden", "true");
+  }
+
+  mmHamburger?.addEventListener("click", openNav);
+  mmNavClose?.addEventListener("click", closeNav);
+  navLinks.forEach((link) => link.addEventListener("click", closeNav));
+
+  // ---------------------------
+  // 2. Supabase Init + Auth
+  // ---------------------------
   const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const popularGrid   = document.getElementById("popularGrid");
-  const popularEmpty  = document.getElementById("popularEmpty");
-  const countSummary  = document.getElementById("countSummary");
+  const authUserLabel     = document.getElementById("authUserLabel");
+  const loginGoogleButton = document.getElementById("loginGoogleButton");
+  const loginEmailButton  = document.getElementById("loginEmailButton");
+  const logoutButton      = document.getElementById("logoutButton");
+
+  let currentUser    = null;
+  let likedPhotoIds  = new Set();
+  let currentPhotos  = [];
+  let lightboxIndex  = 0;
+
+  const countryFilter = document.getElementById("countryFilter");
   const yearFilter    = document.getElementById("yearFilter");
+  const popularInfo   = document.getElementById("popularInfo");
+  const popularError  = document.getElementById("popularError");
+  const galleryGrid   = document.getElementById("galleryGrid");
 
-  const lightbox      = document.getElementById("lightbox");
-  const lightboxImage = document.getElementById("lightboxImage");
-  const lightboxTitle = document.getElementById("lightboxTitle");
-  const lightboxSubtitle = document.getElementById("lightboxSubtitle");
-  const lightboxExtra = document.getElementById("lightboxExtra");
-  const lightboxPrev  = document.getElementById("lightboxPrev");
-  const lightboxNext  = document.getElementById("lightboxNext");
-  const lightboxClose = document.getElementById("lightboxClose");
+  function updateAuthUI() {
+    if (!authUserLabel) return;
+    if (currentUser) {
+      authUserLabel.textContent =
+        currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
+      loginGoogleButton.style.display = "none";
+      loginEmailButton.style.display  = "none";
+      logoutButton.style.display      = "block";
+    } else {
+      authUserLabel.textContent = "Not signed in";
+      loginGoogleButton.style.display = "block";
+      loginEmailButton.style.display  = "block";
+      logoutButton.style.display      = "none";
+    }
+  }
 
-  let allPopular = [];   // all mugs loaded from Supabase
-  let filteredPopular = []; // filtered by year
-  let marketsMap = new Map(); // market_id -> market
-  let currentIndex = 0;
+  async function loadUserLikes() {
+    if (!currentUser) {
+      likedPhotoIds = new Set();
+      return;
+    }
 
-  async function loadPopularMugs() {
-    // 1) Load top mugs
-    const { data: mugs, error: mugsError } = await supabase
+    const { data, error } = await supabase
+      .from("photo_likes")
+      .select("photo_id")
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error("Error loading user likes:", error);
+      likedPhotoIds = new Set();
+      return;
+    }
+
+    likedPhotoIds = new Set((data || []).map((row) => row.photo_id));
+  }
+
+  async function initAuth() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    currentUser = session?.user ?? null;
+    updateAuthUI();
+    await loadUserLikes();
+
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      currentUser = session?.user ?? null;
+      updateAuthUI();
+      await loadUserLikes();
+      renderGallery();
+    });
+  }
+
+  loginGoogleButton?.addEventListener("click", async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.href },
+    });
+    if (error) alert("Google sign-in error: " + error.message);
+  });
+
+  loginEmailButton?.addEventListener("click", async () => {
+    const email = prompt("Enter your email for a sign-in link:");
+    if (!email) return;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href },
+    });
+    if (error) alert("Email sign-in error: " + error.message);
+    else alert("Magic link sent. Check your inbox.");
+  });
+
+  logoutButton?.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+  });
+
+  await initAuth();
+
+  // ---------------------------
+  // 3. Load filter options (countries + years)
+  // ---------------------------
+  async function loadFilterOptions() {
+    popularError.textContent = "";
+    const { data, error } = await supabase
       .from("mug_photos")
-      .select("id, market_id, public_url, caption, year, like_count, created_at")
-      .eq("status", "approved")
+      .select("year, markets(country)")
+      .eq("status", "approved");
+
+    if (error) {
+      console.error("Error loading filter options:", error);
+      popularError.textContent = "Error loading filters:\n" + error.message;
+      return;
+    }
+
+    const rows = data || [];
+
+    const countrySet = new Set();
+    const yearSet    = new Set();
+
+    rows.forEach((r) => {
+      if (r.markets?.country) {
+        countrySet.add(r.markets.country);
+      }
+      if (r.year) {
+        yearSet.add(r.year);
+      }
+    });
+
+    // Populate country filter
+    countryFilter.innerHTML = `<option value="all">All countries</option>`;
+    Array.from(countrySet)
+      .sort((a, b) => a.localeCompare(b))
+      .forEach((country) => {
+        const opt = document.createElement("option");
+        opt.value = country;
+        opt.textContent = country;
+        countryFilter.appendChild(opt);
+      });
+
+    // Populate year filter
+    yearFilter.innerHTML = `<option value="all">All years</option>`;
+    Array.from(yearSet)
+      .sort((a, b) => b - a) // newest first
+      .forEach((year) => {
+        const opt = document.createElement("option");
+        opt.value = year;
+        opt.textContent = year;
+        yearFilter.appendChild(opt);
+      });
+  }
+
+  // ---------------------------
+  // 4. Load popular photos (respect filters)
+  // ---------------------------
+  async function loadPopularPhotos() {
+    popularError.textContent = "";
+    popularInfo.textContent  = "Loading popular mugs…";
+    galleryGrid.innerHTML    = "";
+
+    let query = supabase
+      .from("mug_photos")
+      .select(`
+        id,
+        public_url,
+        caption,
+        year,
+        like_count,
+        status,
+        market_id,
+        created_at,
+        markets (
+          market_name,
+          city,
+          country
+        )
+      `)
+      .eq("status", "approved");
+
+    const countryValue = countryFilter.value;
+    const yearValue    = yearFilter.value;
+
+    if (countryValue && countryValue !== "all") {
+      // filter on joined markets.country
+      query = query.eq("markets.country", countryValue);
+    }
+
+    if (yearValue && yearValue !== "all") {
+      query = query.eq("year", parseInt(yearValue, 10));
+    }
+
+    // Most popular first, then newest
+    const { data, error } = await query
       .order("like_count", { ascending: false })
       .order("created_at", { ascending: false })
-      .limit(60);
+      .limit(200);
 
-    if (mugsError) {
-      console.error("Error loading popular mugs:", mugsError);
-      popularEmpty.textContent = "Error loading popular mugs.";
+    if (error) {
+      console.error("Error loading popular photos:", error);
+      popularInfo.textContent = "";
+      popularError.textContent = "Error loading popular mugs:\n" + error.message;
       return;
     }
 
-    if (!mugs || mugs.length === 0) {
-      popularEmpty.textContent = "No approved mugs yet. Once users like photos, they'll show up here.";
+    currentPhotos = data || [];
+
+    if (!currentPhotos.length) {
+      popularInfo.textContent = "No mugs found for this filter yet.";
+      galleryGrid.innerHTML = `<div class="popular-info" style="margin-top:10px;">Try a different country or year.</div>`;
       return;
     }
 
-    allPopular = mugs;
-
-    // 2) Load associated markets
-    const marketIds = Array.from(new Set(mugs.map((m) => m.market_id).filter((id) => id != null)));
-    if (marketIds.length) {
-      const { data: markets, error: marketsError } = await supabase
-        .from("markets")
-        .select("id, country, city, market_name")
-        .in("id", marketIds);
-
-      if (marketsError) {
-        console.error("Error loading markets for popular mugs:", marketsError);
-      } else {
-        markets.forEach((m) => marketsMap.set(m.id, m));
-      }
-    }
-
-    // 3) Populate year filter
-    const years = Array.from(new Set(mugs.map((m) => m.year).filter((y) => !!y)));
-    years.sort((a, b) => b - a);
-    years.forEach((y) => {
-      const opt = document.createElement("option");
-      opt.value = String(y);
-      opt.textContent = y;
-      yearFilter.appendChild(opt);
-    });
-
-    countSummary.textContent = `${mugs.length} top mugs loaded`;
-
-    applyFilterAndRender();
+    popularInfo.textContent = `${currentPhotos.length} mug(s) found.`;
+    renderGallery();
   }
 
-  function applyFilterAndRender() {
-    const yearValue = yearFilter.value;
-    if (yearValue === "all") {
-      filteredPopular = allPopular.slice();
-    } else {
-      const yearInt = parseInt(yearValue, 10);
-      filteredPopular = allPopular.filter((m) => m.year === yearInt);
-    }
+  countryFilter.addEventListener("change", loadPopularPhotos);
+  yearFilter.addEventListener("change", loadPopularPhotos);
 
-    renderPopular();
-  }
+  // ---------------------------
+  // 5. Render gallery
+  // ---------------------------
+  function renderGallery() {
+    galleryGrid.innerHTML = "";
+    if (!currentPhotos.length) return;
 
-  function renderPopular() {
-    popularGrid.innerHTML = "";
-    if (!filteredPopular.length) {
-      popularEmpty.style.display = "block";
-      popularEmpty.textContent = "No mugs found for this filter.";
-      return;
-    }
-    popularEmpty.style.display = "none";
-
-    filteredPopular.forEach((photo, idx) => {
-      const market = marketsMap.get(photo.market_id);
-      const card = document.createElement("div");
-      card.className = "popular-card";
-      card.dataset.index = idx;
+    currentPhotos.forEach((p, index) => {
+      const item = document.createElement("div");
+      item.className = "gallery-item";
 
       const img = document.createElement("img");
-      img.src = photo.public_url;
-      img.alt = photo.caption || (market ? `Mug at ${market.market_name}` : "Mug photo");
-      card.appendChild(img);
+      img.src = p.public_url;
+      img.alt = "Mug photo";
+      img.loading = "lazy";
+      img.style.cursor = "pointer";
+      img.addEventListener("click", () => openLightbox(index));
 
-      const body = document.createElement("div");
-      body.className = "popular-card-body";
+      const info = document.createElement("div");
+      info.className = "gallery-item-info";
 
-      const title = document.createElement("div");
-      title.className = "popular-name";
-      title.textContent = market ? market.market_name : "Unknown market";
-      body.appendChild(title);
+      const meta = document.createElement("div");
+      meta.className = "gallery-item-meta";
 
-      const loc = document.createElement("div");
-      loc.className = "popular-location";
-      loc.textContent = market ? `${market.city}, ${market.country}` : "";
-      body.appendChild(loc);
+      const main = document.createElement("div");
+      main.className = "gallery-item-meta-main";
+      const mkt = p.markets;
+      main.textContent = mkt
+        ? mkt.market_name
+        : "Unknown market";
 
-      const metaRow = document.createElement("div");
-      metaRow.className = "popular-meta-row";
+      const sub = document.createElement("div");
+      sub.className = "gallery-item-meta-sub";
+      const locText = mkt
+        ? `${mkt.city}, ${mkt.country}`
+        : "Location unknown";
+      sub.textContent = p.year
+        ? `${locText} · ${p.year}`
+        : locText;
 
-      const yearBadge = document.createElement("div");
-      yearBadge.className = "badge-year";
-      yearBadge.textContent = photo.year || "Year ?";
-      metaRow.appendChild(yearBadge);
+      meta.appendChild(main);
+      meta.appendChild(sub);
 
-      const likesBadge = document.createElement("div");
-      likesBadge.className = "badge-likes";
-      likesBadge.textContent = `★ ${photo.like_count ?? 0}`;
-      metaRow.appendChild(likesBadge);
+      const likeBtn = document.createElement("button");
+      likeBtn.className = "like-button";
 
-      body.appendChild(metaRow);
-      card.appendChild(body);
+      const isLiked = likedPhotoIds.has(p.id);
+      likeBtn.innerHTML = isLiked
+        ? `❤️ <span>${p.like_count ?? 0}</span>`
+        : `🤍 <span>${p.like_count ?? 0}</span>`;
 
-      card.addEventListener("click", () => openLightbox(idx));
-      popularGrid.appendChild(card);
+      likeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        handleLike(p.id, false);
+      });
+
+      if (!currentUser) {
+        likeBtn.classList.add("disabled");
+        likeBtn.title = "Sign in to like photos";
+      }
+
+      info.appendChild(meta);
+      info.appendChild(likeBtn);
+
+      item.appendChild(img);
+      item.appendChild(info);
+      galleryGrid.appendChild(item);
     });
   }
 
+  // ---------------------------
+  // 6. Lightbox
+  // ---------------------------
+  const lightbox            = document.getElementById("lightbox");
+  const lightboxImg         = document.getElementById("lightboxImg");
+  const lightboxTitleEl     = document.getElementById("lightboxTitle");
+  const lightboxSubtitleEl  = document.getElementById("lightboxSubtitle");
+  const lightboxYear        = document.getElementById("lightboxYear");
+  const lightboxLocation    = document.getElementById("lightboxLocation");
+  const lightboxLike        = document.getElementById("lightboxLike");
+  const lightboxLikeCountEl = document.getElementById("lightboxLikeCount");
+  const btnPrev             = document.getElementById("lightboxPrev");
+  const btnNext             = document.getElementById("lightboxNext");
+  const btnClose            = document.getElementById("lightboxClose");
+
   function openLightbox(index) {
-    if (!filteredPopular.length) return;
-    currentIndex = index;
-    const photo = filteredPopular[currentIndex];
-    const market = marketsMap.get(photo.market_id);
+    if (!currentPhotos.length) return;
+    lightboxIndex = index;
+    const p = currentPhotos[index];
 
-    lightboxImage.src = photo.public_url;
-    lightboxTitle.textContent = market ? market.market_name : "Mug photo";
-    const locationText = market ? `${market.city}, ${market.country}` : "Unknown location";
-    const yearText = photo.year || "Year unknown";
-    const likeText = `★ ${photo.like_count ?? 0} likes`;
-    lightboxSubtitle.textContent = `${locationText} · ${yearText} · ${likeText}`;
-    lightboxExtra.textContent = photo.caption || "";
+    lightboxImg.src = p.public_url;
+    lightboxTitleEl.textContent = p.markets?.market_name || "Mug Photo";
+    lightboxSubtitleEl.textContent = p.caption || "";
+    lightboxYear.textContent = p.year || "";
 
-    lightbox.classList.add("open");
+    const mkt = p.markets;
+    lightboxLocation.textContent = mkt
+      ? `${mkt.city}, ${mkt.country}`
+      : "";
+
+    const isLiked = likedPhotoIds.has(p.id);
+    lightboxLikeCountEl.textContent = p.like_count ?? 0;
+    lightboxLike.innerHTML = isLiked
+      ? `❤️ <span id="lightboxLikeCount">${p.like_count ?? 0}</span>`
+      : `🤍 <span id="lightboxLikeCount">${p.like_count ?? 0}</span>`;
+
+    if (!currentUser) {
+      lightboxLike.classList.add("disabled");
+      lightboxLike.title = "Sign in to like photos";
+    } else {
+      lightboxLike.classList.remove("disabled");
+      lightboxLike.title = "";
+    }
+
+    lightboxLike.onclick = () => handleLike(p.id, true);
+
+    lightbox.classList.add("visible");
   }
 
   function closeLightbox() {
-    lightbox.classList.remove("open");
+    lightbox.classList.remove("visible");
   }
 
-  function stepLightbox(delta) {
-    if (!filteredPopular.length) return;
-    currentIndex = (currentIndex + delta + filteredPopular.length) % filteredPopular.length;
-    openLightbox(currentIndex);
-  }
-
-  yearFilter.addEventListener("change", applyFilterAndRender);
-  lightboxPrev.addEventListener("click", () => stepLightbox(-1));
-  lightboxNext.addEventListener("click", () => stepLightbox(1));
-  lightboxClose.addEventListener("click", closeLightbox);
+  btnClose.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", (e) => {
     if (e.target === lightbox) closeLightbox();
   });
-  document.addEventListener("keydown", (e) => {
-    if (!lightbox.classList.contains("open")) return;
-    if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowLeft") stepLightbox(-1);
-    if (e.key === "ArrowRight") stepLightbox(1);
+
+  btnPrev.addEventListener("click", () => {
+    if (!currentPhotos.length) return;
+    lightboxIndex = (lightboxIndex - 1 + currentPhotos.length) % currentPhotos.length;
+    openLightbox(lightboxIndex);
   });
 
-  (async function init() {
-    await loadPopularMugs();
-  })();
+  btnNext.addEventListener("click", () => {
+    if (!currentPhotos.length) return;
+    lightboxIndex = (lightboxIndex + 1) % currentPhotos.length;
+    openLightbox(lightboxIndex);
+  });
+
+  // ---------------------------
+  // 7. Like handler (toggle, uses photo_likes)
+  // ---------------------------
+  async function handleLike(photoId, fromLightbox) {
+    if (!currentUser) {
+      alert("Sign in to like photos.");
+      return;
+    }
+
+    const alreadyLiked = likedPhotoIds.has(photoId);
+    const photo = currentPhotos.find((p) => p.id === photoId);
+    if (!photo) return;
+
+    if (!alreadyLiked) {
+      // Insert like
+      const { error } = await supabase
+        .from("photo_likes")
+        .insert({ photo_id: photoId, user_id: currentUser.id });
+
+      // 23505 = unique violation (already liked)
+      if (error && error.code !== "23505") {
+        console.error("Error inserting like:", error);
+        return;
+      }
+
+      likedPhotoIds.add(photoId);
+      photo.like_count = (photo.like_count ?? 0) + 1;
+    } else {
+      // Delete like
+      const { error } = await supabase
+        .from("photo_likes")
+        .delete()
+        .eq("photo_id", photoId)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error("Error deleting like:", error);
+        return;
+      }
+
+      likedPhotoIds.delete(photoId);
+      photo.like_count = Math.max((photo.like_count ?? 0) - 1, 0);
+    }
+
+    // Re-render gallery
+    renderGallery();
+
+    // If lightbox is open, update that slide
+    if (fromLightbox) {
+      const idx = currentPhotos.findIndex((p) => p.id === photoId);
+      if (idx !== -1) openLightbox(idx);
+    }
+  }
+
+  // ---------------------------
+  // 8. Init filters + data
+  // ---------------------------
+  await loadFilterOptions();
+  await loadPopularPhotos();
 </script>
+
 </body>
 </html>
