@@ -97,6 +97,7 @@
     .mm-msg {
       margin-top: 10px;
       font-size: 0.9rem;
+      white-space: pre-line; /* so we can show multi-line errors */
     }
 
     /* Sticky footer */
@@ -161,7 +162,6 @@
     }
 
     @media (min-width: 640px) {
-      /* Optional: tighten form spacing on larger screens */
       .mm-card {
         padding: 22px 26px 28px;
       }
@@ -197,12 +197,10 @@
       <label for="marketSelect">Market</label>
       <select id="marketSelect"></select>
 
-      <!-- My Market Is Missing button on its own row -->
       <button type="button" id="addMarketButton" class="mm-link-btn">
         + My Market Is Missing
       </button>
 
-      <!-- Year stacked BELOW the button so nothing overlaps -->
       <label for="yearInput">Year</label>
       <input type="number" id="yearInput" min="2000" max="2100" />
 
@@ -264,9 +262,9 @@
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  // ---------------------------
-  // 1. Load Sticky Header
-  // ---------------------------
+  /* ---------------------------
+     1. Load Sticky Header
+  --------------------------- */
   const headerHTML = await fetch("header.html").then((r) => r.text());
   document.getElementById("mm-header").innerHTML = headerHTML;
 
@@ -283,13 +281,13 @@
     mmNavOverlay.style.display = "none";
   }
 
-  mmHamburger.addEventListener("click", openNav);
-  mmNavClose.addEventListener("click", closeNav);
+  mmHamburger?.addEventListener("click", openNav);
+  mmNavClose?.addEventListener("click", closeNav);
   navLinks.forEach((a) => a.addEventListener("click", closeNav));
 
-  // ---------------------------
-  // 2. Supabase Init + Auth
-  // ---------------------------
+  /* ---------------------------
+     2. Supabase Init + Auth
+  --------------------------- */
   const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
   const SUPABASE_ANON_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
@@ -306,6 +304,12 @@
   const uploadMsg   = document.getElementById("uploadMessage");
 
   let currentUser = null;
+
+  function setUploadMessage(type, text, extra) {
+    if (!uploadMsg) return;
+    uploadMsg.style.color = type === "error" ? "#fecaca" : "#bbf7d0";
+    uploadMsg.textContent = text + (extra ? `\n${extra}` : "");
+  }
 
   function updateAuthUI() {
     if (!authUserLabel) return;
@@ -362,9 +366,9 @@
 
   await initAuth();
 
-  // ---------------------------
-  // 3. Market Dropdown Logic
-  // ---------------------------
+  /* ---------------------------
+     3. Market Dropdown Logic
+  --------------------------- */
   const countrySelect = document.getElementById("countrySelect");
   const citySelect    = document.getElementById("citySelect");
   const marketSelect  = document.getElementById("marketSelect");
@@ -393,6 +397,7 @@
     const { data, error } = await query;
     if (error) {
       console.error("Error loading markets:", error);
+      setUploadMessage("error", "Error loading markets.", error.message);
       return;
     }
 
@@ -455,9 +460,9 @@
     });
   });
 
-  // ---------------------------
-  // 4. Add Market Modal
-  // ---------------------------
+  /* ---------------------------
+     4. Add Market Modal
+  --------------------------- */
   const addMarketButton      = document.getElementById("addMarketButton");
   const addMarketModal       = document.getElementById("addMarketModal");
   const closeModalButton     = document.getElementById("closeModalButton");
@@ -516,9 +521,9 @@
       .single();
 
     if (error) {
-      console.error(error);
+      console.error("Error adding market:", error);
       modalMessage.style.color = "#fecaca";
-      modalMessage.textContent = "Error adding market.";
+      modalMessage.textContent = "Error adding market.\n" + error.message;
       return;
     }
 
@@ -535,9 +540,9 @@
     setTimeout(() => (addMarketModal.style.display = "none"), 800);
   });
 
-  // ---------------------------
-  // 5. Upload Photos
-  // ---------------------------
+  /* ---------------------------
+     5. Upload Photos (with detailed errors)
+  --------------------------- */
   function getExtension(filename) {
     return filename.split(".").pop().toLowerCase();
   }
@@ -552,12 +557,11 @@
 
   uploadForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    uploadMsg.style.color = "#9ca3af";
-    uploadMsg.textContent = "Uploading...";
+    setUploadMessage("info", "Uploading...");
+    console.log("Starting upload...");
 
     if (!currentUser) {
-      uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "You must be signed in.";
+      setUploadMessage("error", "You must be signed in.");
       return;
     }
 
@@ -569,28 +573,23 @@
     const caption  = captionInput.value.trim();
 
     if (!country || !city || !marketId) {
-      uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "Please select a valid market.";
+      setUploadMessage("error", "Please select a valid market.");
       return;
     }
     if (!year || isNaN(year)) {
-      uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "Enter a valid year.";
+      setUploadMessage("error", "Enter a valid year.");
       return;
     }
     if (!files.length) {
-      uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "Attach at least one photo.";
+      setUploadMessage("error", "Attach at least one photo.");
       return;
     }
     if (files.length > 3) {
-      uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "Max 3 photos allowed.";
+      setUploadMessage("error", "Max 3 photos allowed.");
       return;
     }
     if (!consent.checked) {
-      uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "You must agree to public display.";
+      setUploadMessage("error", "You must agree to public display.");
       return;
     }
 
@@ -601,21 +600,33 @@
         const file = files[i];
         const path = generateStoragePath(marketId, year, file, i);
 
-        const uploadRes = await supabase.storage
+        console.log("Uploading to storage path:", path);
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from("mugs")
           .upload(path, file, { upsert: false });
 
-        if (uploadRes.error) throw uploadRes.error;
+        if (uploadError) {
+          console.error("Storage upload error:", uploadError);
+          setUploadMessage(
+            "error",
+            "Upload failed during file upload.",
+            uploadError.message || JSON.stringify(uploadError)
+          );
+          throw uploadError;
+        }
 
-        const { data: pub } = supabase.storage
-          .from("mugs")
-          .getPublicUrl(path);
+        console.log("Storage upload OK:", uploadData);
+
+        const { data: pub } = supabase.storage.from("mugs").getPublicUrl(path);
         const publicUrl = pub.publicUrl;
 
-        const { error: insertErr } = await supabase
+        console.log("Public URL:", publicUrl);
+
+        const { error: insertError } = await supabase
           .from("mug_photos")
           .insert({
-            market_id: Number(marketId),
+            market_id: Number(marketId), // assumes mug_photos.market_id is BIGINT
             uploader_id: currentUser.id,
             uploader_email: currentUser.email,
             storage_path: path,
@@ -626,20 +637,32 @@
             like_count: 0,
           });
 
-        if (insertErr) throw insertErr;
+        if (insertError) {
+          console.error("DB insert error:", insertError);
+          setUploadMessage(
+            "error",
+            "Upload failed while saving to the database.",
+            insertError.message || JSON.stringify(insertError)
+          );
+          throw insertError;
+        }
+
+        console.log("DB insert OK for photo:", path);
       }
 
-      uploadMsg.style.color = "#bbf7d0";
-      uploadMsg.textContent =
-        "Upload complete! Your photos are pending approval.";
+      setUploadMessage(
+        "success",
+        "Upload complete! Your photos are pending approval."
+      );
 
       fileInput.value = "";
       captionInput.value = "";
       consent.checked = false;
     } catch (err) {
-      console.error(err);
-      uploadMsg.style.color = "#fecaca";
-      uploadMsg.textContent = "Upload failed. Please try again.";
+      console.error("Upload exception:", err);
+      if (!uploadMsg.textContent || !uploadMsg.textContent.startsWith("Upload failed")) {
+        setUploadMessage("error", "Upload failed. Please try again.", err.message || "");
+      }
     } finally {
       submitButton.disabled = false;
     }
