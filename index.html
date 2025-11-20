@@ -9,16 +9,19 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Leaflet -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
     body {
       margin: 0;
-      padding-top: 56px; /* space for fixed header */
       background: #111827;
       color: #f9fafb;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      /* space for sticky header & footer */
+      padding-top: 58px;  /* header height */
+      padding-bottom: 48px; /* footer height */
     }
 
     #map {
@@ -27,30 +30,23 @@
 
     @media (min-width: 900px) {
       #map {
-        height: calc(100vh - 56px);
+        height: calc(100vh - 58px - 48px);
       }
     }
 
     .gallery-container {
-      padding: 12px 16px 20px;
-    }
-
-    .gallery-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
+      padding: 14px 16px 20px;
     }
 
     .gallery-title {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 600;
     }
 
     .gallery-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: #9ca3af;
+      margin-bottom: 12px;
     }
 
     .like-button {
@@ -74,6 +70,22 @@
       font-size: 1.1rem;
     }
 
+    .mm-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #1f2937;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9980;
+      font-size: 0.9rem;
+      box-shadow: 0 -2px 4px rgba(15, 23, 42, 0.4);
+    }
+
     /* Lightbox tweaks for mobile */
     @media (max-width: 640px) {
       .lightbox-inner {
@@ -88,7 +100,7 @@
 
 <body>
 
-<!-- Shared header gets injected here -->
+<!-- Shared header will be injected here -->
 <div id="mm-header"></div>
 
 <!-- Map -->
@@ -96,19 +108,15 @@
 
 <!-- Gallery -->
 <section class="gallery-container">
-  <div class="gallery-header">
-    <div>
-      <div class="gallery-title" id="galleryTitle">Select a mug icon</div>
-      <div class="gallery-subtitle" id="gallerySubtitle">
-        Tap a mug icon on the map to view photos from that market.
-      </div>
-    </div>
+  <div class="gallery-title" id="galleryTitle">Select a mug icon</div>
+  <div class="gallery-subtitle" id="gallerySubtitle">
+    Tap a mug icon on the map to see photos from that market.
   </div>
 
   <div id="galleryGrid" class="gallery-grid"></div>
 </section>
 
-<!-- Lightbox (from styles.css) -->
+<!-- Lightbox (styles defined in styles.css) -->
 <div id="lightbox" class="lightbox">
   <div class="lightbox-inner">
     <div class="lightbox-img-wrapper">
@@ -122,7 +130,7 @@
         <div class="chip" id="lightboxLocation"></div>
       </div>
       <button id="lightboxLike" class="like-button">
-        <span>❤️</span><span id="lightboxLikeCount">0</span>
+        ❤️ <span id="lightboxLikeCount">0</span>
       </button>
     </div>
 
@@ -134,17 +142,24 @@
   </div>
 </div>
 
+<!-- Sticky footer -->
+<footer class="mm-footer">
+  <div class="mm-footer-inner">© 2025 Mug Mapper</div>
+</footer>
+
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  // --- 1. Load shared header and wire up menu/auth shells ---
-  const headerContainer = document.getElementById("mm-header");
-  const headerHtml = await fetch("header.html").then((r) => r.text());
-  headerContainer.innerHTML = headerHtml;
+  // ------------------------------
+  // 1. Load shared header
+  // ------------------------------
+  const headerHTML = await fetch("header.html").then((r) => r.text());
+  document.getElementById("mm-header").innerHTML = headerHTML;
 
+  // Now we can get header elements
   const mmHamburger   = document.getElementById("mmHamburger");
   const mmNavOverlay  = document.getElementById("mmNavOverlay");
   const mmNavClose    = document.getElementById("mmNavClose");
@@ -164,12 +179,9 @@
   mmNavClose?.addEventListener("click", closeNav);
   navLinks.forEach((link) => link.addEventListener("click", closeNav));
 
-  // Optional mobile detection (overlay is full-screen either way)
-  const isMobile =
-    window.matchMedia("(max-width: 768px)").matches ||
-    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  // --- 2. Supabase client & auth wiring ---
+  // ------------------------------
+  // 2. Supabase Init + Auth
+  // ------------------------------
   const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
   const SUPABASE_ANON_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
@@ -185,10 +197,11 @@
 
   function updateAuthUI() {
     if (!authUserLabel) return;
+
     if (currentUser) {
       authUserLabel.textContent =
         currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
-      loginGoogleButton.style.display = "none";
+      loginGoogleButton.style.display = "block"; // keep Google visible if you want re-auth
       loginEmailButton.style.display  = "none";
       logoutButton.style.display      = "block";
     } else {
@@ -200,7 +213,10 @@
   }
 
   async function initAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     currentUser = session?.user ?? null;
     updateAuthUI();
 
@@ -235,9 +251,11 @@
 
   await initAuth();
 
-  // --- 3. Leaflet map setup ---
+  // ------------------------------
+  // 3. Map Setup
+  // ------------------------------
   const map = L.map("map", {
-    center: [51.1657, 10.4515], // central Europe-ish
+    center: [51.1657, 10.4515], // Central Europe-ish
     zoom: 5,
     zoomControl: false,
   });
@@ -253,7 +271,6 @@
     iconAnchor: [20, 40],
   });
 
-  // --- 4. Load markets that have approved photos ---
   async function loadActiveMarkets() {
     const { data: photoRows, error: photosError } = await supabase
       .from("mug_photos")
@@ -290,9 +307,11 @@
     });
   }
 
-  // --- 5. Gallery + Likes ---
-  const galleryGrid = document.getElementById("galleryGrid");
-  const galleryTitle = document.getElementById("galleryTitle");
+  // ------------------------------
+  // 4. Gallery & Likes
+  // ------------------------------
+  const galleryGrid     = document.getElementById("galleryGrid");
+  const galleryTitle    = document.getElementById("galleryTitle");
   const gallerySubtitle = document.getElementById("gallerySubtitle");
 
   let currentPhotos = [];
@@ -301,7 +320,7 @@
 
   async function openGalleryForMarket(market) {
     currentMarket = market;
-    galleryTitle.textContent = market.market_name;
+    galleryTitle.textContent    = market.market_name;
     gallerySubtitle.textContent = `${market.city}, ${market.country}`;
 
     const { data: photos, error } = await supabase
@@ -314,13 +333,15 @@
 
     if (error) {
       console.error("Error loading photos:", error);
-      galleryGrid.innerHTML = `<div style="font-size:0.82rem;color:#9ca3af;">Error loading photos.</div>`;
+      galleryGrid.innerHTML =
+        `<div style="font-size:0.82rem;color:#9ca3af;">Error loading photos.</div>`;
       return;
     }
 
     currentPhotos = photos || [];
     if (!currentPhotos.length) {
-      galleryGrid.innerHTML = `<div style="font-size:0.82rem;color:#9ca3af;">No approved photos yet.</div>`;
+      galleryGrid.innerHTML =
+        `<div style="font-size:0.82rem;color:#9ca3af;">No approved photos yet.</div>`;
       return;
     }
 
@@ -329,6 +350,7 @@
 
   function renderGallery() {
     galleryGrid.innerHTML = "";
+
     currentPhotos.forEach((p, i) => {
       const item = document.createElement("div");
       item.className = "gallery-item";
@@ -347,7 +369,8 @@
 
       const likeBtn = document.createElement("button");
       likeBtn.className = "like-button";
-      likeBtn.innerHTML = `<span>❤️</span><span>${p.like_count ?? 0}</span>`;
+      likeBtn.innerHTML = `❤️ <span>${p.like_count ?? 0}</span>`;
+
       likeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         handleLike(p.id, false);
@@ -366,18 +389,20 @@
     });
   }
 
-  // --- 6. Lightbox ---
-  const lightbox        = document.getElementById("lightbox");
-  const lightboxImg     = document.getElementById("lightboxImg");
-  const lightboxTitle   = document.getElementById("lightboxTitle");
-  const lightboxSubtitle= document.getElementById("lightboxSubtitle");
-  const lightboxYear    = document.getElementById("lightboxYear");
-  const lightboxLocation= document.getElementById("lightboxLocation");
-  const lightboxLike    = document.getElementById("lightboxLike");
-  const lightboxLikeCount = document.getElementById("lightboxLikeCount");
-  const btnPrev         = document.getElementById("lightboxPrev");
-  const btnNext         = document.getElementById("lightboxNext");
-  const btnClose        = document.getElementById("lightboxClose");
+  // ------------------------------
+  // 5. Lightbox
+  // ------------------------------
+  const lightbox            = document.getElementById("lightbox");
+  const lightboxImg         = document.getElementById("lightboxImg");
+  const lightboxTitle       = document.getElementById("lightboxTitle");
+  const lightboxSubtitle    = document.getElementById("lightboxSubtitle");
+  const lightboxYear        = document.getElementById("lightboxYear");
+  const lightboxLocation    = document.getElementById("lightboxLocation");
+  const lightboxLike        = document.getElementById("lightboxLike");
+  const lightboxLikeCountEl = document.getElementById("lightboxLikeCount");
+  const btnPrev             = document.getElementById("lightboxPrev");
+  const btnNext             = document.getElementById("lightboxNext");
+  const btnClose            = document.getElementById("lightboxClose");
 
   function openLightbox(index) {
     if (!currentPhotos.length) return;
@@ -385,14 +410,14 @@
     const p = currentPhotos[index];
 
     lightboxImg.src = p.public_url;
-    lightboxTitle.textContent   = "Mug Photo";
-    lightboxSubtitle.textContent= p.caption || "";
-    lightboxYear.textContent    = p.year || "";
-    lightboxLocation.textContent= currentMarket
+    lightboxTitle.textContent    = "Mug Photo";
+    lightboxSubtitle.textContent = p.caption || "";
+    lightboxYear.textContent     = p.year || "";
+    lightboxLocation.textContent = currentMarket
       ? `${currentMarket.market_name} – ${currentMarket.city}, ${currentMarket.country}`
       : "";
 
-    lightboxLikeCount.textContent = p.like_count ?? 0;
+    lightboxLikeCountEl.textContent = p.like_count ?? 0;
 
     if (!currentUser) {
       lightboxLike.classList.add("disabled");
@@ -403,6 +428,7 @@
     }
 
     lightboxLike.onclick = () => handleLike(p.id, true);
+
     lightbox.classList.add("visible");
   }
 
@@ -427,12 +453,15 @@
     openLightbox(lightboxIndex);
   });
 
-  // --- 7. Like handler (simple counter) ---
+  // ------------------------------
+  // 6. Like Handler (simple counter)
+  // ------------------------------
   async function handleLike(photoId, fromLightbox) {
     if (!currentUser) {
       alert("Sign in to like photos.");
       return;
     }
+
     const photo = currentPhotos.find((p) => p.id === photoId);
     if (!photo) return;
 
@@ -450,6 +479,7 @@
 
     photo.like_count = newCount;
 
+    // Re-render gallery counts
     renderGallery();
 
     if (fromLightbox) {
@@ -458,7 +488,9 @@
     }
   }
 
-  // --- 8. Init map markers ---
+  // ------------------------------
+  // 7. Init: load markers
+  // ------------------------------
   (async function init() {
     const markets = await loadActiveMarkets();
     addMarkersToMap(markets);
