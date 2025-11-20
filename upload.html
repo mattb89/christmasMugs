@@ -516,6 +516,7 @@
         description: desc || null,
         status: "pending",
         created_by: currentUser.id,
+        created_by_email: currentUser.email,
       })
       .select()
       .single();
