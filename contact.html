@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mug Mapper – Contact</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    body {
+      margin: 0;
+      background: #111827;
+      color: #f9fafb;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding-top: 58px;   /* header */
+      padding-bottom: 48px; /* footer */
+    }
+
+    .contact-container {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 30px 18px 80px;
+    }
+
+    .contact-card {
+      background: #1f2937;
+      padding: 22px 24px 30px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.25);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    p {
+      margin-top: 14px;
+      line-height: 1.6;
+      font-size: 1rem;
+      color: #cbd5e1;
+    }
+
+    a.email-link {
+      display: inline-block;
+      margin-top: 18px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0ea5e9;
+      text-decoration: none;
+    }
+
+    a.email-link:hover {
+      color: #38bdf8;
+      text-decoration: underline;
+    }
+
+    .mm-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #1f2937;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9980;
+      font-size: 0.9rem;
+      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Sticky Header -->
+<div id="mm-header"></div>
+
+<div class="contact-container">
+  <div class="contact-card">
+    <h1>☎️ Contact Mug Mapper</h1>
+
+    <p>
+      Have a question, suggestion, or need to report some off data?<br>
+      I’d love to hear from you!
+    </p>
+
+    <a class="email-link" href="mailto:euromugmap@gmail.com">
+      📧 euromugmap@gmail.com
+    </a>
+  </div>
+</div>
+
+<!-- Sticky Footer -->
+<footer class="mm-footer">© 2025 Mug Mapper</footer>
+
+<script type="module">
+  // Load shared sticky header
+  const headerHTML = await fetch("header.html").then((r) => r.text());
+  document.getElementById("mm-header").innerHTML = headerHTML;
+
+  // Attach menu events
+  const mmHamburger  = document.getElementById("mmHamburger");
+  const mmNavOverlay = document.getElementById("mmNavOverlay");
+  const mmNavClose   = document.getElementById("mmNavClose");
+  const navLinks     = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
+
+  function openNav()  { mmNavOverlay.style.display = "block"; }
+  function closeNav() { mmNavOverlay.style.display = "none"; }
+
+  mmHamburger?.addEventListener("click", openNav);
+  mmNavClose?.addEventListener("click", closeNav);
+  navLinks.forEach((l) => l.addEventListener("click", closeNav));
+</script>
+
+</body>
+</html>
