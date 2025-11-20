@@ -1,235 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Mug Mapper – Map</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- W3CSS Theme -->
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-  <!-- Your existing styles (gallery, lightbox, etc.) -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="styles.css">
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
   <style>
-    body {
-      background-color: #111827;
-      color: #f9fafb;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    body { background:#111827; color:white; }
+    #map { height: 55vh; }
+    @media (min-width: 900px) { #map { height: 100vh; } }
 
-    /* Header / nav */
-    .mm-topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .mm-brand-title {
-      font-weight: 700;
-      letter-spacing: 0.1em;
-    }
-
-    .mm-brand-title span {
-      color: #0ea5e9;
-    }
-
-    .mm-nav a {
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 999px;
-    }
-    .mm-nav a:hover {
-      background: rgba(148, 163, 184, 0.2);
-    }
-    .mm-nav .mm-active {
-      background: #0ea5e9;
-      color: #0f172a !important;
-    }
-
-    /* Auth bar */
-    .mm-auth-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      padding: 6px 16px 8px;
-      font-size: 0.8rem;
-    }
-    .mm-auth-user {
-      color: #9ca3af;
-    }
-
-    .google-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid #dadce0;
-      background: #ffffff;
-      color: #3c4043;
-      font-size: 0.8rem;
-      font-weight: 500;
+    .gallery-container { padding:16px; }
+    .like-button {
       cursor: pointer;
-    }
-    .google-btn img {
-      width: 16px;
-      height: 16px;
-    }
-    .google-btn:hover {
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
-    }
-
-    .email-btn,
-    .logout-btn {
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid #4b5563;
-      background: transparent;
-      color: #e5e7eb;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-    .email-btn:hover,
-    .logout-btn:hover {
-      background: rgba(55, 65, 81, 0.6);
-    }
-
-    /* Layout: map + side panel */
-    main {
-      display: flex;
-      flex-direction: row;
-      min-height: calc(100vh - 110px);
-    }
-
-    #map {
-      flex: 1 1 auto;
-      height: calc(100vh - 110px);
-      z-index: 1;
-    }
-
-    .mm-side-panel {
-      width: 380px;
-      background: #020617;
-      border-left: 1px solid rgba(148, 163, 184, 0.3);
-      padding: 12px 16px 16px;
-      overflow-y: auto;
-    }
-
-    .mm-panel-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: #0ea5e9;
-    }
-
-    .mm-panel-heading {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .mm-panel-subtitle {
-      font-size: 0.85rem;
-      color: #9ca3af;
-    }
-
-    /* Mug icon marker */
-    .mug-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0ea5e9;
-      color: #0f172a;
-      border-radius: 999px;
-      width: 34px;
-      height: 34px;
-      border: 2px solid #e5e7eb;
-      font-size: 18px;
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.45);
-    }
-
-    /* Mobile layout */
-    @media (max-width: 900px) {
-      main {
-        flex-direction: column;
-      }
-      #map {
-        height: 50vh;
-      }
-      .mm-side-panel {
-        width: 100%;
-        height: auto;
-        border-left: none;
-        border-top: 1px solid rgba(148, 163, 184, 0.3);
-      }
-    }
-
-    /* Lightbox tweak for phones */
-    @media (max-width: 640px) {
-      .lightbox-inner {
-        grid-template-columns: 1fr;
-      }
-      .lightbox-img-wrapper img {
-        height: 50vh;
-      }
+      font-size: 1.2rem;
+      user-select: none;
     }
   </style>
 </head>
 
 <body>
 
-<!-- Top bar -->
-<div class="mm-topbar w3-card w3-dark-grey">
-  <div class="w3-bar w3-padding-small">
-    <div class="w3-bar-item">
-      <span class="mm-brand-title">MUG <span>MAPPER</span></span>
-    </div>
-    <div class="w3-bar-item w3-right mm-nav">
-      <a href="index.html" class="mm-active">Map</a>
-      <a href="upload.html">Upload</a>
-      <a href="popular.html">Popular</a>
-      <a href="leaderboard.html">Leaderboard</a>
-    </div>
-  </div>
+<!-- Header include -->
+<div id="mm-header"></div>
 
-  <!-- Auth bar -->
-  <div class="mm-auth-bar">
-    <span id="authUserLabel" class="mm-auth-user">Not signed in</span>
-    <button id="loginGoogleButton" class="google-btn">
-      <img src="https://developers.google.com/identity/images/g-logo.png" alt="G">
-      <span>Sign in with Google</span>
-    </button>
-    <button id="loginEmailButton" class="email-btn">Email link</button>
-    <button id="logoutButton" class="logout-btn" style="display:none;">Logout</button>
-  </div>
+<div id="map"></div>
+
+<div class="gallery-container">
+  <h3 id="galleryTitle">Select a mug icon</h3>
+  <div id="galleryGrid" class="gallery-grid"></div>
 </div>
 
-<main>
-  <!-- Map -->
-  <div id="map"></div>
-
-  <!-- Side panel -->
-  <aside class="mm-side-panel">
-    <div class="mm-panel-title">Market</div>
-    <div id="panelTitle" class="mm-panel-heading">Tap a mug icon</div>
-    <div id="panelSubtitle" class="mm-panel-subtitle">
-      Click a mug icon on the map to see photos from that market.
-    </div>
-
-    <div id="galleryGrid" class="gallery-grid" style="margin-top:12px;"></div>
-  </aside>
-</main>
-
-<!-- Lightbox (from your existing styles.css) -->
+<!-- Lightbox -->
 <div id="lightbox" class="lightbox">
   <div class="lightbox-inner">
     <div class="lightbox-img-wrapper">
-      <img id="lightboxImg" src="" alt="Mug photo" />
+      <img id="lightboxImg" src="">
     </div>
     <div class="lightbox-meta">
       <div class="lightbox-title" id="lightboxTitle"></div>
@@ -238,246 +50,213 @@
         <div class="chip" id="lightboxYear"></div>
         <div class="chip" id="lightboxLocation"></div>
       </div>
+      <div id="lightboxLikes" class="like-button"></div>
     </div>
+
     <div class="lightbox-controls">
-      <button class="lightbox-btn lightbox-prev" id="lightboxPrev">&#10094;</button>
-      <button class="lightbox-btn lightbox-next" id="lightboxNext">&#10095;</button>
-      <button class="lightbox-btn lightbox-close" id="lightboxClose">&#10005;</button>
+      <button id="lightboxPrev" class="lightbox-btn lightbox-prev">&#10094;</button>
+      <button id="lightboxNext" class="lightbox-btn lightbox-next">&#10095;</button>
+      <button id="lightboxClose" class="lightbox-btn lightbox-close">&#10005;</button>
     </div>
   </div>
 </div>
 
-<!-- Leaflet JS -->
+<!-- Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+  /* Load shared header */
+  await fetch("header.html").then(r => r.text()).then(html => {
+    document.getElementById("mm-header").innerHTML = html;
+  });
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  /* Supabase Setup */
+  const supabase = createClient(
+    "https://tosyomhrxttlejwlqvsf.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8"
+  );
 
-  let currentUser = null;
-  let authInitialized = false;
-  const authReadyCallbacks = [];
-
+  /* Authentication elements (after header loads) */
   const authUserLabel = document.getElementById("authUserLabel");
   const loginGoogleButton = document.getElementById("loginGoogleButton");
   const loginEmailButton = document.getElementById("loginEmailButton");
   const logoutButton = document.getElementById("logoutButton");
 
-  function updateAuthUI() {
-    if (!authUserLabel) return;
-    if (currentUser) {
-      authUserLabel.textContent =
-        currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
-      loginGoogleButton.style.display = "none";
-      loginEmailButton.style.display = "none";
-      logoutButton.style.display = "inline-flex";
-    } else {
-      authUserLabel.textContent = "Not signed in";
-      loginGoogleButton.style.display = "inline-flex";
-      loginEmailButton.style.display = "inline-flex";
-      logoutButton.style.display = "none";
-    }
-  }
+  let currentUser = null;
 
   async function initAuth() {
     const { data: { session } } = await supabase.auth.getSession();
     currentUser = session?.user ?? null;
-    updateAuthUI();
-    authInitialized = true;
-    authReadyCallbacks.forEach(cb => cb(currentUser));
+    syncAuthUI();
 
     supabase.auth.onAuthStateChange((_event, session) => {
       currentUser = session?.user ?? null;
-      updateAuthUI();
-      authReadyCallbacks.forEach(cb => cb(currentUser));
+      syncAuthUI();
     });
   }
 
-  function onAuthReady(cb) {
-    if (authInitialized) cb(currentUser);
-    else authReadyCallbacks.push(cb);
+  function syncAuthUI() {
+    if (currentUser) {
+      authUserLabel.textContent = currentUser.email;
+      logoutButton.style.display = "block";
+      loginGoogleButton.style.display = "none";
+      loginEmailButton.style.display = "none";
+    } else {
+      authUserLabel.textContent = "Not signed in";
+      logoutButton.style.display = "none";
+      loginGoogleButton.style.display = "block";
+      loginEmailButton.style.display = "block";
+    }
   }
 
-  loginGoogleButton.addEventListener("click", async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+  /* Login */
+  loginGoogleButton.onclick = async () => {
+    await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.href }
     });
-    if (error) alert("Google sign-in error: " + error.message);
-  });
+  };
 
-  loginEmailButton.addEventListener("click", async () => {
-    const email = prompt("Enter your email to get a sign-in link:");
+  loginEmailButton.onclick = async () => {
+    const email = prompt("Email for sign-in link:");
     if (!email) return;
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.href }
-    });
-    if (error) alert("Email sign-in error: " + error.message);
-    else alert("Magic link sent. Check your inbox.");
-  });
+    await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+    alert("Magic link sent.");
+  };
 
-  logoutButton.addEventListener("click", async () => {
+  logoutButton.onclick = async () => {
     await supabase.auth.signOut();
-  });
+  };
 
   await initAuth();
 
-  // ---------------------- MAP ----------------------
-  const map = L.map("map", {
-    center: [51.1657, 10.4515], // central Europe
-    zoom: 5,
-    zoomControl: false
-  });
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
+  /* Map */
+  const map = L.map("map").setView([51.1657, 10.4515], 5);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
   const mugIcon = L.divIcon({
     className: "mug-icon",
     html: "☕",
     iconSize: [40, 40],
-    iconAnchor: [20, 34]
+    iconAnchor: [20, 40]
   });
 
-  const galleryGrid = document.getElementById("galleryGrid");
-  const panelTitle = document.getElementById("panelTitle");
-  const panelSubtitle = document.getElementById("panelSubtitle");
-
-  let currentPhotos = [];
-  let lightboxIndex = 0;
-
-  async function loadActiveMarkets() {
-    const { data: photoRows, error: photoError } = await supabase
+  async function loadMarkets() {
+    const { data: photoRows } = await supabase
       .from("mug_photos")
       .select("market_id")
       .eq("status", "approved");
 
-    if (photoError || !photoRows?.length) {
-      console.error("Error loading market_ids from mug_photos:", photoError);
-      return [];
-    }
-
     const marketIds = [...new Set(photoRows.map(p => p.market_id))];
 
-    const { data: markets, error: marketsError } = await supabase
+    const { data: markets } = await supabase
       .from("markets")
-      .select("id, market_name, city, country, lat, lng, status")
+      .select("id, market_name, city, country, lat, lng")
       .in("id", marketIds)
       .eq("status", "approved");
 
-    if (marketsError) {
-      console.error("Error loading markets:", marketsError);
-      return [];
-    }
-    return markets || [];
-  }
-
-  function addMarkersToMap(markets) {
     markets.forEach(m => {
       if (!m.lat || !m.lng) return;
       const marker = L.marker([m.lat, m.lng], { icon: mugIcon }).addTo(map);
-      marker.on("click", () => openGalleryForMarket(m));
+      marker.on("click", () => loadPhotos(m));
     });
   }
 
-  async function openGalleryForMarket(market) {
-    panelTitle.textContent = market.market_name;
-    panelSubtitle.textContent = `${market.city}, ${market.country}`;
+  await loadMarkets();
 
-    const { data: photos, error } = await supabase
+  const galleryGrid = document.getElementById("galleryGrid");
+  const galleryTitle = document.getElementById("galleryTitle");
+
+  let currentPhotos = [];
+  let currentIndex = 0;
+
+  async function loadPhotos(market) {
+    galleryTitle.textContent = `${market.market_name} – ${market.city}, ${market.country}`;
+
+    const { data: photos } = await supabase
       .from("mug_photos")
-      .select("id, public_url, year, like_count, caption")
+      .select("*")
       .eq("market_id", market.id)
       .eq("status", "approved")
-      .order("like_count", { ascending: false })
-      .order("created_at", { ascending: false });
+      .order("like_count", { ascending: false });
 
-    if (error) {
-      console.error("Error loading photos:", error);
-      galleryGrid.innerHTML =
-        `<div style="font-size:0.82rem;color:#9ca3af;">Error loading photos.</div>`;
-      return;
-    }
-
-    currentPhotos = photos || [];
-    if (!currentPhotos.length) {
-      galleryGrid.innerHTML =
-        `<div style="font-size:0.82rem;color:#9ca3af;">No approved photos yet.</div>`;
-      return;
-    }
-
+    currentPhotos = photos;
     galleryGrid.innerHTML = "";
-    currentPhotos.forEach((p, i) => {
-      const item = document.createElement("div");
-      item.className = "gallery-item";
-      item.dataset.index = i;
-      item.innerHTML = `
-        <img src="${p.public_url}" alt="Mug photo" />
+
+    photos.forEach((p, i) => {
+      const div = document.createElement("div");
+      div.className = "gallery-item";
+      div.innerHTML = `
+        <img src="${p.public_url}">
         <div class="gallery-item-info">
           <span>${p.year}</span>
-          <span>❤️ ${p.like_count ?? 0}</span>
-        </div>`;
-      item.addEventListener("click", () => openLightbox(i));
-      galleryGrid.appendChild(item);
+          <span class="like-button" data-id="${p.id}">❤️ ${p.like_count}</span>
+        </div>
+      `;
+      div.onclick = () => openLightbox(i);
+      galleryGrid.appendChild(div);
     });
   }
 
-  // ---------------------- LIGHTBOX ----------------------
+  /* Lightbox */
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightboxImg");
   const lightboxTitle = document.getElementById("lightboxTitle");
   const lightboxSubtitle = document.getElementById("lightboxSubtitle");
   const lightboxYear = document.getElementById("lightboxYear");
   const lightboxLocation = document.getElementById("lightboxLocation");
-  const btnPrev = document.getElementById("lightboxPrev");
-  const btnNext = document.getElementById("lightboxNext");
-  const btnClose = document.getElementById("lightboxClose");
+  const lightboxLikes = document.getElementById("lightboxLikes");
 
-  function openLightbox(index) {
-    if (!currentPhotos.length) return;
-    lightboxIndex = index;
-    const p = currentPhotos[index];
+  document.getElementById("lightboxClose").onclick = () => lightbox.classList.remove("visible");
+
+  function openLightbox(i) {
+    currentIndex = i;
+    const p = currentPhotos[i];
 
     lightboxImg.src = p.public_url;
     lightboxTitle.textContent = "Mug Photo";
-    lightboxSubtitle.textContent = p.caption || "No caption";
-    lightboxYear.textContent = p.year || "";
-    lightboxLocation.textContent = panelTitle.textContent || "";
+    lightboxSubtitle.textContent = p.caption ?? "";
+    lightboxYear.textContent = p.year;
+    lightboxLocation.textContent = galleryTitle.textContent;
+    lightboxLikes.textContent = `❤️ ${p.like_count}`;
+    lightboxLikes.onclick = () => likePhoto(p.id, true);
+
     lightbox.classList.add("visible");
   }
 
-  function closeLightbox() {
-    lightbox.classList.remove("visible");
+  document.getElementById("lightboxPrev").onclick = () => {
+    if (!currentPhotos.length) return;
+    currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
+    openLightbox(currentIndex);
+  };
+
+  document.getElementById("lightboxNext").onclick = () => {
+    if (!currentPhotos.length) return;
+    currentIndex = (currentIndex + 1) % currentPhotos.length;
+    openLightbox(currentIndex);
+  };
+
+  /* Likes */
+  async function likePhoto(photoId, fromLightbox = false) {
+    if (!currentUser) {
+      alert("Sign in to like photos.");
+      return;
+    }
+
+    const { data, error } = await supabase.rpc("increment_like", { photo_id: photoId });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    await loadPhotos({ id: currentPhotos[currentIndex].market_id });
+
+    if (fromLightbox) openLightbox(currentIndex);
   }
-
-  btnClose.addEventListener("click", closeLightbox);
-  lightbox.addEventListener("click", e => {
-    if (e.target === lightbox) closeLightbox();
-  });
-
-  btnPrev.addEventListener("click", () => {
-    if (!currentPhotos.length) return;
-    lightboxIndex = (lightboxIndex - 1 + currentPhotos.length) % currentPhotos.length;
-    openLightbox(lightboxIndex);
-  });
-
-  btnNext.addEventListener("click", () => {
-    if (!currentPhotos.length) return;
-    lightboxIndex = (lightboxIndex + 1) % currentPhotos.length;
-    openLightbox(lightboxIndex);
-  });
-
-  // Init
-  (async function initPage() {
-    const markets = await loadActiveMarkets();
-    addMarkersToMap(markets);
-  })();
 </script>
+
 </body>
 </html>
