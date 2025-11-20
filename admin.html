@@ -92,7 +92,7 @@
 
     .admin-item {
       display: grid;
-      grid-template-columns: 90px 1fr;
+      grid-template-columns: 120px 1fr; /* wider thumb column */
       gap: 10px;
       padding: 10px;
       border-radius: 10px;
@@ -102,7 +102,7 @@
 
     .admin-thumb img {
       width: 100%;
-      height: 70px;
+      height: 130px; /* larger photo height */
       object-fit: cover;
       border-radius: 8px;
     }
@@ -232,6 +232,9 @@
       .admin-item {
         grid-template-columns: 1fr;
       }
+      .admin-thumb img {
+        height: 160px; /* a bit taller on small screens */
+      }
     }
   </style>
 </head>
@@ -359,7 +362,6 @@
       return;
     }
 
-    // Assumes you have an "admin_users" table with user_id uuid
     const { data, error } = await supabase
       .from("admin_users")
       .select("user_id")
@@ -445,8 +447,9 @@
   tabMarkets.addEventListener("click", () => {
     tabMarkets.classList.add("active");
     tabPhotos.classList.remove("active");
-    photosView.style.display  = "none";
+    photosView.style.display  = "flex"; // list is flex-column
     marketsView.style.display = "flex";
+    photosView.style.display  = "none";
     adminError.textContent    = "";
     adminInfo.textContent     = "Loading pending markets…";
     loadPendingMarkets();
@@ -501,7 +504,7 @@
       const wrapper = document.createElement("div");
       wrapper.className = "admin-item";
 
-      // Thumbnail
+      // Thumbnail (bigger now)
       const thumbDiv = document.createElement("div");
       thumbDiv.className = "admin-thumb";
       const img = document.createElement("img");
@@ -633,7 +636,7 @@
 
     const { data, error } = await supabase
       .from("markets")
-      .select("id, market_name, city, country, status, description, created_at, created_by")
+      .select("id, market_name, city, country, status, description, created_at, created_by, created_by_email")
       .eq("status", "pending")
       .order("created_at", { ascending: true });
 
@@ -658,17 +661,18 @@
       const wrapper = document.createElement("div");
       wrapper.className = "admin-item";
 
-      // Left column placeholder (no image, just icon)
+      // Left column: simple big icon (taller to match photo thumb)
       const thumbDiv = document.createElement("div");
       thumbDiv.className = "admin-thumb";
       const icon = document.createElement("div");
       icon.style.width = "100%";
-      icon.style.height = "70px";
+      icon.style.height = "130px";  // match photo height
       icon.style.display = "flex";
       icon.style.alignItems = "center";
       icon.style.justifyContent = "center";
       icon.style.borderRadius = "8px";
       icon.style.background = "#020617";
+      icon.style.fontSize = "2rem";
       icon.textContent = "🎄";
       thumbDiv.appendChild(icon);
 
@@ -697,10 +701,13 @@
         "Created " + new Date(m.created_at).toLocaleString();
       tagsRow.appendChild(createdTag);
 
-      if (m.created_by) {
+      // Show user email if available, else fallback to user_id
+      if (m.created_by_email || m.created_by) {
         const byTag = document.createElement("span");
         byTag.className = "admin-tag";
-        byTag.textContent = "User: " + m.created_by;
+        byTag.textContent = m.created_by_email
+          ? `User: ${m.created_by_email}`
+          : `User: ${m.created_by}`;
         tagsRow.appendChild(byTag);
       }
 
