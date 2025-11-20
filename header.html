@@ -2,21 +2,51 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
 <style>
-  .mm-logo {
-    height: 38px;
-    width: auto;
+  .mm-header-bar {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    background: #1f2937; /* Dark grey */
+    color: #fff;
   }
+
+  .mm-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.05rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mm-title span {
+    color: #0ea5e9;
+  }
+
+  .mm-hamburger {
+    margin-left: auto;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  .mm-hamburger:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
   .mm-nav-item {
-    padding: 12px 18px;
-    display: block;
+    padding: 16px;
+    font-size: 1.2rem;
     color: #f1f1f1;
-    font-size: 1.05rem;
     text-decoration: none;
+    display: block;
   }
   .mm-nav-item:hover {
     background: #0ea5e9 !important;
     color: #0f172a !important;
   }
+
   .google-btn {
     display: inline-flex;
     align-items: center;
@@ -29,11 +59,13 @@
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
+    width: 100%;
   }
   .google-btn img {
     width: 18px;
     height: 18px;
   }
+
   .email-btn, .logout-btn {
     padding: 8px 12px;
     border-radius: 999px;
@@ -42,44 +74,62 @@
     color: #f0f0f0;
     cursor: pointer;
     font-size: 0.85rem;
+    width: 100%;
+    margin-top: 8px;
   }
 </style>
 
-<div class="w3-bar w3-dark-grey w3-top w3-large" style="z-index:200;">
-  <button class="w3-bar-item w3-button w3-xlarge w3-right" onclick="toggleMenu()">&#9776;</button>
+<!-- Top Header Bar -->
+<div class="mm-header-bar w3-top">
+  <div class="mm-title">🗺️ <span>Mug Mapper</span></div>
 
-  <a href="index.html" class="w3-bar-item w3-button">
-    <img src="https://tosyomhrxttlejwlqvsf.supabase.co/storage/v1/object/public/mugs/website/MM_logo.png"
-         class="mm-logo">
-  </a>
+  <div class="mm-hamburger" onclick="toggleMenu()">☰</div>
 </div>
 
-<!-- Mobile dropdown -->
-<nav id="mmMobileNav" class="w3-sidebar w3-bar-block w3-dark-grey w3-animate-left"
-     style="display:none; width:250px; padding-top:60px;">
+<!-- Mobile / Sidebar Menu -->
+<nav id="mmMobileNav"
+     class="w3-sidebar w3-bar-block w3-dark-grey w3-animate-left"
+     style="display:none; width:260px; padding-top:60px;">
 
   <a href="index.html" class="mm-nav-item">Map</a>
   <a href="upload.html" class="mm-nav-item">Upload</a>
   <a href="popular.html" class="mm-nav-item">Popular</a>
   <a href="leaderboard.html" class="mm-nav-item">Leaderboard</a>
 
-  <!-- Auth area -->
   <div style="padding:20px;">
     <div id="authUserLabel" style="color:#cbd5e1; margin-bottom:12px;">Not signed in</div>
 
-    <button id="loginGoogleButton" class="google-btn" style="width:100%; margin-bottom:8px;">
+    <button id="loginGoogleButton" class="google-btn">
       <img src="https://developers.google.com/identity/images/g-logo.png">
       Sign in with Google
     </button>
 
-    <button id="loginEmailButton" class="email-btn" style="width:100%; margin-bottom:8px;">Email Sign-In</button>
-    <button id="logoutButton" class="logout-btn" style="width:100%; display:none;">Logout</button>
+    <button id="loginEmailButton" class="email-btn">Email Sign-In</button>
+    <button id="logoutButton" class="logout-btn" style="display:none;">Logout</button>
   </div>
 </nav>
 
 <script>
+  // Mobile-friendly menu toggle
   function toggleMenu() {
     const nav = document.getElementById("mmMobileNav");
     nav.style.display = nav.style.display === "block" ? "none" : "block";
   }
+
+  // Close the menu if user taps outside the sidebar
+  document.addEventListener("click", function (e) {
+    const nav = document.getElementById("mmMobileNav");
+    const hamburger = document.querySelector(".mm-hamburger");
+
+    if (!nav || !hamburger) return;
+
+    // Clicked hamburger → ignore
+    if (hamburger.contains(e.target)) return;
+
+    // Clicked inside nav → ignore
+    if (nav.contains(e.target)) return;
+
+    // Otherwise → close nav
+    nav.style.display = "none";
+  });
 </script>
