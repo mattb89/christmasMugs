@@ -1,47 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mug Mapper – Map</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <link rel="stylesheet" href="styles.css">
+  <!-- W3CSS + your styles -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  <link rel="stylesheet" href="styles.css" />
 
   <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
-    body { background:#111827; color:white; }
-    #map { height: 55vh; }
-    @media (min-width: 900px) { #map { height: 100vh; } }
+    body {
+      margin: 0;
+      padding-top: 56px; /* space for fixed header */
+      background: #111827;
+      color: #f9fafb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-    .gallery-container { padding:16px; }
+    #map {
+      height: 50vh;
+    }
+
+    @media (min-width: 900px) {
+      #map {
+        height: calc(100vh - 56px);
+      }
+    }
+
+    .gallery-container {
+      padding: 12px 16px 20px;
+    }
+
+    .gallery-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .gallery-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .gallery-subtitle {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
     .like-button {
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 0.9rem;
       user-select: none;
+      border: none;
+      background: transparent;
+      color: #fbbf24;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .like-button.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .like-button span {
+      font-size: 1.1rem;
+    }
+
+    /* Lightbox tweaks for mobile */
+    @media (max-width: 640px) {
+      .lightbox-inner {
+        grid-template-columns: 1fr;
+      }
+      .lightbox-img-wrapper img {
+        height: 50vh;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<!-- Header include -->
+<!-- Shared header gets injected here -->
 <div id="mm-header"></div>
 
+<!-- Map -->
 <div id="map"></div>
 
-<div class="gallery-container">
-  <h3 id="galleryTitle">Select a mug icon</h3>
-  <div id="galleryGrid" class="gallery-grid"></div>
-</div>
+<!-- Gallery -->
+<section class="gallery-container">
+  <div class="gallery-header">
+    <div>
+      <div class="gallery-title" id="galleryTitle">Select a mug icon</div>
+      <div class="gallery-subtitle" id="gallerySubtitle">
+        Tap a mug icon on the map to view photos from that market.
+      </div>
+    </div>
+  </div>
 
-<!-- Lightbox -->
+  <div id="galleryGrid" class="gallery-grid"></div>
+</section>
+
+<!-- Lightbox (from styles.css) -->
 <div id="lightbox" class="lightbox">
   <div class="lightbox-inner">
     <div class="lightbox-img-wrapper">
-      <img id="lightboxImg" src="">
+      <img id="lightboxImg" src="" alt="Mug photo" />
     </div>
     <div class="lightbox-meta">
       <div class="lightbox-title" id="lightboxTitle"></div>
@@ -50,7 +121,9 @@
         <div class="chip" id="lightboxYear"></div>
         <div class="chip" id="lightboxLocation"></div>
       </div>
-      <div id="lightboxLikes" class="like-button"></div>
+      <button id="lightboxLike" class="like-button">
+        <span>❤️</span><span id="lightboxLikeCount">0</span>
+      </button>
     </div>
 
     <div class="lightbox-controls">
@@ -61,201 +134,335 @@
   </div>
 </div>
 
-<!-- Scripts -->
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  /* Load shared header */
-  await fetch("header.html").then(r => r.text()).then(html => {
-    document.getElementById("mm-header").innerHTML = html;
-  });
+  // --- 1. Load shared header and wire up menu/auth shells ---
+  const headerContainer = document.getElementById("mm-header");
+  const headerHtml = await fetch("header.html").then((r) => r.text());
+  headerContainer.innerHTML = headerHtml;
 
-  /* Supabase Setup */
-  const supabase = createClient(
-    "https://tosyomhrxttlejwlqvsf.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8"
-  );
+  const mmHamburger   = document.getElementById("mmHamburger");
+  const mmNavOverlay  = document.getElementById("mmNavOverlay");
+  const mmNavClose    = document.getElementById("mmNavClose");
+  const navLinks      = mmNavOverlay.querySelectorAll(".mm-nav-link");
 
-  /* Authentication elements (after header loads) */
-  const authUserLabel = document.getElementById("authUserLabel");
+  function openNav() {
+    mmNavOverlay.style.display = "block";
+    mmNavOverlay.setAttribute("aria-hidden", "false");
+  }
+
+  function closeNav() {
+    mmNavOverlay.style.display = "none";
+    mmNavOverlay.setAttribute("aria-hidden", "true");
+  }
+
+  mmHamburger?.addEventListener("click", openNav);
+  mmNavClose?.addEventListener("click", closeNav);
+  navLinks.forEach((link) => link.addEventListener("click", closeNav));
+
+  // Optional mobile detection (overlay is full-screen either way)
+  const isMobile =
+    window.matchMedia("(max-width: 768px)").matches ||
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // --- 2. Supabase client & auth wiring ---
+  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const authUserLabel     = document.getElementById("authUserLabel");
   const loginGoogleButton = document.getElementById("loginGoogleButton");
-  const loginEmailButton = document.getElementById("loginEmailButton");
-  const logoutButton = document.getElementById("logoutButton");
+  const loginEmailButton  = document.getElementById("loginEmailButton");
+  const logoutButton      = document.getElementById("logoutButton");
 
   let currentUser = null;
+
+  function updateAuthUI() {
+    if (!authUserLabel) return;
+    if (currentUser) {
+      authUserLabel.textContent =
+        currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
+      loginGoogleButton.style.display = "none";
+      loginEmailButton.style.display  = "none";
+      logoutButton.style.display      = "block";
+    } else {
+      authUserLabel.textContent = "Not signed in";
+      loginGoogleButton.style.display = "block";
+      loginEmailButton.style.display  = "block";
+      logoutButton.style.display      = "none";
+    }
+  }
 
   async function initAuth() {
     const { data: { session } } = await supabase.auth.getSession();
     currentUser = session?.user ?? null;
-    syncAuthUI();
+    updateAuthUI();
 
     supabase.auth.onAuthStateChange((_event, session) => {
       currentUser = session?.user ?? null;
-      syncAuthUI();
+      updateAuthUI();
     });
   }
 
-  function syncAuthUI() {
-    if (currentUser) {
-      authUserLabel.textContent = currentUser.email;
-      logoutButton.style.display = "block";
-      loginGoogleButton.style.display = "none";
-      loginEmailButton.style.display = "none";
-    } else {
-      authUserLabel.textContent = "Not signed in";
-      logoutButton.style.display = "none";
-      loginGoogleButton.style.display = "block";
-      loginEmailButton.style.display = "block";
-    }
-  }
-
-  /* Login */
-  loginGoogleButton.onclick = async () => {
-    await supabase.auth.signInWithOAuth({
+  loginGoogleButton?.addEventListener("click", async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.href }
+      options: { redirectTo: window.location.href },
     });
-  };
+    if (error) alert("Google sign-in error: " + error.message);
+  });
 
-  loginEmailButton.onclick = async () => {
-    const email = prompt("Email for sign-in link:");
+  loginEmailButton?.addEventListener("click", async () => {
+    const email = prompt("Enter your email for a sign-in link:");
     if (!email) return;
-    await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
-    alert("Magic link sent.");
-  };
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href },
+    });
+    if (error) alert("Email sign-in error: " + error.message);
+    else alert("Magic link sent. Check your inbox.");
+  });
 
-  logoutButton.onclick = async () => {
+  logoutButton?.addEventListener("click", async () => {
     await supabase.auth.signOut();
-  };
+  });
 
   await initAuth();
 
-  /* Map */
-  const map = L.map("map").setView([51.1657, 10.4515], 5);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+  // --- 3. Leaflet map setup ---
+  const map = L.map("map", {
+    center: [51.1657, 10.4515], // central Europe-ish
+    zoom: 5,
+    zoomControl: false,
+  });
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map);
 
   const mugIcon = L.divIcon({
     className: "mug-icon",
     html: "☕",
     iconSize: [40, 40],
-    iconAnchor: [20, 40]
+    iconAnchor: [20, 40],
   });
 
-  async function loadMarkets() {
-    const { data: photoRows } = await supabase
+  // --- 4. Load markets that have approved photos ---
+  async function loadActiveMarkets() {
+    const { data: photoRows, error: photosError } = await supabase
       .from("mug_photos")
       .select("market_id")
       .eq("status", "approved");
 
-    const marketIds = [...new Set(photoRows.map(p => p.market_id))];
+    if (photosError) {
+      console.error("Error loading market_ids from mug_photos:", photosError);
+      return [];
+    }
+    if (!photoRows || photoRows.length === 0) return [];
 
-    const { data: markets } = await supabase
+    const marketIds = [...new Set(photoRows.map((p) => p.market_id))];
+
+    const { data: markets, error: marketsError } = await supabase
       .from("markets")
-      .select("id, market_name, city, country, lat, lng")
+      .select("id, market_name, city, country, lat, lng, status")
       .in("id", marketIds)
       .eq("status", "approved");
 
-    markets.forEach(m => {
+    if (marketsError) {
+      console.error("Error loading markets:", marketsError);
+      return [];
+    }
+
+    return markets || [];
+  }
+
+  function addMarkersToMap(markets) {
+    markets.forEach((m) => {
       if (!m.lat || !m.lng) return;
       const marker = L.marker([m.lat, m.lng], { icon: mugIcon }).addTo(map);
-      marker.on("click", () => loadPhotos(m));
+      marker.on("click", () => openGalleryForMarket(m));
     });
   }
 
-  await loadMarkets();
-
+  // --- 5. Gallery + Likes ---
   const galleryGrid = document.getElementById("galleryGrid");
   const galleryTitle = document.getElementById("galleryTitle");
+  const gallerySubtitle = document.getElementById("gallerySubtitle");
 
   let currentPhotos = [];
-  let currentIndex = 0;
+  let currentMarket = null;
+  let lightboxIndex = 0;
 
-  async function loadPhotos(market) {
-    galleryTitle.textContent = `${market.market_name} – ${market.city}, ${market.country}`;
+  async function openGalleryForMarket(market) {
+    currentMarket = market;
+    galleryTitle.textContent = market.market_name;
+    gallerySubtitle.textContent = `${market.city}, ${market.country}`;
 
-    const { data: photos } = await supabase
+    const { data: photos, error } = await supabase
       .from("mug_photos")
-      .select("*")
+      .select("id, public_url, year, like_count, caption, market_id")
       .eq("market_id", market.id)
       .eq("status", "approved")
-      .order("like_count", { ascending: false });
+      .order("like_count", { ascending: false })
+      .order("created_at", { ascending: false });
 
-    currentPhotos = photos;
+    if (error) {
+      console.error("Error loading photos:", error);
+      galleryGrid.innerHTML = `<div style="font-size:0.82rem;color:#9ca3af;">Error loading photos.</div>`;
+      return;
+    }
+
+    currentPhotos = photos || [];
+    if (!currentPhotos.length) {
+      galleryGrid.innerHTML = `<div style="font-size:0.82rem;color:#9ca3af;">No approved photos yet.</div>`;
+      return;
+    }
+
+    renderGallery();
+  }
+
+  function renderGallery() {
     galleryGrid.innerHTML = "";
+    currentPhotos.forEach((p, i) => {
+      const item = document.createElement("div");
+      item.className = "gallery-item";
 
-    photos.forEach((p, i) => {
-      const div = document.createElement("div");
-      div.className = "gallery-item";
-      div.innerHTML = `
-        <img src="${p.public_url}">
-        <div class="gallery-item-info">
-          <span>${p.year}</span>
-          <span class="like-button" data-id="${p.id}">❤️ ${p.like_count}</span>
-        </div>
-      `;
-      div.onclick = () => openLightbox(i);
-      galleryGrid.appendChild(div);
+      const img = document.createElement("img");
+      img.src = p.public_url;
+      img.alt = "Mug photo";
+      img.style.cursor = "pointer";
+      img.addEventListener("click", () => openLightbox(i));
+
+      const info = document.createElement("div");
+      info.className = "gallery-item-info";
+
+      const yearSpan = document.createElement("span");
+      yearSpan.textContent = p.year ?? "";
+
+      const likeBtn = document.createElement("button");
+      likeBtn.className = "like-button";
+      likeBtn.innerHTML = `<span>❤️</span><span>${p.like_count ?? 0}</span>`;
+      likeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        handleLike(p.id, false);
+      });
+
+      if (!currentUser) {
+        likeBtn.classList.add("disabled");
+        likeBtn.title = "Sign in to like photos";
+      }
+
+      info.appendChild(yearSpan);
+      info.appendChild(likeBtn);
+      item.appendChild(img);
+      item.appendChild(info);
+      galleryGrid.appendChild(item);
     });
   }
 
-  /* Lightbox */
-  const lightbox = document.getElementById("lightbox");
-  const lightboxImg = document.getElementById("lightboxImg");
-  const lightboxTitle = document.getElementById("lightboxTitle");
-  const lightboxSubtitle = document.getElementById("lightboxSubtitle");
-  const lightboxYear = document.getElementById("lightboxYear");
-  const lightboxLocation = document.getElementById("lightboxLocation");
-  const lightboxLikes = document.getElementById("lightboxLikes");
+  // --- 6. Lightbox ---
+  const lightbox        = document.getElementById("lightbox");
+  const lightboxImg     = document.getElementById("lightboxImg");
+  const lightboxTitle   = document.getElementById("lightboxTitle");
+  const lightboxSubtitle= document.getElementById("lightboxSubtitle");
+  const lightboxYear    = document.getElementById("lightboxYear");
+  const lightboxLocation= document.getElementById("lightboxLocation");
+  const lightboxLike    = document.getElementById("lightboxLike");
+  const lightboxLikeCount = document.getElementById("lightboxLikeCount");
+  const btnPrev         = document.getElementById("lightboxPrev");
+  const btnNext         = document.getElementById("lightboxNext");
+  const btnClose        = document.getElementById("lightboxClose");
 
-  document.getElementById("lightboxClose").onclick = () => lightbox.classList.remove("visible");
-
-  function openLightbox(i) {
-    currentIndex = i;
-    const p = currentPhotos[i];
+  function openLightbox(index) {
+    if (!currentPhotos.length) return;
+    lightboxIndex = index;
+    const p = currentPhotos[index];
 
     lightboxImg.src = p.public_url;
-    lightboxTitle.textContent = "Mug Photo";
-    lightboxSubtitle.textContent = p.caption ?? "";
-    lightboxYear.textContent = p.year;
-    lightboxLocation.textContent = galleryTitle.textContent;
-    lightboxLikes.textContent = `❤️ ${p.like_count}`;
-    lightboxLikes.onclick = () => likePhoto(p.id, true);
+    lightboxTitle.textContent   = "Mug Photo";
+    lightboxSubtitle.textContent= p.caption || "";
+    lightboxYear.textContent    = p.year || "";
+    lightboxLocation.textContent= currentMarket
+      ? `${currentMarket.market_name} – ${currentMarket.city}, ${currentMarket.country}`
+      : "";
 
+    lightboxLikeCount.textContent = p.like_count ?? 0;
+
+    if (!currentUser) {
+      lightboxLike.classList.add("disabled");
+      lightboxLike.title = "Sign in to like photos";
+    } else {
+      lightboxLike.classList.remove("disabled");
+      lightboxLike.title = "";
+    }
+
+    lightboxLike.onclick = () => handleLike(p.id, true);
     lightbox.classList.add("visible");
   }
 
-  document.getElementById("lightboxPrev").onclick = () => {
-    if (!currentPhotos.length) return;
-    currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
-    openLightbox(currentIndex);
-  };
+  function closeLightbox() {
+    lightbox.classList.remove("visible");
+  }
 
-  document.getElementById("lightboxNext").onclick = () => {
-    if (!currentPhotos.length) return;
-    currentIndex = (currentIndex + 1) % currentPhotos.length;
-    openLightbox(currentIndex);
-  };
+  btnClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
 
-  /* Likes */
-  async function likePhoto(photoId, fromLightbox = false) {
+  btnPrev.addEventListener("click", () => {
+    if (!currentPhotos.length) return;
+    lightboxIndex = (lightboxIndex - 1 + currentPhotos.length) % currentPhotos.length;
+    openLightbox(lightboxIndex);
+  });
+
+  btnNext.addEventListener("click", () => {
+    if (!currentPhotos.length) return;
+    lightboxIndex = (lightboxIndex + 1) % currentPhotos.length;
+    openLightbox(lightboxIndex);
+  });
+
+  // --- 7. Like handler (simple counter) ---
+  async function handleLike(photoId, fromLightbox) {
     if (!currentUser) {
       alert("Sign in to like photos.");
       return;
     }
+    const photo = currentPhotos.find((p) => p.id === photoId);
+    if (!photo) return;
 
-    const { data, error } = await supabase.rpc("increment_like", { photo_id: photoId });
+    const newCount = (photo.like_count ?? 0) + 1;
+
+    const { error } = await supabase
+      .from("mug_photos")
+      .update({ like_count: newCount })
+      .eq("id", photoId);
 
     if (error) {
-      console.error(error);
+      console.error("Error updating like_count:", error);
       return;
     }
 
-    await loadPhotos({ id: currentPhotos[currentIndex].market_id });
+    photo.like_count = newCount;
 
-    if (fromLightbox) openLightbox(currentIndex);
+    renderGallery();
+
+    if (fromLightbox) {
+      const idx = currentPhotos.findIndex((p) => p.id === photoId);
+      if (idx !== -1) openLightbox(idx);
+    }
   }
+
+  // --- 8. Init map markers ---
+  (async function init() {
+    const markets = await loadActiveMarkets();
+    addMarkersToMap(markets);
+  })();
 </script>
 
 </body>

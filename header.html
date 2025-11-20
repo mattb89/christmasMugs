@@ -6,50 +6,143 @@
     padding: 8px 16px;
     display: flex;
     align-items: center;
-    background: #1f2937; /* Dark grey */
-    color: #fff;
+    background: #1f2937; /* dark grey */
+    color: #f9fafb;
+    box-shadow: 0 2px 4px rgba(15,23,42,0.4);
   }
 
   .mm-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    letter-spacing: 0.05rem;
+    letter-spacing: 0.06em;
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
   .mm-title span {
-    color: #0ea5e9;
+    color: #0ea5e9; /* teal accent */
   }
 
-  .mm-hamburger {
+  .mm-hamburger-btn {
     margin-left: auto;
     font-size: 1.8rem;
     cursor: pointer;
     padding: 4px 10px;
     border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: inherit;
   }
 
-  .mm-hamburger:hover {
-    background: rgba(255, 255, 255, 0.15);
+  .mm-hamburger-btn:focus {
+    outline: 2px solid #0ea5e9;
+    outline-offset: 2px;
   }
 
-  .mm-nav-item {
-    padding: 16px;
+  .mm-hamburger-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Full-screen overlay nav */
+  .mm-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.96);
+    color: #e5e7eb;
+    z-index: 500;
+    display: none; /* will be toggled by page JS */
+  }
+
+  .mm-nav-overlay-inner {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mm-nav-overlay-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  }
+
+  .mm-nav-overlay-title {
     font-size: 1.2rem;
-    color: #f1f1f1;
-    text-decoration: none;
-    display: block;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .mm-nav-item:hover {
-    background: #0ea5e9 !important;
-    color: #0f172a !important;
+
+  .mm-nav-overlay-title span {
+    color: #0ea5e9;
+  }
+
+  .mm-nav-overlay-close {
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: inherit;
+  }
+  .mm-nav-overlay-close:hover {
+    background: rgba(148, 163, 184, 0.3);
+  }
+
+  .mm-nav-overlay-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    gap: 18px;
+    overflow-y: auto;
+  }
+
+  .mm-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mm-nav-link {
+    display: block;
+    padding: 12px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #f9fafb;
+    background: rgba(31, 41, 55, 0.9);
+  }
+
+  .mm-nav-link:hover {
+    background: #0ea5e9;
+    color: #0f172a;
+  }
+
+  .mm-auth-block {
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+    padding-top: 14px;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mm-auth-label {
+    font-size: 0.85rem;
+    color: #9ca3af;
   }
 
   .google-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 8px 18px;
     border-radius: 999px;
@@ -61,12 +154,14 @@
     cursor: pointer;
     width: 100%;
   }
+
   .google-btn img {
     width: 18px;
     height: 18px;
   }
 
-  .email-btn, .logout-btn {
+  .email-btn,
+  .logout-btn {
     padding: 8px 12px;
     border-radius: 999px;
     border: 1px solid #4b5563;
@@ -75,61 +170,76 @@
     cursor: pointer;
     font-size: 0.85rem;
     width: 100%;
-    margin-top: 8px;
+  }
+
+  .email-btn:hover,
+  .logout-btn:hover {
+    background: rgba(55, 65, 81, 0.9);
+  }
+
+  /* Optional: on desktop, you may want a narrower overlay content */
+  @media (min-width: 900px) {
+    .mm-nav-overlay-inner {
+      max-width: 480px;
+      margin: 0 auto;
+      border-left: 1px solid rgba(148, 163, 184, 0.35);
+      border-right: 1px solid rgba(148, 163, 184, 0.35);
+    }
   }
 </style>
 
-<!-- Top Header Bar -->
-<div class="mm-header-bar w3-top">
-  <div class="mm-title">🗺️ <span>Mug Mapper</span></div>
+<!-- Top header bar -->
+<header class="mm-header-bar w3-top">
+  <div class="mm-title">
+    🗺️ <span>Mug Mapper</span>
+  </div>
 
-  <div class="mm-hamburger" onclick="toggleMenu()">☰</div>
-</div>
+  <!-- No inline onclick. Pages will attach a listener to this ID. -->
+  <button id="mmHamburger" class="mm-hamburger-btn" aria-label="Open navigation menu">
+    ☰
+  </button>
+</header>
 
-<!-- Mobile / Sidebar Menu -->
-<nav id="mmMobileNav"
-     class="w3-sidebar w3-bar-block w3-dark-grey w3-animate-left"
-     style="display:none; width:260px; padding-top:60px;">
+<!-- Full-screen overlay navigation -->
+<nav id="mmNavOverlay" class="mm-nav-overlay" aria-hidden="true">
+  <div class="mm-nav-overlay-inner">
+    <div class="mm-nav-overlay-top">
+      <div class="mm-nav-overlay-title">
+        🗺️ <span>Mug Mapper</span>
+      </div>
+      <!-- Pages will attach listener to this ID -->
+      <button id="mmNavClose" class="mm-nav-overlay-close" aria-label="Close navigation menu">
+        ✕
+      </button>
+    </div>
 
-  <a href="index.html" class="mm-nav-item">Map</a>
-  <a href="upload.html" class="mm-nav-item">Upload</a>
-  <a href="popular.html" class="mm-nav-item">Popular</a>
-  <a href="leaderboard.html" class="mm-nav-item">Leaderboard</a>
+    <div class="mm-nav-overlay-body">
+      <div class="mm-nav-links">
+        <a href="index.html" class="mm-nav-link">Map</a>
+        <a href="upload.html" class="mm-nav-link">Upload</a>
+        <a href="popular.html" class="mm-nav-link">Popular</a>
+        <a href="leaderboard.html" class="mm-nav-link">Leaderboard</a>
+        <!-- You can add Admin here later if you want -->
+      </div>
 
-  <div style="padding:20px;">
-    <div id="authUserLabel" style="color:#cbd5e1; margin-bottom:12px;">Not signed in</div>
+      <div class="mm-auth-block">
+        <div id="authUserLabel" class="mm-auth-label">
+          Not signed in
+        </div>
 
-    <button id="loginGoogleButton" class="google-btn">
-      <img src="https://developers.google.com/identity/images/g-logo.png">
-      Sign in with Google
-    </button>
+        <button id="loginGoogleButton" class="google-btn">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="">
+          <span>Sign in with Google</span>
+        </button>
 
-    <button id="loginEmailButton" class="email-btn">Email Sign-In</button>
-    <button id="logoutButton" class="logout-btn" style="display:none;">Logout</button>
+        <button id="loginEmailButton" class="email-btn">
+          Email Sign-In
+        </button>
+
+        <button id="logoutButton" class="logout-btn" style="display:none;">
+          Logout
+        </button>
+      </div>
+    </div>
   </div>
 </nav>
-
-<script>
-  // Mobile-friendly menu toggle
-  function toggleMenu() {
-    const nav = document.getElementById("mmMobileNav");
-    nav.style.display = nav.style.display === "block" ? "none" : "block";
-  }
-
-  // Close the menu if user taps outside the sidebar
-  document.addEventListener("click", function (e) {
-    const nav = document.getElementById("mmMobileNav");
-    const hamburger = document.querySelector(".mm-hamburger");
-
-    if (!nav || !hamburger) return;
-
-    // Clicked hamburger → ignore
-    if (hamburger.contains(e.target)) return;
-
-    // Clicked inside nav → ignore
-    if (nav.contains(e.target)) return;
-
-    // Otherwise → close nav
-    nav.style.display = "none";
-  });
-</script>
