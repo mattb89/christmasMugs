@@ -1,64 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mug Mapper – Upload</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <link rel="stylesheet" href="styles.css">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  <link rel="stylesheet" href="styles.css" />
 
   <style>
-    body { background:#111827; color:white; }
+    body {
+      margin: 0;
+      background: #111827;
+      color: #f9fafb;
+      font-family: system-ui, -apple-system, sans-serif;
+
+      /* space for header & footer */
+      padding-top: 58px;
+      padding-bottom: 48px;
+    }
+
     .mm-container {
-      max-width: 800px;
-      margin: 100px auto;
-      padding: 16px;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
     }
+
     .mm-card {
-      background:#020617;
-      padding:20px;
-      border-radius:12px;
-      border:1px solid rgba(148,163,184,0.3);
+      background: #1f2937;
+      border: 1px solid rgba(148,163,184,0.25);
+      border-radius: 14px;
+      padding: 18px 20px 26px;
     }
-    select, input, textarea {
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      margin-top:4px;
-      background:#111827;
-      color:white;
-      border:1px solid #374151;
+
+    label {
+      font-size: 0.9rem;
+      margin-top: 10px;
+      display: block;
     }
-    .mm-btn {
-      background:#0ea5e9;
-      color:#0f172a;
-      padding:10px 20px;
-      border-radius:999px;
-      border:none;
-      margin-top:12px;
-      cursor:pointer;
-      font-weight:600;
-      letter-spacing:0.1em;
+
+    select, input[type="number"], input[type="file"], textarea {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 4px;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      background: #0f172a;
+      color: #f9fafb;
+      font-size: 0.9rem;
+    }
+
+    textarea { min-height: 70px; resize: vertical; }
+
+    .mm-submit-btn {
+      background: #0ea5e9;
+      color: #0f172a;
+      font-weight: 600;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: none;
+      margin-top: 16px;
+      width: 100%;
+      letter-spacing: 0.08rem;
+      cursor: pointer;
+    }
+
+    .mm-submit-btn:disabled {
+      opacity: 0.6;
+      cursor: progress;
+    }
+
+    .mm-link-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: transparent;
+      border: 1px dashed #6b7280;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .mm-msg {
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    /* Modal */
+    .mm-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 3000;
+    }
+
+    .mm-modal {
+      width: 100%;
+      max-width: 420px;
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 18px 20px 24px;
+      border: 1px solid rgba(148,163,184,0.35);
+    }
+
+    .mm-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mm-modal-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .mm-modal-close {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    .mm-modal-close:hover { color: #fff; }
+
+    .mm-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #1f2937;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9980;
+      font-size: 0.9rem;
+      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
     }
   </style>
 </head>
 
 <body>
 
-<!-- Shared header -->
+<!-- Sticky Header -->
 <div id="mm-header"></div>
 
 <div class="mm-container">
   <div class="mm-card">
-    <h2>Upload Mug Photos</h2>
-    <p>Upload up to <b>3 mug photos</b>. If a market isn’t listed, suggest a new one.</p>
+    <h2 style="margin-top:0;">Upload Mug Photos</h2>
+    <p>Share up to <strong>3 photos</strong> of your Christmas market mug.  
+       If your market isn't listed, you can add it as a pending suggestion.</p>
 
-    <div id="authHint" style="color:#94a3b8; margin-bottom:12px;">Sign in to upload photos.</div>
+    <div id="authHint" style="color:#94a3b8; margin-bottom:12px;">Please sign in to upload.</div>
 
-    <div id="uploadMessage" style="margin:8px 0;"></div>
+    <div id="uploadMessage" class="mm-msg"></div>
 
     <form id="uploadForm" style="display:none;">
+
       <label>Country</label>
       <select id="countrySelect"></select>
 
@@ -67,104 +172,456 @@
 
       <label>Market</label>
       <select id="marketSelect"></select>
-      <button type="button" id="addMarketButton" class="w3-button w3-border w3-small" style="margin-top:8px;">
-        + My Market Is Missing
-      </button>
 
-      <label style="margin-top:12px;">Year</label>
-      <input type="number" id="yearInput">
+      <button type="button" id="addMarketButton" class="mm-link-btn">+ My market is missing</button>
 
-      <label style="margin-top:12px;">Photos (max 3)</label>
-      <input type="file" id="fileInput" accept="image/*" multiple>
+      <label>Year</label>
+      <input type="number" id="yearInput" min="2000" max="2100" />
 
-      <label style="margin-top:12px;">Caption (optional)</label>
+      <label>Upload photos (max 3)</label>
+      <input type="file" id="fileInput" accept="image/*" multiple />
+
+      <label>Caption (optional)</label>
       <textarea id="captionInput"></textarea>
 
-      <label style="margin-top:12px;">
-        <input type="checkbox" id="consentCheckbox"> I agree to display these photos publicly
+      <label style="margin-top:10px;">
+        <input type="checkbox" id="consentCheckbox" />
+        I allow these photos to be displayed publicly.
       </label>
 
-      <button type="submit" id="submitButton" class="mm-btn">Submit Photos</button>
+      <button id="submitButton" type="submit" class="mm-submit-btn">Submit</button>
     </form>
   </div>
 </div>
 
-<!-- Modals, Scripts (same logic as you saw before) -->
+<!-- Sticky Footer -->
+<footer class="mm-footer">© 2025 Mug Mapper</footer>
+
+<!-- ADD MARKET MODAL -->
+<div id="addMarketModal" class="mm-modal-backdrop">
+  <div class="mm-modal">
+    <div class="mm-modal-header">
+      <div class="mm-modal-title">Add a New Market</div>
+      <button id="closeModalButton" class="mm-modal-close">✕</button>
+    </div>
+
+    <p style="font-size:0.85rem;color:#9ca3af;">
+      Add a missing market. It will appear as <strong>pending</strong> until approved.
+    </p>
+
+    <div id="modalMessage" class="mm-msg"></div>
+
+    <form id="marketSuggestionForm" style="margin-top:12px;">
+      <label>Country</label>
+      <input type="text" id="suggestionCountry" required />
+
+      <label>City</label>
+      <input type="text" id="suggestionCity" required />
+
+      <label>Market Name</label>
+      <input type="text" id="suggestionMarketName" required />
+
+      <label>Description (optional)</label>
+      <textarea id="suggestionDescription"></textarea>
+
+      <button type="submit" id="submitSuggestionButton" class="mm-submit-btn" style="margin-top:14px;">
+        Save Market
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- SCRIPT -->
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  /* Load shared header */
-  await fetch("header.html").then(r => r.text()).then(html => {
-    document.getElementById("mm-header").innerHTML = html;
-  });
+  /* ---------------------------
+     1. Load Sticky Header
+  --------------------------- */
+  const headerHTML = await fetch("header.html").then(r => r.text());
+  document.getElementById("mm-header").innerHTML = headerHTML;
 
-  const supabase = createClient(
-    "https://tosyomhrxttlejwlqvsf.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8"
-  );
+  // Now attach menu events
+  const mmHamburger  = document.getElementById("mmHamburger");
+  const mmNavOverlay = document.getElementById("mmNavOverlay");
+  const mmNavClose   = document.getElementById("mmNavClose");
+  const navLinks     = mmNavOverlay.querySelectorAll(".mm-nav-link");
 
-  /* Auth references inside header */
-  const authUserLabel = document.getElementById("authUserLabel");
+  function openNav() {
+    mmNavOverlay.style.display = "block";
+  }
+  function closeNav() {
+    mmNavOverlay.style.display = "none";
+  }
+
+  mmHamburger.addEventListener("click", openNav);
+  mmNavClose.addEventListener("click", closeNav);
+  navLinks.forEach(a => a.addEventListener("click", closeNav));
+
+  /* ---------------------------
+     2. Supabase Init + Auth
+  --------------------------- */
+  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const authUserLabel     = document.getElementById("authUserLabel");
   const loginGoogleButton = document.getElementById("loginGoogleButton");
-  const loginEmailButton = document.getElementById("loginEmailButton");
-  const logoutButton = document.getElementById("logoutButton");
+  const loginEmailButton  = document.getElementById("loginEmailButton");
+  const logoutButton      = document.getElementById("logoutButton");
 
-  const uploadForm = document.getElementById("uploadForm");
-  const authHint = document.getElementById("authHint");
+  const uploadForm  = document.getElementById("uploadForm");
+  const authHint    = document.getElementById("authHint");
+  const uploadMsg   = document.getElementById("uploadMessage");
 
   let currentUser = null;
 
-  function syncAuthUI() {
+  function updateAuthUI() {
+    if (!authUserLabel) return;
+
     if (currentUser) {
       authUserLabel.textContent = currentUser.email;
       uploadForm.style.display = "block";
       authHint.style.display = "none";
+
       logoutButton.style.display = "block";
       loginGoogleButton.style.display = "none";
-      loginEmailButton.style.display = "none";
+      loginEmailButton.style.display  = "none";
     } else {
       authUserLabel.textContent = "Not signed in";
       uploadForm.style.display = "none";
       authHint.style.display = "block";
+
       logoutButton.style.display = "none";
       loginGoogleButton.style.display = "block";
-      loginEmailButton.style.display = "block";
+      loginEmailButton.style.display  = "block";
     }
   }
 
   async function initAuth() {
     const { data: { session } } = await supabase.auth.getSession();
     currentUser = session?.user ?? null;
-    syncAuthUI();
+    updateAuthUI();
 
     supabase.auth.onAuthStateChange((_event, session) => {
       currentUser = session?.user ?? null;
-      syncAuthUI();
+      updateAuthUI();
     });
   }
 
-  loginGoogleButton.onclick = async () => {
+  loginGoogleButton?.addEventListener("click", async () => {
     await supabase.auth.signInWithOAuth({
-      provider:"google",
-      options:{ redirectTo:window.location.href }
+      provider: "google",
+      options: { redirectTo: window.location.href }
     });
-  };
+  });
 
-  loginEmailButton.onclick = async () => {
-    const email = prompt("Email for magic link:");
+  loginEmailButton?.addEventListener("click", async () => {
+    const email = prompt("Enter your email for a sign-in link:");
     if (!email) return;
-    await supabase.auth.signInWithOtp({ email, options:{emailRedirectTo:window.location.href}});
-  };
+    await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href }
+    });
+  });
 
-  logoutButton.onclick = async () => {
+  logoutButton?.addEventListener("click", async () => {
     await supabase.auth.signOut();
-  };
+  });
 
   await initAuth();
 
-  /* The market loading + upload handling logic stays identical to previous version */
-  /* (I will re-generate that full block once you confirm theme + layout are good) */
 
+  /* ---------------------------
+     3. Load Markets for Form
+  --------------------------- */
+
+  const countrySelect = document.getElementById("countrySelect");
+  const citySelect    = document.getElementById("citySelect");
+  const marketSelect  = document.getElementById("marketSelect");
+  const yearInput     = document.getElementById("yearInput");
+  const fileInput     = document.getElementById("fileInput");
+  const captionInput  = document.getElementById("captionInput");
+  const consent       = document.getElementById("consentCheckbox");
+  const submitButton  = document.getElementById("submitButton");
+
+  let allMarkets = [];
+
+  async function loadMarkets(user) {
+    let query = supabase
+      .from("markets")
+      .select("id, country, city, market_name, status, created_by")
+      .order("country")
+      .order("city")
+      .order("market_name");
+
+    if (user) {
+      query = query.or(`status.eq.approved,created_by.eq.${user.id}`);
+    } else {
+      query = query.eq("status", "approved");
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("Error loading markets:", error);
+      return;
+    }
+
+    allMarkets = data || [];
+    populateCountryDropdown();
+  }
+
+  function populateCountryDropdown() {
+    const countries = [...new Set(allMarkets.map(m => m.country))].sort();
+    countrySelect.innerHTML = `<option value="">Select country</option>`;
+    countries.forEach(c => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      countrySelect.appendChild(o);
+    });
+    citySelect.innerHTML   = `<option value="">Select country first</option>`;
+    marketSelect.innerHTML = `<option value="">Select city first</option>`;
+  }
+
+  countrySelect.addEventListener("change", () => {
+    const country = countrySelect.value;
+    if (!country) {
+      citySelect.innerHTML = `<option value="">Select country first</option>`;
+      return;
+    }
+
+    const cities = [
+      ...new Set(allMarkets.filter(m => m.country === country).map(m => m.city))
+    ].sort();
+
+    citySelect.innerHTML = `<option value="">Select city</option>`;
+    cities.forEach(c => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      citySelect.appendChild(o);
+    });
+
+    marketSelect.innerHTML = `<option value="">Select city first</option>`;
+  });
+
+  citySelect.addEventListener("change", () => {
+    const country = countrySelect.value;
+    const city = citySelect.value;
+
+    const markets = allMarkets.filter(m => m.country === country && m.city === city);
+
+    marketSelect.innerHTML = `<option value="">Select market</option>`;
+    markets.forEach(m => {
+      const o = document.createElement("option");
+      o.value = m.id;
+      o.textContent = m.status === "pending" ? `${m.market_name} (pending)` : m.market_name;
+      marketSelect.appendChild(o);
+    });
+  });
+
+
+  /* ---------------------------
+     4. Add Market (Modal)
+  --------------------------- */
+
+  const addMarketButton = document.getElementById("addMarketButton");
+  const addMarketModal  = document.getElementById("addMarketModal");
+  const closeModalButton = document.getElementById("closeModalButton");
+  const marketSuggestionForm = document.getElementById("marketSuggestionForm");
+  const modalMessage = document.getElementById("modalMessage");
+
+  const suggestionCountry = document.getElementById("suggestionCountry");
+  const suggestionCity = document.getElementById("suggestionCity");
+  const suggestionMarketName = document.getElementById("suggestionMarketName");
+  const suggestionDescription = document.getElementById("suggestionDescription");
+
+  addMarketButton.addEventListener("click", () => {
+    suggestionCountry.value = countrySelect.value || "";
+    suggestionCity.value    = citySelect.value || "";
+    suggestionMarketName.value = "";
+    suggestionDescription.value = "";
+    modalMessage.textContent = "";
+    addMarketModal.style.display = "flex";
+  });
+
+  closeModalButton.addEventListener("click", () => {
+    addMarketModal.style.display = "none";
+  });
+
+  marketSuggestionForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    modalMessage.textContent = "";
+
+    if (!currentUser) {
+      modalMessage.style.color = "#fecaca";
+      modalMessage.textContent = "You must be signed in.";
+      return;
+    }
+
+    const country = suggestionCountry.value.trim();
+    const city = suggestionCity.value.trim();
+    const name = suggestionMarketName.value.trim();
+    const desc = suggestionDescription.value.trim();
+
+    if (!country || !city || !name) {
+      modalMessage.style.color = "#fecaca";
+      modalMessage.textContent = "All required fields must be filled.";
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("markets")
+      .insert({
+        country,
+        city,
+        market_name: name,
+        description: desc || null,
+        status: "pending",
+        created_by: currentUser.id
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error(error);
+      modalMessage.style.color = "#fecaca";
+      modalMessage.textContent = "Error adding market.";
+      return;
+    }
+
+    allMarkets.push(data);
+    populateCountryDropdown();
+    countrySelect.value = data.country;
+    countrySelect.dispatchEvent(new Event("change"));
+    citySelect.value = data.city;
+    citySelect.dispatchEvent(new Event("change"));
+    marketSelect.value = data.id;
+
+    modalMessage.style.color = "#bbf7d0";
+    modalMessage.textContent = "Market added!";
+    setTimeout(() => addMarketModal.style.display = "none", 800);
+  });
+
+
+  /* ---------------------------
+     5. Upload Photos
+  --------------------------- */
+
+  function getExtension(filename) {
+    return filename.split(".").pop().toLowerCase();
+  }
+
+  function generateStoragePath(marketId, year, file, i) {
+    const ext = getExtension(file.name);
+    const id = crypto.randomUUID ? crypto.randomUUID() : Date.now() + "_" + i;
+    return `${marketId}/${year}/${id}.${ext}`;
+  }
+
+  uploadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    uploadMsg.style.color = "#9ca3af";
+    uploadMsg.textContent = "Uploading...";
+
+    if (!currentUser) {
+      uploadMsg.style.color = "#fecaca";
+      uploadMsg.textContent = "You must be signed in.";
+      return;
+    }
+
+    const country = countrySelect.value;
+    const city = citySelect.value;
+    const marketId = marketSelect.value;
+    const year = parseInt(yearInput.value);
+    const files = Array.from(fileInput.files || []);
+    const caption = captionInput.value.trim();
+
+    if (!country || !city || !marketId) {
+      uploadMsg.style.color = "#fecaca";
+      uploadMsg.textContent = "Please select a valid market.";
+      return;
+    }
+    if (!year) {
+      uploadMsg.style.color = "#fecaca";
+      uploadMsg.textContent = "Enter a valid year.";
+      return;
+    }
+    if (!files.length) {
+      uploadMsg.style.color = "#fecaca";
+      uploadMsg.textContent = "Attach at least one photo.";
+      return;
+    }
+    if (files.length > 3) {
+      uploadMsg.style.color = "#fecaca";
+      uploadMsg.textContent = "Max 3 photos allowed.";
+      return;
+    }
+    if (!consent.checked) {
+      uploadMsg.style.color = "#fecaca";
+      uploadMsg.textContent = "You must agree to public display.";
+      return;
+    }
+
+    submitButton.disabled = true;
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const path = generateStoragePath(marketId, year, file, i);
+
+        const uploadRes = await supabase.storage
+          .from("mugs")
+          .upload(path, file, { upsert: false });
+
+        if (uploadRes.error) throw uploadRes.error;
+
+        const { data: pub } = supabase.storage.from("mugs").getPublicUrl(path);
+        const publicUrl = pub.publicUrl;
+
+        const { error: insertErr } = await supabase
+          .from("mug_photos")
+          .insert({
+            market_id: Number(marketId),
+            uploader_id: currentUser.id,
+            uploader_email: currentUser.email,
+            storage_path: path,
+            public_url: publicUrl,
+            caption: caption || null,
+            year,
+            status: "pending",
+            like_count: 0
+          });
+
+        if (insertErr) throw insertErr;
+      }
+
+      uploadMsg.style.color = "#bbf7d0";
+      uploadMsg.textContent =
+        "Upload complete! Photos are pending approval.";
+
+      fileInput.value = "";
+      captionInput.value = "";
+      consent.checked = false;
+    } catch (err) {
+      console.error(err);
+      uploadMsg.style.color = "#fecaca";
+      uploadMsg.textContent = "Upload failed. Try again.";
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
+
+  /* ---------------------------
+     INIT PAGE
+  --------------------------- */
+
+  await loadMarkets(currentUser);
+
+  yearInput.value = new Date().getFullYear();
 </script>
 
 </body>
