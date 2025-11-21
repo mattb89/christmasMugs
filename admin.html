@@ -1,305 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Mug Mapper – Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- W3CSS + global styles -->
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-  <link rel="stylesheet" href="styles.css" />
-
-  <style>
-    body {
-      margin: 0;
-      background: #111827;
-      color: #f9fafb;
-      font-family: system-ui, -apple-system, sans-serif;
-
-      padding-top: 58px;   /* sticky header */
-      padding-bottom: 48px; /* sticky footer */
-    }
-
-    .admin-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 18px 16px 60px;
-    }
-
-    .admin-card {
-      background: #1f2937;
-      border-radius: 14px;
-      border: 1px solid rgba(148,163,184,0.25);
-      padding: 16px 18px 22px;
-    }
-
-    .admin-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .admin-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-    }
-
-    .admin-tabs {
-      display: inline-flex;
-      border-radius: 999px;
-      padding: 2px;
-      background: #030712;
-      border: 1px solid rgba(148,163,184,0.5);
-      gap: 2px;
-    }
-
-    .admin-tab {
-      padding: 6px 14px;
-      font-size: 0.9rem;
-      border-radius: 999px;
-      border: none;
-      background: transparent;
-      color: #e5e7eb;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .admin-tab.active {
-      background: #0ea5e9;
-      color: #0f172a;
-      font-weight: 600;
-    }
-
-    .admin-section {
-      margin-top: 12px;
-    }
-
-    .admin-info {
-      font-size: 0.82rem;
-      color: #9ca3af;
-      margin-bottom: 8px;
-    }
-
-    .admin-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    .admin-item {
-      display: grid;
-      grid-template-columns: 120px 1fr; /* wider thumb column */
-      gap: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      background: #020617;
-      border: 1px solid rgba(55,65,81,0.8);
-    }
-
-    .admin-thumb img {
-      width: 100%;
-      height: 200px; /* larger photo height */
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .admin-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.84rem;
-    }
-
-    .admin-meta-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .admin-meta-sub {
-      color: #9ca3af;
-    }
-
-    .admin-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 2px;
-    }
-
-    .admin-tag {
-      font-size: 0.72rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: #111827;
-      color: #e5e7eb;
-    }
-
-    .admin-actions {
-      margin-top: 6px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .btn-approve,
-    .btn-reject {
-      padding: 6px 10px;
-      font-size: 0.78rem;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn-approve {
-      background: #22c55e;
-      color: #052e16;
-    }
-
-    .btn-approve:hover {
-      background: #4ade80;
-    }
-
-    .btn-reject {
-      background: #f97373;
-      color: #450a0a;
-    }
-
-    .btn-reject:hover {
-      background: #fecaca;
-    }
-
-    .admin-empty {
-      font-size: 0.85rem;
-      color: #9ca3af;
-      padding: 8px 2px;
-    }
-
-    .admin-error {
-      color: #fecaca;
-      font-size: 0.85rem;
-      margin-top: 8px;
-      white-space: pre-line;
-    }
-
-    .admin-pill-status {
-      font-size: 0.72rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: #1d283a;
-      color: #fbbf24;
-    }
-
-    .mm-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 48px;
-      background: #1f2937;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9980;
-      font-size: 0.9rem;
-      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
-    }
-
-    .access-denied {
-      max-width: 650px;
-      margin: 40px auto;
-      text-align: center;
-      padding: 18px 16px;
-      background: #111827;
-      border-radius: 12px;
-      border: 1px dashed #4b5563;
-      color: #e5e7eb;
-      font-size: 0.95rem;
-    }
-
-    .access-denied span {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.82rem;
-      color: #9ca3af;
-    }
-
-    @media (max-width: 640px) {
-      .admin-item {
-        grid-template-columns: 1fr;
-      }
-      .admin-thumb img {
-        height: 200px; /* a bit taller on small screens */
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<!-- Sticky Header -->
-<div id="mm-header"></div>
-
-<div class="admin-container">
-
-  <!-- Shown if NOT admin -->
-  <div id="accessDenied" class="access-denied" style="display:none;">
-    🚫 Admin access required<br />
-    <span>You’re either not signed in, or your account is not configured as an admin.</span>
+<div class="mm-header-bar">
+  <div class="mm-header-left">
+    <span class="mm-emoji">🗺️</span>
+    <span class="mm-title">Mug Mapper</span>
   </div>
 
-  <!-- Main admin content only visible for admins -->
-  <div id="adminWrapper" style="display:none;">
-    <div class="admin-card">
-      <div class="admin-header">
-        <div class="admin-title">Admin Panel</div>
-        <div class="admin-tabs">
-          <button id="tabPhotos" class="admin-tab active">Approve Photos</button>
-          <button id="tabMarkets" class="admin-tab">Approve Markets</button>
-        </div>
-      </div>
+  <div id="mmHamburger" class="mm-hamburger">
+    &#9776;
+  </div>
+</div>
 
-      <div class="admin-section">
-        <div id="adminInfo" class="admin-info">
-          Loading pending items…
-        </div>
+<!-- Fullscreen overlay menu -->
+<div id="mmNavOverlay" class="mm-nav-overlay" aria-hidden="true">
+  <div class="mm-nav-content">
+    <button id="mmNavClose" class="mm-nav-close">&times;</button>
 
-        <!-- Photos View -->
-        <div id="photosView" class="admin-list"></div>
+    <a href="index.html" class="mm-nav-link">Home</a>
+    <a href="upload.html" class="mm-nav-link">Upload</a>
+    <a href="popular.html" class="mm-nav-link">Popular</a>
+    <a href="leaderboard.html" class="mm-nav-link">Leaderboard</a>
+    <a href="contact.html" class="mm-nav-link">Contact</a>
+    <a href="support.html" class="mm-nav-link">Support</a>
 
-        <!-- Markets View -->
-        <div id="marketsView" class="admin-list" style="display:none;"></div>
+    <!-- Admin link gets injected here dynamically -->
+    <div id="adminLinkContainer"></div>
 
-        <div id="adminError" class="admin-error"></div>
-      </div>
+    <div class="mm-auth-section">
+      <div id="authUserLabel" class="mm-auth-label">Not signed in</div>
+      <button id="loginGoogleButton" class="mm-auth-btn mm-google-btn">Sign in with Google</button>
+      <button id="loginEmailButton" class="mm-auth-btn mm-email-btn">Sign in with Email</button>
+      <button id="logoutButton" class="mm-auth-btn mm-logout-btn" style="display:none;">Sign Out</button>
     </div>
   </div>
 </div>
 
-<!-- Sticky Footer -->
-<footer class="mm-footer">
-  <div class="mm-footer-inner">© 2025 Mug Mapper</div>
-</footer>
-
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  // ---------------------------
-  // 1. Load shared header
-  // ---------------------------
-  const headerHTML = await fetch("header.html").then((r) => r.text());
-  document.getElementById("mm-header").innerHTML = headerHTML;
+  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
 
-  // Hamburger / overlay wiring
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   const mmHamburger  = document.getElementById("mmHamburger");
   const mmNavOverlay = document.getElementById("mmNavOverlay");
   const mmNavClose   = document.getElementById("mmNavClose");
   const navLinks     = mmNavOverlay.querySelectorAll(".mm-nav-link");
+  const adminContainer = document.getElementById("adminLinkContainer");
 
+  const authUserLabel     = document.getElementById("authUserLabel");
+  const loginGoogleButton = document.getElementById("loginGoogleButton");
+  const loginEmailButton  = document.getElementById("loginEmailButton");
+  const logoutButton      = document.getElementById("logoutButton");
+
+  let currentUser = null;
+  let isAdmin = false;
+
+  // --- Navigation overlay handlers ---
   function openNav() {
     mmNavOverlay.style.display = "block";
     mmNavOverlay.setAttribute("aria-hidden", "false");
@@ -313,38 +70,12 @@
   mmNavClose?.addEventListener("click", closeNav);
   navLinks.forEach((link) => link.addEventListener("click", closeNav));
 
-  // ---------------------------
-  // 2. Supabase Init + Auth
-  // ---------------------------
-  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const authUserLabel     = document.getElementById("authUserLabel");
-  const loginGoogleButton = document.getElementById("loginGoogleButton");
-  const loginEmailButton  = document.getElementById("loginEmailButton");
-  const logoutButton      = document.getElementById("logoutButton");
-
-  const adminWrapper = document.getElementById("adminWrapper");
-  const accessDenied = document.getElementById("accessDenied");
-  const adminInfo    = document.getElementById("adminInfo");
-  const adminError   = document.getElementById("adminError");
-
-  const photosView   = document.getElementById("photosView");
-  const marketsView  = document.getElementById("marketsView");
-  const tabPhotos    = document.getElementById("tabPhotos");
-  const tabMarkets   = document.getElementById("tabMarkets");
-
-  let currentUser = null;
-  let isAdmin     = false;
-
+  // --- Update UI for user ---
   function updateAuthUI() {
     if (!authUserLabel) return;
+
     if (currentUser) {
-      authUserLabel.textContent =
-        currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
+      authUserLabel.textContent = currentUser.email;
       loginGoogleButton.style.display = "none";
       loginEmailButton.style.display  = "none";
       logoutButton.style.display      = "block";
@@ -356,6 +87,7 @@
     }
   }
 
+  // --- Check if user is an admin ---
   async function checkAdmin() {
     if (!currentUser) {
       isAdmin = false;
@@ -368,61 +100,52 @@
       .eq("user_id", currentUser.id)
       .maybeSingle();
 
-    if (error) {
-      console.error("Error checking admin:", error);
-      isAdmin = false;
-      return;
-    }
-
     isAdmin = !!data;
+    renderAdminLink();
   }
 
-  function showAdminUI() {
+  // --- Insert/Remove Admin Link ---
+  function renderAdminLink() {
     if (isAdmin) {
-      adminWrapper.style.display = "block";
-      accessDenied.style.display = "none";
-      adminInfo.textContent = "Loading pending photos…";
-      loadPendingPhotos();
+      adminContainer.innerHTML = `
+        <a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">
+          🔧 Admin Panel
+        </a>`;
     } else {
-      adminWrapper.style.display = "none";
-      accessDenied.style.display = "block";
+      adminContainer.innerHTML = "";
     }
   }
 
+  // --- Auth Init ---
   async function initAuth() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
+    const { data: { session } } = await supabase.auth.getSession();
     currentUser = session?.user ?? null;
     updateAuthUI();
     await checkAdmin();
-    showAdminUI();
 
-    supabase.auth.onAuthStateChange(async (_event, session) => {
+    supabase.auth.onAuthStateChange(async (_evt, session) => {
       currentUser = session?.user ?? null;
       updateAuthUI();
       await checkAdmin();
-      showAdminUI();
     });
   }
 
+  // --- Auth Buttons ---
   loginGoogleButton?.addEventListener("click", async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.href },
     });
-    if (error) alert("Google sign-in error: " + error.message);
   });
 
   loginEmailButton?.addEventListener("click", async () => {
-    const email = prompt("Enter your email for a sign-in link:");
+    const email = prompt("Enter your email:");
     if (!email) return;
-    const { error } = await supabase.auth.signInWithOtp({
+    await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: window.location.href },
     });
-    if (error) alert("Email sign-in error: " + error.message);
+    alert("Magic link sent!");
   });
 
   logoutButton?.addEventListener("click", async () => {
@@ -430,362 +153,4 @@
   });
 
   await initAuth();
-
-  // ---------------------------
-  // 3. Tab switching
-  // ---------------------------
-  tabPhotos.addEventListener("click", () => {
-    tabPhotos.classList.add("active");
-    tabMarkets.classList.remove("active");
-    photosView.style.display  = "flex";
-    marketsView.style.display = "none";
-    adminError.textContent    = "";
-    adminInfo.textContent     = "Loading pending photos…";
-    loadPendingPhotos();
-  });
-
-  tabMarkets.addEventListener("click", () => {
-    tabMarkets.classList.add("active");
-    tabPhotos.classList.remove("active");
-    photosView.style.display  = "flex"; // list is flex-column
-    marketsView.style.display = "flex";
-    photosView.style.display  = "none";
-    adminError.textContent    = "";
-    adminInfo.textContent     = "Loading pending markets…";
-    loadPendingMarkets();
-  });
-
-  // ---------------------------
-  // 4. Load PENDING PHOTOS
-  // ---------------------------
-  async function loadPendingPhotos() {
-    if (!isAdmin) return;
-    photosView.innerHTML = "";
-    adminError.textContent = "";
-
-    const { data, error } = await supabase
-      .from("mug_photos")
-      .select(`
-        id,
-        public_url,
-        caption,
-        year,
-        status,
-        uploader_email,
-        created_at,
-        market_id,
-        markets (
-          market_name,
-          city,
-          country
-        )
-      `)
-      .eq("status", "pending")
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.error("Error loading pending photos:", error);
-      adminInfo.textContent = "";
-      adminError.textContent = "Error loading pending photos:\n" + error.message;
-      return;
-    }
-
-    const photos = data || [];
-    if (!photos.length) {
-      adminInfo.textContent = "No pending photos. 🎉";
-      photosView.innerHTML = `<div class="admin-empty">Everything is approved right now.</div>`;
-      return;
-    }
-
-    adminInfo.textContent = `${photos.length} pending photo(s).`;
-
-    photosView.innerHTML = "";
-    photos.forEach((p) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "admin-item";
-
-      // Thumbnail (bigger now)
-      const thumbDiv = document.createElement("div");
-      thumbDiv.className = "admin-thumb";
-      const img = document.createElement("img");
-      img.src = p.public_url;
-      img.alt = "Pending mug photo";
-      img.loading = "lazy";
-      thumbDiv.appendChild(img);
-
-      // Meta
-      const meta = document.createElement("div");
-      meta.className = "admin-meta";
-
-      const title = document.createElement("div");
-      title.className = "admin-meta-title";
-      const market = p.markets?.market_name || "Unknown market";
-      title.textContent = market;
-
-      const sub = document.createElement("div");
-      sub.className = "admin-meta-sub";
-      const loc = p.markets
-        ? `${p.markets.city}, ${p.markets.country}`
-        : "Location unknown";
-      sub.textContent = `${loc} · ${p.year || "Year n/a"}`;
-
-      const tagsRow = document.createElement("div");
-      tagsRow.className = "admin-tags";
-
-      const statusTag = document.createElement("span");
-      statusTag.className = "admin-pill-status";
-      statusTag.textContent = p.status || "pending";
-
-      tagsRow.appendChild(statusTag);
-
-      if (p.uploader_email) {
-        const uploaderTag = document.createElement("span");
-        uploaderTag.className = "admin-tag";
-        uploaderTag.textContent = p.uploader_email;
-        tagsRow.appendChild(uploaderTag);
-      }
-
-      const createdTag = document.createElement("span");
-      createdTag.className = "admin-tag";
-      createdTag.textContent =
-        "Submitted " + new Date(p.created_at).toLocaleString();
-      tagsRow.appendChild(createdTag);
-
-      // Caption
-      if (p.caption) {
-        const captionEl = document.createElement("div");
-        captionEl.style.fontSize = "0.82rem";
-        captionEl.style.marginTop = "2px";
-        captionEl.textContent = `"${p.caption}"`;
-        meta.appendChild(captionEl);
-      }
-
-      // Actions
-      const actions = document.createElement("div");
-      actions.className = "admin-actions";
-
-      const approveBtn = document.createElement("button");
-      approveBtn.className = "btn-approve";
-      approveBtn.textContent = "Approve";
-      approveBtn.addEventListener("click", () => approvePhoto(p.id));
-
-      const rejectBtn = document.createElement("button");
-      rejectBtn.className = "btn-reject";
-      rejectBtn.textContent = "Reject";
-      rejectBtn.addEventListener("click", () => rejectPhoto(p.id));
-
-      actions.appendChild(approveBtn);
-      actions.appendChild(rejectBtn);
-
-      meta.appendChild(title);
-      meta.appendChild(sub);
-      meta.appendChild(tagsRow);
-      meta.appendChild(actions);
-
-      wrapper.appendChild(thumbDiv);
-      wrapper.appendChild(meta);
-
-      photosView.appendChild(wrapper);
-    });
-  }
-
-  async function approvePhoto(photoId) {
-    if (!isAdmin) return;
-    const { error } = await supabase
-      .from("mug_photos")
-      .update({ status: "approved" })
-      .eq("id", photoId);
-
-    if (error) {
-      console.error("Error approving photo:", error);
-      adminError.textContent =
-        "Failed to approve photo:\n" + (error.message || "");
-      return;
-    }
-    adminError.textContent = "";
-    await loadPendingPhotos();
-  }
-
-  async function rejectPhoto(photoId) {
-    if (!isAdmin) return;
-    const confirmed = confirm("Reject this photo? It will be marked as rejected.");
-    if (!confirmed) return;
-
-    const { error } = await supabase
-      .from("mug_photos")
-      .update({ status: "rejected" })
-      .eq("id", photoId);
-
-    if (error) {
-      console.error("Error rejecting photo:", error);
-      adminError.textContent =
-        "Failed to reject photo:\n" + (error.message || "");
-      return;
-    }
-    adminError.textContent = "";
-    await loadPendingPhotos();
-  }
-
-  // ---------------------------
-  // 5. Load PENDING MARKETS
-  // ---------------------------
-  async function loadPendingMarkets() {
-    if (!isAdmin) return;
-    marketsView.innerHTML = "";
-    adminError.textContent = "";
-
-    const { data, error } = await supabase
-      .from("markets")
-      .select("id, market_name, city, country, status, description, created_at, created_by, created_by_email")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.error("Error loading pending markets:", error);
-      adminInfo.textContent = "";
-      adminError.textContent = "Error loading pending markets:\n" + error.message;
-      return;
-    }
-
-    const markets = data || [];
-    if (!markets.length) {
-      adminInfo.textContent = "No pending markets. 🎉";
-      marketsView.innerHTML = `<div class="admin-empty">All markets are approved right now.</div>`;
-      return;
-    }
-
-    adminInfo.textContent = `${markets.length} pending market(s).`;
-
-    marketsView.innerHTML = "";
-    markets.forEach((m) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "admin-item";
-
-      // Left column: simple big icon (taller to match photo thumb)
-      const thumbDiv = document.createElement("div");
-      thumbDiv.className = "admin-thumb";
-      const icon = document.createElement("div");
-      icon.style.width = "100%";
-      icon.style.height = "130px";  // match photo height
-      icon.style.display = "flex";
-      icon.style.alignItems = "center";
-      icon.style.justifyContent = "center";
-      icon.style.borderRadius = "8px";
-      icon.style.background = "#020617";
-      icon.style.fontSize = "2rem";
-      icon.textContent = "🎄";
-      thumbDiv.appendChild(icon);
-
-      const meta = document.createElement("div");
-      meta.className = "admin-meta";
-
-      const title = document.createElement("div");
-      title.className = "admin-meta-title";
-      title.textContent = m.market_name;
-
-      const sub = document.createElement("div");
-      sub.className = "admin-meta-sub";
-      sub.textContent = `${m.city}, ${m.country}`;
-
-      const tagsRow = document.createElement("div");
-      tagsRow.className = "admin-tags";
-
-      const statusTag = document.createElement("span");
-      statusTag.className = "admin-pill-status";
-      statusTag.textContent = m.status || "pending";
-      tagsRow.appendChild(statusTag);
-
-      const createdTag = document.createElement("span");
-      createdTag.className = "admin-tag";
-      createdTag.textContent =
-        "Created " + new Date(m.created_at).toLocaleString();
-      tagsRow.appendChild(createdTag);
-
-      // Show user email if available, else fallback to user_id
-      if (m.created_by_email || m.created_by) {
-        const byTag = document.createElement("span");
-        byTag.className = "admin-tag";
-        byTag.textContent = m.created_by_email
-          ? `User: ${m.created_by_email}`
-          : `User: ${m.created_by}`;
-        tagsRow.appendChild(byTag);
-      }
-
-      if (m.description) {
-        const descEl = document.createElement("div");
-        descEl.style.fontSize = "0.82rem";
-        descEl.style.marginTop = "2px";
-        descEl.textContent = m.description;
-        meta.appendChild(descEl);
-      }
-
-      const actions = document.createElement("div");
-      actions.className = "admin-actions";
-
-      const approveBtn = document.createElement("button");
-      approveBtn.className = "btn-approve";
-      approveBtn.textContent = "Approve";
-      approveBtn.addEventListener("click", () => approveMarket(m.id));
-
-      const rejectBtn = document.createElement("button");
-      rejectBtn.className = "btn-reject";
-      rejectBtn.textContent = "Reject";
-      rejectBtn.addEventListener("click", () => rejectMarket(m.id));
-
-      actions.appendChild(approveBtn);
-      actions.appendChild(rejectBtn);
-
-      meta.appendChild(title);
-      meta.appendChild(sub);
-      meta.appendChild(tagsRow);
-      meta.appendChild(actions);
-
-      wrapper.appendChild(thumbDiv);
-      wrapper.appendChild(meta);
-
-      marketsView.appendChild(wrapper);
-    });
-  }
-
-  async function approveMarket(marketId) {
-    if (!isAdmin) return;
-    const { error } = await supabase
-      .from("markets")
-      .update({ status: "approved" })
-      .eq("id", marketId);
-
-    if (error) {
-      console.error("Error approving market:", error);
-      adminError.textContent =
-        "Failed to approve market:\n" + (error.message || "");
-      return;
-    }
-    adminError.textContent = "";
-    await loadPendingMarkets();
-  }
-
-  async function rejectMarket(marketId) {
-    if (!isAdmin) return;
-    const confirmed = confirm(
-      "Reject this market? It will be marked as rejected (you can still keep the row if you want future reference)."
-    );
-    if (!confirmed) return;
-
-    const { error } = await supabase
-      .from("markets")
-      .update({ status: "rejected" })
-      .eq("id", marketId);
-
-    if (error) {
-      console.error("Error rejecting market:", error);
-      adminError.textContent =
-        "Failed to reject market:\n" + (error.message || "");
-      return;
-    }
-    adminError.textContent = "";
-    await loadPendingMarkets();
-  }
 </script>
-
-</body>
-</html>
