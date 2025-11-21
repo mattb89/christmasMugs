@@ -2,356 +2,691 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Map – Market Leaderboard</title>
+  <title>Mug Mapper – Leaderboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- W3CSS + global styles -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
   <link rel="stylesheet" href="styles.css" />
+
   <style>
-    .leaderboard-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 1rem;
+    body {
+      margin: 0;
+      background: #111827;
+      color: #f9fafb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding-top: 58px;    /* sticky header */
+      padding-bottom: 48px; /* sticky footer */
     }
 
-    .board-card {
-      border-radius: 1.25rem;
-      border: 1px solid rgba(148,163,184,0.35);
-      padding: 1rem 1.1rem;
-      background: radial-gradient(circle at top, rgba(15,23,42,0.9) 0, #020617 55%);
-      min-height: 260px;
+    .lb-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 16px 80px;
     }
 
-    .board-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .board-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-    }
-    .board-sub {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .lb-card {
+      background: #1f2937;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.25);
+      padding: 18px 18px 26px;
     }
 
-    .board-filters {
+    .lb-header {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.7rem;
       align-items: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-    .board-select {
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-soft);
-      color: var(--text-main);
-      font-size: 0.8rem;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
-    .board-table-wrapper {
-      margin-top: 0.8rem;
-      max-height: 420px;
-      overflow: auto;
-      border-radius: 0.9rem;
-      border: 1px solid rgba(30,64,175,0.5);
-      background: rgba(15,23,42,0.7);
-    }
-
-    table.board-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-    }
-    table.board-table thead {
-      position: sticky;
-      top: 0;
-      background: rgba(15,23,42,0.98);
-      backdrop-filter: blur(6px);
-      z-index: 1;
-    }
-    table.board-table th,
-    table.board-table td {
-      padding: 0.4rem 0.6rem;
-      text-align: left;
-      border-bottom: 1px solid rgba(31,41,55,0.9);
-    }
-    table.board-table th {
+    .lb-title {
+      font-size: 1.4rem;
       font-weight: 600;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
     }
-    table.board-table tbody tr:nth-child(even) {
-      background: rgba(15,23,42,0.5);
+
+    .lb-subtitle {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: 2px;
     }
-    table.board-table tbody tr:hover {
-      background: rgba(30,64,175,0.28);
-    }
-    .rank-pill {
+
+    .lb-tabs {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.7rem;
-      height: 1.4rem;
       border-radius: 999px;
-      font-size: 0.75rem;
-      border: 1px solid rgba(234,179,8,0.7);
-      color: #facc15;
+      padding: 2px;
+      background: #030712;
+      border: 1px solid rgba(148,163,184,0.5);
+      gap: 2px;
     }
-    .market-col-main {
-      display: flex;
-      flex-direction: column;
-      gap: 0.1rem;
+
+    .lb-tab {
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: #e5e7eb;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    .market-name {
-      font-weight: 500;
-      font-size: 0.82rem;
+
+    .lb-tab.active {
+      background: #0ea5e9;
+      color: #0f172a;
+      font-weight: 600;
     }
-    .market-city {
-      font-size: 0.75rem;
-      color: var(--text-muted);
+
+    .lb-info {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 4px;
     }
-    .numeric {
+
+    .lb-error {
+      margin-top: 8px;
+      color: #fecaca;
+      font-size: 0.85rem;
+      white-space: pre-line;
+    }
+
+    .lb-section {
+      margin-top: 12px;
+    }
+
+    /* Top uploaders list */
+    .lb-list {
+      margin-top: 8px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .lb-row {
+      display: grid;
+      grid-template-columns: 36px 1.5fr 1fr;
+      gap: 10px;
+      padding: 8px 10px;
+      font-size: 0.88rem;
+      align-items: center;
+      background: #020617;
+    }
+
+    .lb-row:nth-child(odd) {
+      background: #030712;
+    }
+
+    .lb-row-header {
+      background: #0b1120;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .lb-rank {
+      text-align: center;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .lb-user {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lb-count {
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
+
+    /* Most liked photos */
+    .lb-photo-grid {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .lb-photo-item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .lb-photo-thumb img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .lb-photo-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+    }
+
+    .lb-photo-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .lb-photo-sub {
+      color: #9ca3af;
+      font-size: 0.8rem;
+    }
+
+    .lb-photo-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .lb-tag {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    .lb-like-pill {
+      background: #f59e0b;
+      color: #422006;
+    }
+
+    .lb-photo-caption {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: #e5e7eb;
+    }
+
+    .mm-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #1f2937;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9980;
+      font-size: 0.9rem;
+      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
+    }
+
+    @media (max-width: 640px) {
+      .lb-row {
+        grid-template-columns: 30px 2fr 1fr;
+        font-size: 0.84rem;
+      }
+
+      .lb-photo-item {
+        grid-template-columns: 1fr;
+      }
+
+      .lb-photo-thumb img {
+        height: 200px;
+      }
+    }
   </style>
 </head>
+
 <body>
-<div class="page">
-  <header>
-    <div class="brand">
-      <div class="logo-pill">☕</div>
+
+<!-- Sticky Header -->
+<div id="mm-header"></div>
+
+<div class="lb-container">
+  <div class="lb-card">
+    <div class="lb-header">
       <div>
-        <h1>EUROPEAN <span>MUG MAP</span></h1>
-        <div class="tagline">Which markets have the strongest mug game?</div>
+        <div class="lb-title">Leaderboard</div>
+        <div class="lb-subtitle">
+          Top contributors and most-loved mugs across Mug Mapper.
+        </div>
+      </div>
+
+      <div class="lb-tabs">
+        <button id="tabUploaders" class="lb-tab active">Top Uploaders</button>
+        <button id="tabLiked" class="lb-tab">Most Liked Photos</button>
       </div>
     </div>
-    <nav class="nav-links">
-      <a href="index.html">Current Year</a>
-      <a href="previous.html">Previous Years</a>
-      <a href="popular.html">Popular Mugs</a>
-      <a href="leaderboard.html" class="active">Leaderboard</a>
-      <a href="upload.html">Upload Mug</a>
-    </nav>
-  </header>
 
-  <main>
-    <div class="main-container leaderboard-layout">
-      <section class="board-card">
-        <div class="board-header">
-          <div>
-            <div class="board-title">Market Leaderboard</div>
-            <div class="board-sub">
-              Ranked by total likes across all approved mugs for each market.
-            </div>
-          </div>
-          <div id="boardSummary" style="font-size:0.78rem; color:var(--text-muted);">
-            Loading...
-          </div>
-        </div>
+    <div class="lb-info" id="lbInfo">Loading leaderboards…</div>
+    <div class="lb-error" id="lbError"></div>
 
-        <div class="board-filters">
-          <span>Sort by:</span>
-          <select id="sortSelect" class="board-select">
-            <option value="likes">Total likes (desc)</option>
-            <option value="photos">Number of photos (desc)</option>
-          </select>
-
-          <span>· Limit:</span>
-          <select id="limitSelect" class="board-select">
-            <option value="25">Top 25</option>
-            <option value="50" selected>Top 50</option>
-            <option value="100">Top 100</option>
-          </select>
-        </div>
-
-        <div id="boardEmpty" style="margin-top:0.8rem; font-size:0.82rem; color:var(--text-muted);">
-          Loading leaderboard...
-        </div>
-
-        <div class="board-table-wrapper" id="boardTableWrapper" style="display:none;">
-          <table class="board-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Market</th>
-                <th class="numeric">Photos</th>
-                <th class="numeric">Total Likes</th>
-                <th class="numeric">Best Year</th>
-              </tr>
-            </thead>
-            <tbody id="boardBody"></tbody>
-          </table>
-        </div>
-      </section>
+    <!-- Top Uploaders -->
+    <div id="viewUploaders" class="lb-section">
+      <div id="uploaderList" class="lb-list"></div>
     </div>
-  </main>
+
+    <!-- Most Liked Photos -->
+    <div id="viewLiked" class="lb-section" style="display:none;">
+      <div id="likedList" class="lb-photo-grid"></div>
+    </div>
+  </div>
 </div>
+
+<!-- Lightbox (reuse same structure/classes) -->
+<div id="lightbox" class="lightbox">
+  <div class="lightbox-inner">
+    <div class="lightbox-img-wrapper">
+      <img id="lightboxImg" src="" alt="Mug photo" />
+    </div>
+    <div class="lightbox-meta">
+      <div class="lightbox-title" id="lightboxTitle"></div>
+      <div class="lightbox-subtitle" id="lightboxSubtitle"></div>
+      <div class="lightbox-chips">
+        <div class="chip" id="lightboxYear"></div>
+        <div class="chip" id="lightboxLocation"></div>
+      </div>
+      <div class="chip" id="lightboxUploader"></div>
+    </div>
+
+    <div class="lightbox-controls">
+      <button id="lightboxPrev" class="lightbox-btn lightbox-prev">&#10094;</button>
+      <button id="lightboxNext" class="lightbox-btn lightbox-next">&#10095;</button>
+      <button id="lightboxClose" class="lightbox-btn lightbox-close">&#10005;</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sticky Footer -->
+<footer class="mm-footer">
+  <div class="mm-footer-inner">© 2025 Mug Mapper</div>
+</footer>
 
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+  // ---------------------------
+  // 1. Load shared header
+  // ---------------------------
+  const headerHTML = await fetch("header.html").then((r) => r.text());
+  document.getElementById("mm-header").innerHTML = headerHTML;
+
+  // Hamburger / overlay wiring
+  const mmHamburger  = document.getElementById("mmHamburger");
+  const mmNavOverlay = document.getElementById("mmNavOverlay");
+  const mmNavClose   = document.getElementById("mmNavClose");
+  const navLinks     = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
+
+  function openNav() {
+    mmNavOverlay.style.display = "block";
+    mmNavOverlay.setAttribute("aria-hidden", "false");
+  }
+  function closeNav() {
+    mmNavOverlay.style.display = "none";
+    mmNavOverlay.setAttribute("aria-hidden", "true");
+  }
+
+  mmHamburger?.addEventListener("click", openNav);
+  mmNavClose?.addEventListener("click", closeNav);
+  navLinks.forEach((link) => link.addEventListener("click", closeNav));
+
+  // ---------------------------
+  // 2. Supabase Init + Auth
+  // ---------------------------
   const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const boardSummary   = document.getElementById("boardSummary");
-  const boardEmpty     = document.getElementById("boardEmpty");
-  const boardTableWrap = document.getElementById("boardTableWrapper");
-  const boardBody      = document.getElementById("boardBody");
-  const sortSelect     = document.getElementById("sortSelect");
-  const limitSelect    = document.getElementById("limitSelect");
+  const authUserLabel     = document.getElementById("authUserLabel");
+  const loginGoogleButton = document.getElementById("loginGoogleButton");
+  const loginEmailButton  = document.getElementById("loginEmailButton");
+  const logoutButton      = document.getElementById("logoutButton");
 
-  let leaderboardRows = []; // aggregated stats per market
-  let marketsMap = new Map();
+  let currentUser = null;
+  let topUploaders = [];
+  let topLikedPhotos = [];
+  let currentLikedIndex = 0;
 
-  async function loadLeaderboard() {
-    // 1) Load all approved photos' minimal stats
-    const { data: photos, error: photosError } = await supabase
-      .from("mug_photos")
-      .select("market_id, like_count, year")
-      .eq("status", "approved");
+  const lbInfo   = document.getElementById("lbInfo");
+  const lbError  = document.getElementById("lbError");
+  const vUpload  = document.getElementById("viewUploaders");
+  const vLiked   = document.getElementById("viewLiked");
+  const tabUp    = document.getElementById("tabUploaders");
+  const tabLiked = document.getElementById("tabLiked");
 
-    if (photosError) {
-      console.error("Error loading mug_photos:", photosError);
-      boardEmpty.textContent = "Error loading leaderboard.";
-      return;
+  const uploaderList = document.getElementById("uploaderList");
+  const likedList    = document.getElementById("likedList");
+
+  function updateAuthUI() {
+    if (!authUserLabel) return;
+    if (currentUser) {
+      authUserLabel.textContent =
+        currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
+      loginGoogleButton.style.display = "none";
+      loginEmailButton.style.display  = "none";
+      logoutButton.style.display      = "block";
+    } else {
+      authUserLabel.textContent = "Not signed in";
+      loginGoogleButton.style.display = "block";
+      loginEmailButton.style.display  = "block";
+      logoutButton.style.display      = "none";
     }
-
-    if (!photos || photos.length === 0) {
-      boardEmpty.textContent = "No approved mugs yet. Once users start liking photos, markets will appear here.";
-      return;
-    }
-
-    // 2) Aggregate by market_id in JS
-    const byMarket = new Map();
-
-    for (const p of photos) {
-      if (p.market_id == null) continue;
-      const key = p.market_id;
-      if (!byMarket.has(key)) {
-        byMarket.set(key, {
-          market_id: key,
-          photoCount: 0,
-          totalLikes: 0,
-          bestYear: null,
-          bestLikes: -1,
-        });
-      }
-      const entry = byMarket.get(key);
-      const likes = p.like_count || 0;
-      entry.photoCount += 1;
-      entry.totalLikes += likes;
-
-      // Track "best" year as the year of the photo with highest likes
-      if (likes > entry.bestLikes) {
-        entry.bestLikes = likes;
-        entry.bestYear = p.year || entry.bestYear;
-      } else if (likes === entry.bestLikes && p.year && (!entry.bestYear || p.year > entry.bestYear)) {
-        // tie-break by most recent year
-        entry.bestYear = p.year;
-      }
-    }
-
-    const marketIds = Array.from(byMarket.keys());
-
-    // 3) Load markets
-    const { data: markets, error: marketsError } = await supabase
-      .from("markets")
-      .select("id, country, city, market_name")
-      .in("id", marketIds);
-
-    if (marketsError) {
-      console.error("Error loading markets:", marketsError);
-      boardEmpty.textContent = "Error loading markets for leaderboard.";
-      return;
-    }
-
-    markets.forEach((m) => marketsMap.set(m.id, m));
-
-    leaderboardRows = Array.from(byMarket.values()).filter((row) => marketsMap.has(row.market_id));
-
-    boardSummary.textContent = `${leaderboardRows.length} markets with approved mugs`;
-    boardEmpty.style.display = "none";
-    boardTableWrap.style.display = "block";
-
-    renderLeaderboard();
   }
 
-  function renderLeaderboard() {
-    boardBody.innerHTML = "";
+  async function initAuth() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    const sortBy = sortSelect.value;
-    let rows = leaderboardRows.slice();
+    currentUser = session?.user ?? null;
+    updateAuthUI();
 
-    if (sortBy === "likes") {
-      rows.sort((a, b) => (b.totalLikes - a.totalLikes) || (b.photoCount - a.photoCount));
-    } else {
-      // photos
-      rows.sort((a, b) => (b.photoCount - a.photoCount) || (b.totalLikes - a.totalLikes));
-    }
-
-    const limit = parseInt(limitSelect.value, 10) || 50;
-    rows = rows.slice(0, limit);
-
-    rows.forEach((row, idx) => {
-      const market = marketsMap.get(row.market_id);
-      const tr = document.createElement("tr");
-
-      const rankTd = document.createElement("td");
-      const rankSpan = document.createElement("span");
-      rankSpan.className = "rank-pill";
-      rankSpan.textContent = idx + 1;
-      rankTd.appendChild(rankSpan);
-      tr.appendChild(rankTd);
-
-      const marketTd = document.createElement("td");
-      const container = document.createElement("div");
-      container.className = "market-col-main";
-      const nameEl = document.createElement("div");
-      nameEl.className = "market-name";
-      nameEl.textContent = market ? market.market_name : "Unknown market";
-      const cityEl = document.createElement("div");
-      cityEl.className = "market-city";
-      cityEl.textContent = market ? `${market.city}, ${market.country}` : "";
-      container.appendChild(nameEl);
-      container.appendChild(cityEl);
-      marketTd.appendChild(container);
-      tr.appendChild(marketTd);
-
-      const photosTd = document.createElement("td");
-      photosTd.className = "numeric";
-      photosTd.textContent = row.photoCount;
-      tr.appendChild(photosTd);
-
-      const likesTd = document.createElement("td");
-      likesTd.className = "numeric";
-      likesTd.textContent = row.totalLikes;
-      tr.appendChild(likesTd);
-
-      const yearTd = document.createElement("td");
-      yearTd.className = "numeric";
-      yearTd.textContent = row.bestYear || "—";
-      tr.appendChild(yearTd);
-
-      boardBody.appendChild(tr);
+    supabase.auth.onAuthStateChange((_event, session) => {
+      currentUser = session?.user ?? null;
+      updateAuthUI();
     });
   }
 
-  sortSelect.addEventListener("change", renderLeaderboard);
-  limitSelect.addEventListener("change", renderLeaderboard);
+  loginGoogleButton?.addEventListener("click", async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.href },
+    });
+    if (error) alert("Google sign-in error: " + error.message);
+  });
 
-  (async function init() {
-    await loadLeaderboard();
-  })();
+  loginEmailButton?.addEventListener("click", async () => {
+    const email = prompt("Enter your email for a sign-in link:");
+    if (!email) return;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href },
+    });
+    if (error) alert("Email sign-in error: " + error.message);
+    else alert("Magic link sent. Check your inbox.");
+  });
+
+  logoutButton?.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+  });
+
+  await initAuth();
+
+  // ---------------------------
+  // 3. Tabs switching
+  // ---------------------------
+  tabUp.addEventListener("click", () => {
+    tabUp.classList.add("active");
+    tabLiked.classList.remove("active");
+    vUpload.style.display = "block";
+    vLiked.style.display  = "none";
+    lbError.textContent   = "";
+    renderUploaders();
+  });
+
+  tabLiked.addEventListener("click", () => {
+    tabLiked.classList.add("active");
+    tabUp.classList.remove("active");
+    vUpload.style.display = "none";
+    vLiked.style.display  = "block";
+    lbError.textContent   = "";
+    renderLikedPhotos();
+  });
+
+  // ---------------------------
+  // 4. Load Top Uploaders
+  // ---------------------------
+  async function loadTopUploaders() {
+    lbError.textContent = "";
+    lbInfo.textContent  = "Loading top uploaders…";
+
+    const { data, error } = await supabase
+      .from("mug_photos")
+      .select("uploader_id, uploader_email, count:id", { head: false })
+      .eq("status", "approved")
+      .not("uploader_id", "is", null)
+      .group("uploader_id, uploader_email")
+      .order("count", { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error("Error loading top uploaders:", error);
+      lbError.textContent = "Error loading top uploaders:\n" + error.message;
+      return;
+    }
+
+    topUploaders = data || [];
+    lbInfo.textContent = "Showing Top 10 users by total approved uploads.";
+    renderUploaders();
+  }
+
+  function renderUploaders() {
+    uploaderList.innerHTML = "";
+
+    if (!topUploaders.length) {
+      uploaderList.innerHTML =
+        `<div style="padding:8px 10px;font-size:0.86rem;color:#9ca3af;">No uploaders found yet.</div>`;
+      return;
+    }
+
+    // Header row
+    const headerRow = document.createElement("div");
+    headerRow.className = "lb-row lb-row-header";
+    headerRow.innerHTML = `
+      <div class="lb-rank">#</div>
+      <div>User</div>
+      <div class="lb-count">Approved Photos</div>
+    `;
+    uploaderList.appendChild(headerRow);
+
+    topUploaders.forEach((u, idx) => {
+      const row = document.createElement("div");
+      row.className = "lb-row";
+
+      const rank = document.createElement("div");
+      rank.className = "lb-rank";
+      rank.textContent = idx + 1;
+
+      const userCell = document.createElement("div");
+      userCell.className = "lb-user";
+      userCell.textContent = u.uploader_email || u.uploader_id || "Unknown user";
+
+      const countCell = document.createElement("div");
+      countCell.className = "lb-count";
+      countCell.textContent = u.count ?? 0;
+
+      row.appendChild(rank);
+      row.appendChild(userCell);
+      row.appendChild(countCell);
+
+      uploaderList.appendChild(row);
+    });
+  }
+
+  // ---------------------------
+  // 5. Load Most Liked Photos
+  // ---------------------------
+  async function loadTopLikedPhotos() {
+    lbError.textContent = "";
+    lbInfo.textContent  = "Loading most liked mugs…";
+
+    const { data, error } = await supabase
+      .from("mug_photos")
+      .select(`
+        id,
+        public_url,
+        caption,
+        year,
+        like_count,
+        uploader_email,
+        created_at,
+        markets (
+          market_name,
+          city,
+          country
+        )
+      `)
+      .eq("status", "approved")
+      .order("like_count", { ascending: false })
+      .order("created_at", { ascending: true })
+      .limit(10);
+
+    if (error) {
+      console.error("Error loading most liked photos:", error);
+      lbError.textContent = "Error loading most liked photos:\n" + error.message;
+      return;
+    }
+
+    topLikedPhotos = data || [];
+    lbInfo.textContent = "Top 10 single photos by total likes.";
+    renderLikedPhotos();
+  }
+
+  function renderLikedPhotos() {
+    likedList.innerHTML = "";
+
+    if (!topLikedPhotos.length) {
+      likedList.innerHTML =
+        `<div style="padding:8px 10px;font-size:0.86rem;color:#9ca3af;">No liked photos yet.</div>`;
+      return;
+    }
+
+    topLikedPhotos.forEach((p, idx) => {
+      const item = document.createElement("div");
+      item.className = "lb-photo-item";
+
+      const thumb = document.createElement("div");
+      thumb.className = "lb-photo-thumb";
+      const img = document.createElement("img");
+      img.src = p.public_url;
+      img.alt = "Mug photo";
+      img.loading = "lazy";
+      img.addEventListener("click", () => openLightbox(idx));
+      thumb.appendChild(img);
+
+      const meta = document.createElement("div");
+      meta.className = "lb-photo-meta";
+
+      const title = document.createElement("div");
+      title.className = "lb-photo-title";
+      const mkt = p.markets;
+      title.textContent = `${idx + 1}. ` + (mkt?.market_name || "Mug Photo");
+
+      const sub = document.createElement("div");
+      sub.className = "lb-photo-sub";
+      const loc = mkt ? `${mkt.city}, ${mkt.country}` : "Location unknown";
+      sub.textContent = p.year ? `${loc} · ${p.year}` : loc;
+
+      const tagsRow = document.createElement("div");
+      tagsRow.className = "lb-photo-tags";
+
+      const likeTag = document.createElement("span");
+      likeTag.className = "lb-tag lb-like-pill";
+      likeTag.textContent = `${p.like_count ?? 0} like${(p.like_count ?? 0) === 1 ? "" : "s"}`;
+      tagsRow.appendChild(likeTag);
+
+      if (p.uploader_email) {
+        const uploaderTag = document.createElement("span");
+        uploaderTag.className = "lb-tag";
+        uploaderTag.textContent = `By ${p.uploader_email}`;
+        tagsRow.appendChild(uploaderTag);
+      }
+
+      const createdTag = document.createElement("span");
+      createdTag.className = "lb-tag";
+      createdTag.textContent =
+        "Uploaded " + new Date(p.created_at).toLocaleDateString();
+      tagsRow.appendChild(createdTag);
+
+      meta.appendChild(title);
+      meta.appendChild(sub);
+      meta.appendChild(tagsRow);
+
+      if (p.caption) {
+        const caption = document.createElement("div");
+        caption.className = "lb-photo-caption";
+        caption.textContent = `"${p.caption}"`;
+        meta.appendChild(caption);
+      }
+
+      item.appendChild(thumb);
+      item.appendChild(meta);
+      likedList.appendChild(item);
+    });
+  }
+
+  // ---------------------------
+  // 6. Lightbox
+  // ---------------------------
+  const lightbox           = document.getElementById("lightbox");
+  const lightboxImg        = document.getElementById("lightboxImg");
+  const lightboxTitleEl    = document.getElementById("lightboxTitle");
+  const lightboxSubtitleEl = document.getElementById("lightboxSubtitle");
+  const lightboxYear       = document.getElementById("lightboxYear");
+  const lightboxLocation   = document.getElementById("lightboxLocation");
+  const lightboxUploader   = document.getElementById("lightboxUploader");
+  const btnPrev            = document.getElementById("lightboxPrev");
+  const btnNext            = document.getElementById("lightboxNext");
+  const btnClose           = document.getElementById("lightboxClose");
+
+  function openLightbox(index) {
+    if (!topLikedPhotos.length) return;
+    currentLikedIndex = index;
+    const p = topLikedPhotos[index];
+
+    lightboxImg.src = p.public_url;
+    const mkt = p.markets;
+
+    lightboxTitleEl.textContent = mkt?.market_name || "Mug Photo";
+    lightboxSubtitleEl.textContent = p.caption || "";
+    lightboxYear.textContent = p.year || "";
+
+    lightboxLocation.textContent = mkt
+      ? `${mkt.city}, ${mkt.country}`
+      : "";
+
+    lightboxUploader.textContent = p.uploader_email
+      ? `Uploaded by ${p.uploader_email}`
+      : "";
+
+    lightbox.classList.add("visible");
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("visible");
+  }
+
+  btnClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  btnPrev.addEventListener("click", () => {
+    if (!topLikedPhotos.length) return;
+    currentLikedIndex =
+      (currentLikedIndex - 1 + topLikedPhotos.length) % topLikedPhotos.length;
+    openLightbox(currentLikedIndex);
+  });
+
+  btnNext.addEventListener("click", () => {
+    if (!topLikedPhotos.length) return;
+    currentLikedIndex = (currentLikedIndex + 1) % topLikedPhotos.length;
+    openLightbox(currentLikedIndex);
+  });
+
+  // ---------------------------
+  // 7. Init both leaderboards
+  // ---------------------------
+  await loadTopUploaders();
+  await loadTopLikedPhotos();
 </script>
+
 </body>
 </html>
