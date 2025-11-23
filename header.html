@@ -1,225 +1,239 @@
-<!-- header.html -->
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<div class="mm-header-bar">
+  <div class="mm-header-left">
+    <span class="mm-emoji">🗺️</span>
+    <span class="mm-title">Mug Mapper</span>
+  </div>
 
-<style>
-  /* --- Sticky top header bar --- */
-  .mm-header-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+  <div id="mmHamburger" class="mm-hamburger">
+    &#9776;
+  </div>
+</div>
 
-    height: 58px;
-    padding: 8px 16px;
+<!-- Fullscreen overlay menu -->
+<div id="mmNavOverlay" class="mm-nav-overlay" aria-hidden="true">
+  <div class="mm-nav-content">
+    <button id="mmNavClose" class="mm-nav-close">&times;</button>
 
-    display: flex;
-    align-items: center;
+    <a href="index.html" class="mm-nav-link">Home</a>
+    <a href="upload.html" class="mm-nav-link">Upload</a>
+    <a href="popular.html" class="mm-nav-link">Popular</a>
+    <a href="leaderboard.html" class="mm-nav-link">Leaderboard</a>
+    <a href="contact.html" class="mm-nav-link">Contact</a>
+    <a href="support.html" class="mm-nav-link">Support</a>
 
-    background: #1f2937; /* dark grey */
-    color: #f9fafb;
-    z-index: 9990;
+    <!-- Admin link gets injected dynamically -->
+    <div id="adminLinkContainer"></div>
 
-    box-shadow: 0 2px 4px rgba(15,23,42,0.4);
-  }
+    <div class="mm-auth-section" style="margin-top:16px;text-align:center;">
 
-  .mm-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .mm-title span {
-    color: #0ea5e9;
-  }
+      <!-- Avatar -->
+      <img
+        id="authAvatar"
+        alt="Profile"
+        style="
+          width: 42px;
+          height: 42px;
+          border-radius: 999px;
+          object-fit: cover;
+          display: none;
+          margin: 0 auto 4px auto;
+        "
+      />
 
-  .mm-hamburger-btn {
-    margin-left: auto;
-    font-size: 1.8rem;
-    cursor: pointer;
-    padding: 4px 10px;
-    border-radius: 6px;
-    background: transparent;
-    color: inherit;
-    border: none;
-  }
-  .mm-hamburger-btn:hover {
-    background: rgba(255,255,255,0.12);
-  }
-
-  /* --- Full-Screen Overlay Menu --- */
-  .mm-nav-overlay {
-    position: fixed;
-    inset: 0;
-    display: none;              /* pages toggle visibility */
-    z-index: 9999;
-
-    background: rgba(15,23,42,0.96);
-    color: #e5e7eb;
-  }
-
-  .mm-nav-overlay-inner {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mm-nav-overlay-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 16px 20px;
-
-    border-bottom: 1px solid rgba(148,163,184,0.25);
-  }
-  .mm-nav-overlay-title {
-    display: flex;
-    font-size: 1.3rem;
-    font-weight: 600;
-    align-items: center;
-    gap: 8px;
-  }
-  .mm-nav-overlay-title span {
-    color: #0ea5e9;
-  }
-
-  .mm-nav-overlay-close {
-    font-size: 1.7rem;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    color: #e5e7eb;
-    border-radius: 6px;
-    padding: 4px 10px;
-  }
-  .mm-nav-overlay-close:hover {
-    background: rgba(255,255,255,0.12);
-  }
-
-  .mm-nav-overlay-body {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    overflow-y: auto;
-  }
-
-  .mm-nav-links {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .mm-nav-link {
-    display: block;
-    padding: 12px 16px;
-    border-radius: 999px;
-    font-size: 1.1rem;
-    text-decoration: none;
-    background: rgba(31,41,55,0.9);
-    color: #f9fafb;
-    font-weight: 500;
-  }
-  .mm-nav-link:hover {
-    background: #0ea5e9;
-    color: #0f172a;
-  }
-
-  /* Auth block inside overlay */
-  .mm-auth-block {
-    border-top: 1px solid rgba(148,163,184,0.25);
-    padding-top: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .mm-auth-label {
-    font-size: 0.85rem;
-    color: #9ca3af;
-  }
-
-  .google-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-
-    padding: 8px 18px;
-
-    border-radius: 999px;
-    border: 1px solid #dadce0;
-
-    background: #fff;
-    color: #3c4043;
-    width: 100%;
-
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
-  .google-btn img {
-    width: 18px;
-    height: 18px;
-  }
-
-  .email-btn,
-  .logout-btn {
-    padding: 10px 14px;
-    border-radius: 999px;
-    border: 1px solid #4b5563;
-    background: transparent;
-    color: #f0f0f0;
-    cursor: pointer;
-    font-size: 0.85rem;
-    width: 100%;
-  }
-
-  .email-btn:hover,
-  .logout-btn:hover {
-    background: rgba(55,65,81,0.95);
-  }
-</style>
-
-<header class="mm-header-bar">
-  <div class="mm-title">🗺️ <span>Mug Mapper</span></div>
-  <button id="mmHamburger" class="mm-hamburger-btn">☰</button>
-</header>
-
-<nav id="mmNavOverlay" class="mm-nav-overlay" aria-hidden="true">
-  <div class="mm-nav-overlay-inner">
-
-    <div class="mm-nav-overlay-top">
-      <div class="mm-nav-overlay-title">🗺️ <span>Mug Mapper</span></div>
-      <button id="mmNavClose" class="mm-nav-overlay-close">✕</button>
-    </div>
-
-    <div class="mm-nav-overlay-body">
-      <div class="mm-nav-links">
-        <a href="index.html" class="mm-nav-link">📌 2025 Map</a>
-        <a href="upload.html" class="mm-nav-link">📸 Upload</a>
-        <a href="popular.html" class="mm-nav-link">❤️ Popular</a>
-        <a href="leaderboard.html" class="mm-nav-link">🥇 Leaderboard</a>
-        <a href="supportme.html" class="mm-nav-link">🍷 Glühwein Me</a>
-        <a href="contact.html" class="mm-nav-link">🤗 Contact Me</a>
+      <!-- Email + Admin badge -->
+      <div id="authUserLabel" class="mm-auth-label" style="font-size:0.85rem;">
+        Not signed in
       </div>
 
-      <div class="mm-auth-block">
-        <div id="authUserLabel" class="mm-auth-label">Not signed in</div>
+      <button id="loginGoogleButton" class="mm-auth-btn mm-google-btn">Sign in with Google</button>
+      <button id="loginEmailButton" class="mm-auth-btn mm-email-btn">Sign in with Email</button>
+      <button id="logoutButton" class="mm-auth-btn mm-logout-btn" style="display:none;">Sign Out</button>
 
-        <button id="loginGoogleButton" class="google-btn">
-          <img src="https://developers.google.com/identity/images/g-logo.png" alt="G">
-          Sign in with Google
-        </button>
-
-        <button id="loginEmailButton" class="email-btn">Email Sign-In</button>
-        <button id="logoutButton" class="logout-btn" style="display:none;">Logout</button>
-      </div>
     </div>
   </div>
-</nav>
+</div>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const mmHamburger     = document.getElementById("mmHamburger");
+  const mmNavOverlay    = document.getElementById("mmNavOverlay");
+  const mmNavClose      = document.getElementById("mmNavClose");
+  const navLinks        = mmNavOverlay.querySelectorAll(".mm-nav-link");
+  const adminContainer  = document.getElementById("adminLinkContainer");
+
+  const authUserLabel     = document.getElementById("authUserLabel");
+  const authAvatar        = document.getElementById("authAvatar");
+  const loginGoogleButton = document.getElementById("loginGoogleButton");
+  const loginEmailButton  = document.getElementById("loginEmailButton");
+  const logoutButton      = document.getElementById("logoutButton");
+
+  let currentUser = null;
+  let isAdmin     = false;
+
+  /* -----------------------------
+     Navigation overlay
+     ----------------------------- */
+  function openNav() {
+    mmNavOverlay.style.display = "block";
+    mmNavOverlay.setAttribute("aria-hidden", "false");
+  }
+  function closeNav() {
+    mmNavOverlay.style.display = "none";
+    mmNavOverlay.setAttribute("aria-hidden", "true");
+  }
+
+  mmHamburger?.addEventListener("click", openNav);
+  mmNavClose?.addEventListener("click", closeNav);
+  navLinks.forEach((link) => link.addEventListener("click", closeNav));
+
+  /* -----------------------------
+     Render Admin Panel link
+     ----------------------------- */
+  function renderAdminLink() {
+    if (isAdmin) {
+      adminContainer.innerHTML = `
+        <a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">
+          🔧 Admin Panel
+        </a>
+      `;
+    } else {
+      adminContainer.innerHTML = "";
+    }
+  }
+
+  /* -----------------------------
+     Update auth info & avatar
+     ----------------------------- */
+  function updateAuthUI() {
+    if (!authUserLabel) return;
+
+    if (currentUser) {
+      const meta = currentUser.user_metadata || {};
+
+      const displayName =
+        currentUser.email ||
+        meta.full_name ||
+        meta.name ||
+        currentUser.id;
+
+      const adminBadgeHTML = isAdmin
+        ? `<span style="
+              background:#f97316;
+              color:#111827;
+              font-size:0.7rem;
+              padding:2px 7px;
+              border-radius:999px;
+              text-transform:uppercase;
+              letter-spacing:0.05em;
+              font-weight:600;
+            ">
+              Admin
+           </span>`
+        : "";
+
+      authUserLabel.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span>${displayName}</span>
+          ${adminBadgeHTML}
+        </div>
+      `;
+
+      const avatarUrl = meta.avatar_url || meta.picture || null;
+      if (avatarUrl) {
+        authAvatar.src = avatarUrl;
+        authAvatar.style.display = "block";
+      } else {
+        authAvatar.style.display = "none";
+      }
+
+      loginGoogleButton.style.display = "none";
+      loginEmailButton.style.display  = "none";
+      logoutButton.style.display      = "block";
+
+    } else {
+      authUserLabel.textContent = "Not signed in";
+      authAvatar.style.display  = "none";
+
+      loginGoogleButton.style.display = "block";
+      loginEmailButton.style.display  = "block";
+      logoutButton.style.display      = "none";
+    }
+  }
+
+  /* -----------------------------
+     Check admin flag via RLS
+     ----------------------------- */
+  async function checkAdmin() {
+    if (!currentUser) {
+      isAdmin = false;
+      renderAdminLink();
+      updateAuthUI();
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    isAdmin = !!data;
+    renderAdminLink();
+    updateAuthUI();
+  }
+
+  /* -----------------------------
+     Init Auth
+     ----------------------------- */
+  async function initAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    currentUser = session?.user ?? null;
+
+    updateAuthUI();
+    await checkAdmin();
+
+    supabase.auth.onAuthStateChange(async (_evt, session) => {
+      currentUser = session?.user ?? null;
+      updateAuthUI();
+      await checkAdmin();
+    });
+  }
+
+  /* -----------------------------
+     Auth button actions
+     ----------------------------- */
+  loginGoogleButton?.addEventListener("click", async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.href },
+    });
+  });
+
+  loginEmailButton?.addEventListener("click", async () => {
+    const email = prompt("Enter your email:");
+    if (!email) return;
+
+    await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href },
+    });
+
+    alert("Magic link sent!");
+  });
+
+  logoutButton?.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+  });
+
+  /* -----------------------------
+     Start
+     ----------------------------- */
+  await initAuth();
+</script>
