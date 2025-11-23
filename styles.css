@@ -366,5 +366,152 @@ main {
   transform: none;
 }
 
-.lightbox-close span {
-  fo
+/* New Mug Mapper header + mobile nav */
+
+.mm-header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(
+    to right,
+    rgba(15, 23, 42, 0.98),
+    rgba(15, 23, 42, 0.85)
+  );
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+}
+
+.mm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mm-emoji {
+  font-size: 1.2rem;
+}
+
+.mm-title {
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.mm-title::first-letter {
+  color: var(--accent);
+}
+
+.mm-hamburger {
+  font-size: 1.4rem;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+/* Fullscreen overlay nav */
+
+.mm-nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.96);
+  display: none;
+  z-index: 9998;
+}
+
+.mm-nav-content {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 1.8rem 1.4rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.mm-nav-close {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  font-size: 1.6rem;
+  cursor: pointer;
+  margin-bottom: 0.6rem;
+}
+
+.mm-nav-link {
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.9rem;
+  border: 1px solid transparent;
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.mm-nav-link:hover {
+  border-color: var(--border-subtle);
+  background: rgba(15, 23, 42, 1);
+}
+
+/* Auth section in menu */
+
+.mm-auth-section {
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mm-auth-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid var(--border-subtle);
+}
+
+.mm-auth-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.mm-auth-btn {
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: #020617;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.mm-auth-btn + .mm-auth-btn {
+  margin-top: 0.25rem;
+}
+
+.mm-google-btn {
+  border-color: #facc15;
+}
+
+.mm-logout-btn {
+  border-color: #f97316;
+}
+
+/* Desktop: you can optionally hide the overlay until clicked */
+@media (min-width: 900px) {
+  .mm-nav-content {
+    max-width: 360px;
+  }
+}
