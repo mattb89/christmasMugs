@@ -34,10 +34,6 @@
     }
 
     .lb-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
       margin-bottom: 10px;
     }
 
@@ -97,7 +93,6 @@
       font-weight: 600;
       background: #020617;
       border: 1px solid #4b5563;
-      margin-right: 6px;
     }
 
     .lb-user-name {
@@ -108,11 +103,6 @@
 
     .lb-user-display {
       font-weight: 500;
-    }
-
-    .lb-user-meta {
-      font-size: 0.75rem;
-      color: #9ca3af;
     }
 
     .lb-count-pill {
@@ -207,12 +197,6 @@
       font-size: 0.9rem;
       box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
     }
-
-    @media (max-width: 640px) {
-      .lb-list-item {
-        flex-direction: row;
-      }
-    }
   </style>
 </head>
 
@@ -225,12 +209,8 @@
     <!-- Top uploaders -->
     <section class="lb-card">
       <div class="lb-card-header">
-        <div>
-          <div class="lb-card-title">Top Mug Uploaders</div>
-          <div class="lb-card-subtitle">
-            Users with the most approved mug photos.
-          </div>
-        </div>
+        <div class="lb-card-title">Top Mug Uploaders</div>
+        <div class="lb-card-subtitle">Users with the most approved mug photos.</div>
       </div>
       <div id="topUploadersStatus" class="lb-status"></div>
       <ul id="topUploadersList" class="lb-list"></ul>
@@ -239,12 +219,8 @@
     <!-- Top liked photos -->
     <section class="lb-card">
       <div class="lb-card-header">
-        <div>
-          <div class="lb-card-title">Most Loved Mugs</div>
-          <div class="lb-card-subtitle">
-            The most liked mug photos on Mug Mapper.
-          </div>
-        </div>
+        <div class="lb-card-title">Most Loved Mugs</div>
+        <div class="lb-card-subtitle">The most liked mug photos on Mug Mapper.</div>
       </div>
       <div id="topLikedStatus" class="lb-status"></div>
       <div id="topLikedGrid" class="lb-photos-grid"></div>
@@ -259,25 +235,23 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    // ---------------------------
-    // 1. Load shared header
-    // ---------------------------
+    /* ---------------------------------------------------------
+       1. Load shared header
+    --------------------------------------------------------- */
     const headerHTML = await fetch("header.html").then((r) => r.text());
     document.getElementById("mm-header").innerHTML = headerHTML;
 
-    // Wire hamburger nav after header is injected
+    // Wire menu
     const mmHamburger   = document.getElementById("mmHamburger");
     const mmNavOverlay  = document.getElementById("mmNavOverlay");
     const mmNavClose    = document.getElementById("mmNavClose");
     const navLinks      = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
 
     function openNav() {
-      if (!mmNavOverlay) return;
       mmNavOverlay.style.display = "block";
       mmNavOverlay.setAttribute("aria-hidden", "false");
     }
     function closeNav() {
-      if (!mmNavOverlay) return;
       mmNavOverlay.style.display = "none";
       mmNavOverlay.setAttribute("aria-hidden", "true");
     }
@@ -286,9 +260,10 @@
     mmNavClose?.addEventListener("click", closeNav);
     navLinks.forEach((link) => link.addEventListener("click", closeNav));
 
-    // ---------------------------
-    // 2. Supabase Init + Auth
-    // ---------------------------
+
+    /* ---------------------------------------------------------
+       2. Supabase Auth + Admin + Dashboard Link
+    --------------------------------------------------------- */
     const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
     const SUPABASE_ANON_KEY =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
@@ -308,30 +283,16 @@
 
     function renderAdminLink() {
       if (!adminContainer) return;
-
-      if (isAdmin) {
-        adminContainer.innerHTML = `
-          <a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">
-            🔧 Admin Panel
-          </a>
-        `;
-      } else {
-        adminContainer.innerHTML = "";
-      }
+      adminContainer.innerHTML = isAdmin
+        ? `<a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">🔧 Admin Panel</a>`
+        : "";
     }
 
     function renderDashboardLink() {
       if (!dashboardContainer) return;
-
-      if (currentUser) {
-        dashboardContainer.innerHTML = `
-          <a href="dashboard.html" class="mm-nav-link" style="color:#a5f3fc;font-weight:600;">
-            👤 Dashboard
-          </a>
-        `;
-      } else {
-        dashboardContainer.innerHTML = "";
-      }
+      dashboardContainer.innerHTML = currentUser
+        ? `<a href="dashboard.html" class="mm-nav-link" style="color:#a5f3fc;font-weight:600;">👤 Dashboard</a>`
+        : "";
     }
 
     function updateAuthUI() {
@@ -339,26 +300,18 @@
 
       if (currentUser) {
         const meta = currentUser.user_metadata || {};
-
-        const displayName =
-          currentUser.email ||
-          meta.full_name ||
-          meta.name ||
-          currentUser.id;
+        const displayName = currentUser.email || meta.full_name || meta.name || currentUser.id;
 
         const adminBadgeHTML = isAdmin
           ? `<span style="
-                background:#f97316;
-                color:#111827;
-                font-size:0.7rem;
-                padding:2px 7px;
-                border-radius:999px;
-                text-transform:uppercase;
-                letter-spacing:0.05em;
-                font-weight:600;
-              ">
-                Admin
-             </span>`
+              background:#f97316;
+              color:#111827;
+              font-size:0.7rem;
+              padding:2px 7px;
+              border-radius:999px;
+              font-weight:600;
+              letter-spacing:0.05em;
+            ">Admin</span>`
           : "";
 
         authUserLabel.innerHTML = `
@@ -369,23 +322,15 @@
         `;
 
         const avatarUrl = meta.avatar_url || meta.picture || null;
-        if (authAvatar) {
-          if (avatarUrl) {
-            authAvatar.src = avatarUrl;
-            authAvatar.style.display = "block";
-          } else {
-            authAvatar.style.display = "none";
-          }
-        }
+        authAvatar.style.display = avatarUrl ? "block" : "none";
+        if (avatarUrl) authAvatar.src = avatarUrl;
 
         loginGoogleButton.style.display = "none";
         loginEmailButton.style.display  = "none";
         logoutButton.style.display      = "block";
       } else {
         authUserLabel.textContent = "Not signed in";
-
-        if (authAvatar) authAvatar.style.display = "none";
-
+        authAvatar.style.display = "none";
         loginGoogleButton.style.display = "block";
         loginEmailButton.style.display  = "block";
         logoutButton.style.display      = "none";
@@ -408,13 +353,7 @@
         .eq("user_id", currentUser.id)
         .maybeSingle();
 
-      if (error) {
-        console.error("Error checking admin:", error);
-        isAdmin = false;
-      } else {
-        isAdmin = !!data;
-      }
-
+      isAdmin = !!data;
       renderAdminLink();
       updateAuthUI();
     }
@@ -458,265 +397,207 @@
 
     await initAuth();
 
-    // ---------------------------
-    // 3. Leaderboard logic
-    // ---------------------------
+
+    /* ---------------------------------------------------------
+       3. Leaderboard logic
+    --------------------------------------------------------- */
     const topUploadersList   = document.getElementById("topUploadersList");
     const topUploadersStatus = document.getElementById("topUploadersStatus");
     const topLikedGrid       = document.getElementById("topLikedGrid");
     const topLikedStatus     = document.getElementById("topLikedStatus");
 
     function setStatus(el, msg, isError = false) {
-      if (!el) return;
       el.textContent = msg || "";
       el.className = "lb-status " + (isError ? "err" : "ok");
     }
 
     function safeDisplayName(profile, fallbackEmail) {
-      if (profile && profile.display_name && profile.display_name.trim() !== "") {
-        return profile.display_name;
-      }
+      if (profile?.display_name?.trim()) return profile.display_name;
       if (fallbackEmail) {
-        const atIdx = fallbackEmail.indexOf("@");
-        if (atIdx > 0) return fallbackEmail.slice(0, atIdx);
+        const at = fallbackEmail.indexOf("@");
+        return at > 0 ? fallbackEmail.slice(0, at) : fallbackEmail;
       }
       return "Anonymous User";
     }
 
-    // Load top uploaders
     async function loadTopUploaders() {
-      setStatus(topUploadersStatus, "Loading top uploaders…", false);
+      setStatus(topUploadersStatus, "Loading top uploaders…");
+
+      const { data: photos, error } = await supabase
+        .from("mug_photos")
+        .select("uploader_id, status")
+        .eq("status", "approved");
+
+      if (error) {
+        console.error(error);
+        return setStatus(topUploadersStatus, "Error loading uploaders.", true);
+      }
+
+      if (!photos?.length) {
+        return setStatus(topUploadersStatus, "No approved photos yet.");
+      }
+
+      const counts = new Map();
+      for (const row of photos) {
+        if (!row.uploader_id) continue;
+        counts.set(row.uploader_id, (counts.get(row.uploader_id) || 0) + 1);
+      }
+
+      const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const userIds = sorted.map(([id]) => id);
+
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", userIds);
+
+      const mapProfiles = new Map();
+      profiles?.forEach(p => mapProfiles.set(p.id, p));
+
       topUploadersList.innerHTML = "";
+      sorted.forEach(([userId, count], i) => {
+        const li = document.createElement("li");
+        li.className = "lb-list-item";
 
-      try {
-        // Get approved photos with uploader_id
-        const { data: photos, error } = await supabase
-          .from("mug_photos")
-          .select("uploader_id, status")
-          .eq("status", "approved");
+        const left = document.createElement("div");
+        left.style.display = "flex";
+        left.style.alignItems = "center";
+        left.style.gap = "8px";
 
-        if (error) {
-          console.error("Error loading photos for uploaders:", error);
-          setStatus(topUploadersStatus, "Error loading top uploaders.", true);
-          return;
-        }
+        const rank = document.createElement("div");
+        rank.className = "lb-rank-badge";
+        rank.textContent = i + 1;
 
-        if (!photos || !photos.length) {
-          setStatus(topUploadersStatus, "No approved photos yet.", false);
-          return;
-        }
+        const name = document.createElement("div");
+        name.className = "lb-user-name";
 
-        // Count photos per uploader_id
-        const counts = new Map();
-        for (const row of photos) {
-          if (!row.uploader_id) continue;
-          counts.set(row.uploader_id, (counts.get(row.uploader_id) || 0) + 1);
-        }
+        const displayName = safeDisplayName(mapProfiles.get(userId), null);
 
-        if (counts.size === 0) {
-          setStatus(topUploadersStatus, "No uploaders found.", false);
-          return;
-        }
+        const displayEl = document.createElement("div");
+        displayEl.className = "lb-user-display";
+        displayEl.textContent = displayName;
+        name.appendChild(displayEl);
 
-        // Sort by count desc and take top 10
-        const sorted = [...counts.entries()]
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 10);
+        left.appendChild(rank);
+        left.appendChild(name);
 
-        const topUserIds = sorted.map(([userId]) => userId);
+        const countEl = document.createElement("div");
+        countEl.className = "lb-count-pill";
+        countEl.textContent = `${count} approved photo${count === 1 ? "" : "s"}`;
 
-        // Fetch profiles for those user IDs
-        const { data: profiles, error: profileErr } = await supabase
+        li.appendChild(left);
+        li.appendChild(countEl);
+        topUploadersList.appendChild(li);
+      });
+
+      setStatus(topUploadersStatus, "");
+    }
+
+
+    async function loadTopLikedPhotos() {
+      setStatus(topLikedStatus, "Loading most loved mugs…");
+
+      const { data: photos, error } = await supabase
+        .from("mug_photos")
+        .select(`
+          id,
+          uploader_id,
+          public_url,
+          year,
+          like_count,
+          status,
+          created_at,
+          market_id,
+          markets (
+            market_name,
+            city,
+            country
+          )
+        `)
+        .eq("status", "approved")
+        .order("like_count", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(20);
+
+      if (error) {
+        console.error(error);
+        return setStatus(topLikedStatus, "Error loading photos.", true);
+      }
+
+      if (!photos?.length) {
+        return setStatus(topLikedStatus, "No approved photos yet.");
+      }
+
+      const uploaderIds = [...new Set(photos.map(p => p.uploader_id))].filter(Boolean);
+
+      let profiles = [];
+      if (uploaderIds.length) {
+        const { data: profileRows } = await supabase
           .from("profiles")
           .select("id, display_name")
-          .in("id", topUserIds);
-
-        if (profileErr) {
-          console.error("Error loading profiles for uploaders:", profileErr);
-          setStatus(topUploadersStatus, "Error loading user profiles.", true);
-          return;
-        }
-
-        const profileMap = new Map();
-        (profiles || []).forEach((p) => profileMap.set(p.id, p));
-
-        // Build list
-        topUploadersList.innerHTML = "";
-        sorted.forEach(([userId, count], idx) => {
-          const li = document.createElement("li");
-          li.className = "lb-list-item";
-
-          const left = document.createElement("div");
-          left.style.display = "flex";
-          left.style.alignItems = "center";
-          left.style.gap = "8px";
-
-          const rankBadge = document.createElement("div");
-          rankBadge.className = "lb-rank-badge";
-          rankBadge.textContent = idx + 1;
-
-          const userInfo = document.createElement("div");
-          userInfo.className = "lb-user-name";
-
-          const profile = profileMap.get(userId);
-          const display = safeDisplayName(profile, null);
-
-          const nameEl = document.createElement("div");
-          nameEl.className = "lb-user-display";
-          nameEl.textContent = display;
-
-          const metaEl = document.createElement("div");
-          metaEl.className = "lb-user-meta";
-          metaEl.textContent = `User ID: ${userId.slice(0, 8)}…`;
-
-          userInfo.appendChild(nameEl);
-          userInfo.appendChild(metaEl);
-
-          left.appendChild(rankBadge);
-          left.appendChild(userInfo);
-
-          const right = document.createElement("div");
-          right.className = "lb-count-pill";
-          right.textContent = `${count} approved photo${count === 1 ? "" : "s"}`;
-
-          li.appendChild(left);
-          li.appendChild(right);
-          topUploadersList.appendChild(li);
-        });
-
-        setStatus(topUploadersStatus, "", false);
-      } catch (e) {
-        console.error(e);
-        setStatus(topUploadersStatus, "Unexpected error loading top uploaders.", true);
+          .in("id", uploaderIds);
+        profiles = profileRows || [];
       }
-    }
 
-    // Load top liked photos
-    async function loadTopLikedPhotos() {
-      setStatus(topLikedStatus, "Loading most loved mugs…", false);
+      const profMap = new Map();
+      profiles.forEach(p => profMap.set(p.id, p));
+
       topLikedGrid.innerHTML = "";
 
-      try {
-        const { data: photos, error } = await supabase
-          .from("mug_photos")
-          .select(`
-            id,
-            uploader_id,
-            public_url,
-            year,
-            like_count,
-            status,
-            created_at,
-            market_id,
-            markets (
-              market_name,
-              city,
-              country
-            )
-          `)
-          .eq("status", "approved")
-          .order("like_count", { ascending: false })
-          .order("created_at", { ascending: true })
-          .limit(20);
+      photos.slice(0, 10).forEach((p, i) => {
+        const card = document.createElement("div");
+        card.className = "lb-photo-card";
 
-        if (error) {
-          console.error("Error loading top liked photos:", error);
-          setStatus(topLikedStatus, "Error loading most loved mugs.", true);
-          return;
-        }
+        const thumb = document.createElement("div");
+        thumb.className = "lb-photo-thumb";
+        const img = document.createElement("img");
+        img.src = p.public_url;
+        thumb.appendChild(img);
 
-        if (!photos || !photos.length) {
-          setStatus(topLikedStatus, "No approved photos yet.", false);
-          return;
-        }
+        const body = document.createElement("div");
+        body.className = "lb-photo-body";
 
-        // Collect unique uploader_ids
-        const uploaderIds = [...new Set(photos.map((p) => p.uploader_id).filter(Boolean))];
+        const rank = document.createElement("div");
+        rank.className = "lb-photo-rank-pill";
+        rank.textContent = `#${i + 1} Most Loved`;
 
-        let profileMap = new Map();
-        if (uploaderIds.length > 0) {
-          const { data: profiles, error: profileErr } = await supabase
-            .from("profiles")
-            .select("id, display_name")
-            .in("id", uploaderIds);
+        const title = document.createElement("div");
+        title.className = "lb-photo-title";
+        title.textContent = p.markets?.market_name || "Mug Photo";
 
-          if (profileErr) {
-            console.error("Error loading profiles for top liked photos:", profileErr);
-            // We can still render photos with "Anonymous User"
-          } else {
-            profileMap = new Map();
-            (profiles || []).forEach((p) => profileMap.set(p.id, p));
-          }
-        }
+        const meta = document.createElement("div");
+        meta.className = "lb-photo-meta";
+        const loc = p.markets ? `${p.markets.city}, ${p.markets.country}` : "Unknown";
+        meta.textContent = `${loc} · ${p.year || "Year N/A"}`;
 
-        const topPhotos = photos.slice(0, 10);
-        topLikedGrid.innerHTML = "";
+        const tags = document.createElement("div");
+        tags.className = "lb-photo-tags";
 
-        topPhotos.forEach((p, idx) => {
-          const card = document.createElement("div");
-          card.className = "lb-photo-card";
+        const likes = document.createElement("span");
+        likes.className = "lb-photo-tag";
+        likes.textContent = `${p.like_count} like${p.like_count === 1 ? "" : "s"}`;
 
-          const thumb = document.createElement("div");
-          thumb.className = "lb-photo-thumb";
-          const img = document.createElement("img");
-          img.src = p.public_url;
-          img.alt = "Mug photo";
-          thumb.appendChild(img);
+        const uploaderName = safeDisplayName(profMap.get(p.uploader_id), null);
+        const uploaderTag = document.createElement("span");
+        uploaderTag.className = "lb-photo-tag";
+        uploaderTag.textContent = `Uploaded by ${uploaderName}`;
 
-          const body = document.createElement("div");
-          body.className = "lb-photo-body";
+        tags.appendChild(likes);
+        tags.appendChild(uploaderTag);
 
-          const rankPill = document.createElement("div");
-          rankPill.className = "lb-photo-rank-pill";
-          rankPill.textContent = `#${idx + 1} Most Loved`;
+        body.appendChild(rank);
+        body.appendChild(title);
+        body.appendChild(meta);
+        body.appendChild(tags);
 
-          const title = document.createElement("div");
-          title.className = "lb-photo-title";
-          const mkt = p.markets;
-          title.textContent = mkt?.market_name || "Mug Photo";
+        card.appendChild(thumb);
+        card.appendChild(body);
+        topLikedGrid.appendChild(card);
+      });
 
-          const meta = document.createElement("div");
-          meta.className = "lb-photo-meta";
-          const locText = mkt ? `${mkt.city}, ${mkt.country}` : "Location unknown";
-          const yearText = p.year || "Year N/A";
-          meta.textContent = `${locText} · ${yearText}`;
-
-          const tagsRow = document.createElement("div");
-          tagsRow.className = "lb-photo-tags";
-
-          const likesTag = document.createElement("span");
-          likesTag.className = "lb-photo-tag";
-          likesTag.textContent =
-            `${p.like_count ?? 0} like${(p.like_count ?? 0) === 1 ? "" : "s"}`;
-          tagsRow.appendChild(likesTag);
-
-          const uploaderProfile = profileMap.get(p.uploader_id);
-          const uploaderName = safeDisplayName(uploaderProfile, null);
-          const uploaderTag = document.createElement("span");
-          uploaderTag.className = "lb-photo-tag";
-          uploaderTag.textContent = `Uploaded by ${uploaderName}`;
-          tagsRow.appendChild(uploaderTag);
-
-          body.appendChild(rankPill);
-          body.appendChild(title);
-          body.appendChild(meta);
-          body.appendChild(tagsRow);
-
-          card.appendChild(thumb);
-          card.appendChild(body);
-          topLikedGrid.appendChild(card);
-        });
-
-        setStatus(topLikedStatus, "", false);
-      } catch (e) {
-        console.error(e);
-        setStatus(topLikedStatus, "Unexpected error loading most loved mugs.", true);
-      }
+      setStatus(topLikedStatus, "");
     }
 
-    // ---------------------------
-    // 4. Init
-    // ---------------------------
     await Promise.all([loadTopUploaders(), loadTopLikedPhotos()]);
   </script>
 
