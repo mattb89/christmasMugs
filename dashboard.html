@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mug Mapper – Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- W3CSS + global styles -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    body {
+      margin: 0;
+      background: #111827;
+      color: #f9fafb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding-top: 58px;   /* sticky header */
+      padding-bottom: 48px;/* sticky footer */
+    }
+
+    .dashboard-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 16px 80px;
+    }
+
+    .dash-card {
+      background: #1f2937;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.25);
+      padding: 18px 18px 22px;
+      margin-bottom: 16px;
+    }
+
+    .dash-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .dash-card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .dash-card-subtitle {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .dash-form-row {
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dash-label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .dash-input {
+      border-radius: 0.6rem;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+
+    .dash-input[readonly] {
+      opacity: 0.8;
+      cursor: default;
+    }
+
+    .dash-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      margin: 6px 0 4px;
+    }
+
+    .dash-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .dash-button.primary {
+      border-color: #22c55e;
+      color: #bbf7d0;
+    }
+
+    .dash-button.danger {
+      border-color: #f97373;
+      color: #fecaca;
+    }
+
+    .dash-status {
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .dash-status.ok {
+      color: #a7f3d0;
+    }
+
+    .dash-status.err {
+      color: #fecaca;
+      white-space: pre-line;
+    }
+
+    /* My Photos list */
+    .my-photos-list {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .my-photo-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid rgba(55,65,81,0.85);
+    }
+
+    .my-photo-thumb img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .my-photo-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.82rem;
+    }
+
+    .my-photo-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .my-photo-sub {
+      color: #9ca3af;
+    }
+
+    .my-photo-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .my-photo-tag {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    .my-photo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .mm-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #1f2937;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9980;
+      font-size: 0.9rem;
+      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
+    }
+
+    @media (max-width: 640px) {
+      .my-photo-item {
+        grid-template-columns: 1fr;
+      }
+      .my-photo-thumb img {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sticky header -->
+  <div id="mm-header"></div>
+
+  <div class="dashboard-container">
+    <!-- Profile & Settings -->
+    <section class="dash-card">
+      <div class="dash-card-header">
+        <div>
+          <div class="dash-card-title">Profile & Settings</div>
+          <div class="dash-card-subtitle">
+            Update your display name and email preferences.
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-form-row">
+        <label class="dash-label">Email</label>
+        <input id="userEmail" class="dash-input" type="email" readonly />
+      </div>
+
+      <div class="dash-form-row">
+        <label class="dash-label" for="displayNameInput">Display Name</label>
+        <input
+          id="displayNameInput"
+          class="dash-input"
+          type="text"
+          maxlength="40"
+          placeholder="How should we show your name?"
+        />
+        <div class="dash-card-subtitle">
+          This name can be shown on leaderboards and public views instead of your email.
+        </div>
+      </div>
+
+      <div class="dash-checkbox-row">
+        <input type="checkbox" id="unsubscribeCheckbox" />
+        <label for="unsubscribeCheckbox">
+          I don’t want to receive Mug Mapper update / marketing emails.
+        </label>
+      </div>
+      <div class="dash-card-subtitle">
+        You’ll still receive essential emails like sign-in links.
+      </div>
+
+      <button id="saveSettingsBtn" class="dash-button primary" style="margin-top:10px;">
+        💾 Save Settings
+      </button>
+
+      <div id="settingsStatus" class="dash-status"></div>
+    </section>
+
+    <!-- My Photos -->
+    <section class="dash-card">
+      <div class="dash-card-header">
+        <div>
+          <div class="dash-card-title">My Photos</div>
+          <div class="dash-card-subtitle">
+            Manage the photos you’ve uploaded to Mug Mapper.
+          </div>
+        </div>
+      </div>
+
+      <div id="photosStatus" class="dash-status"></div>
+      <div id="myPhotosList" class="my-photos-list"></div>
+    </section>
+  </div>
+
+  <!-- Sticky footer -->
+  <footer class="mm-footer">
+    <div class="mm-footer-inner">© 2025 Mug Mapper</div>
+  </footer>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // ---------------------------
+    // 1. Load shared header
+    // ---------------------------
+    const headerHTML = await fetch("header.html").then((r) => r.text());
+    document.getElementById("mm-header").innerHTML = headerHTML;
+
+    // Wire hamburger nav after header is injected
+    const mmHamburger   = document.getElementById("mmHamburger");
+    const mmNavOverlay  = document.getElementById("mmNavOverlay");
+    const mmNavClose    = document.getElementById("mmNavClose");
+    const navLinks      = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
+
+    function openNav() {
+      mmNavOverlay.style.display = "block";
+      mmNavOverlay.setAttribute("aria-hidden", "false");
+    }
+    function closeNav() {
+      mmNavOverlay.style.display = "none";
+      mmNavOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    mmHamburger?.addEventListener("click", openNav);
+    mmNavClose?.addEventListener("click", closeNav);
+    navLinks.forEach((link) => link.addEventListener("click", closeNav));
+
+    // ---------------------------
+    // 2. Supabase Init + Auth
+    // ---------------------------
+    const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const authUserLabel     = document.getElementById("authUserLabel");
+    const authAvatar        = document.getElementById("authAvatar");
+    const adminContainer    = document.getElementById("adminLinkContainer");
+    const loginGoogleButton = document.getElementById("loginGoogleButton");
+    const loginEmailButton  = document.getElementById("loginEmailButton");
+    const logoutButton      = document.getElementById("logoutButton");
+
+    const userEmailInput       = document.getElementById("userEmail");
+    const displayNameInput     = document.getElementById("displayNameInput");
+    const unsubscribeCheckbox  = document.getElementById("unsubscribeCheckbox");
+    const saveSettingsBtn      = document.getElementById("saveSettingsBtn");
+    const settingsStatus       = document.getElementById("settingsStatus");
+    const myPhotosList         = document.getElementById("myPhotosList");
+    const photosStatus         = document.getElementById("photosStatus");
+
+    let currentUser   = null;
+    let isAdmin       = false;
+    let currentPrefs  = null;
+    let currentProfile = null;
+    let myPhotos      = [];
+
+    function renderAdminLink() {
+      if (!adminContainer) return;
+
+      if (isAdmin) {
+        adminContainer.innerHTML = `
+          <a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">
+            🔧 Admin Panel
+          </a>
+        `;
+      } else {
+        adminContainer.innerHTML = "";
+      }
+    }
+
+    function updateAuthUI() {
+      if (!authUserLabel) return;
+
+      if (currentUser) {
+        const meta = currentUser.user_metadata || {};
+        const displayName =
+          currentUser.email ||
+          meta.full_name ||
+          meta.name ||
+          currentUser.id;
+
+        const adminBadgeHTML = isAdmin
+          ? `<span style="
+                background:#f97316;
+                color:#111827;
+                font-size:0.7rem;
+                padding:2px 7px;
+                border-radius:999px;
+                text-transform:uppercase;
+                letter-spacing:0.05em;
+                font-weight:600;
+              ">
+                Admin
+             </span>`
+          : "";
+
+        authUserLabel.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <span>${displayName}</span>
+            ${adminBadgeHTML}
+          </div>
+        `;
+
+        const avatarUrl = meta.avatar_url || meta.picture || null;
+        if (authAvatar) {
+          if (avatarUrl) {
+            authAvatar.src = avatarUrl;
+            authAvatar.style.display = "block";
+          } else {
+            authAvatar.style.display = "none";
+          }
+        }
+
+        loginGoogleButton.style.display = "none";
+        loginEmailButton.style.display  = "none";
+        logoutButton.style.display      = "block";
+      } else {
+        authUserLabel.textContent = "Not signed in";
+        if (authAvatar) authAvatar.style.display = "none";
+        loginGoogleButton.style.display = "block";
+        loginEmailButton.style.display  = "block";
+        logoutButton.style.display      = "none";
+      }
+    }
+
+    async function checkAdmin() {
+      if (!currentUser) {
+        isAdmin = false;
+        renderAdminLink();
+        updateAuthUI();
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking admin:", error);
+        isAdmin = false;
+      } else {
+        isAdmin = !!data;
+      }
+
+      renderAdminLink();
+      updateAuthUI();
+    }
+
+    async function initAuth() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      currentUser = session?.user ?? null;
+      if (!currentUser) {
+        userEmailInput.value = "";
+      } else {
+        userEmailInput.value = currentUser.email || "";
+      }
+
+      await checkAdmin();
+
+      if (currentUser) {
+        await Promise.all([
+          loadProfile(),
+          loadEmailPreferences(),
+          loadMyPhotos(),
+        ]);
+      }
+
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        currentUser = session?.user ?? null;
+        if (!currentUser) {
+          userEmailInput.value = "";
+          displayNameInput.value = "";
+          unsubscribeCheckbox.checked = false;
+          myPhotosList.innerHTML = "";
+        } else {
+          userEmailInput.value = currentUser.email || "";
+          await checkAdmin();
+          await Promise.all([
+            loadProfile(),
+            loadEmailPreferences(),
+            loadMyPhotos(),
+          ]);
+        }
+      });
+    }
+
+    loginGoogleButton?.addEventListener("click", async () => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.href },
+      });
+      if (error) alert("Google sign-in error: " + error.message);
+    });
+
+    loginEmailButton?.addEventListener("click", async () => {
+      const email = prompt("Enter your email for a sign-in link:");
+      if (!email) return;
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.href },
+      });
+      if (error) alert("Email sign-in error: " + error.message);
+      else alert("Magic link sent. Check your inbox.");
+    });
+
+    logoutButton?.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+    });
+
+    // ---------------------------
+    // 3. Load Profile & Preferences
+    // ---------------------------
+    function setSettingsStatus(message, isError = false) {
+      settingsStatus.textContent = message || "";
+      settingsStatus.className = "dash-status " + (isError ? "err" : "ok");
+    }
+
+    async function loadProfile() {
+      if (!currentUser) return;
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", currentUser.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error loading profile:", error);
+          return;
+        }
+        currentProfile = data || null;
+        displayNameInput.value = currentProfile?.display_name || "";
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadEmailPreferences() {
+      if (!currentUser) return;
+      try {
+        const { data, error } = await supabase
+          .from("user_email_preferences")
+          .select("marketing_opt_in")
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error loading email preferences:", error);
+          return;
+        }
+        currentPrefs = data || null;
+        const wantsEmails = currentPrefs?.marketing_opt_in ?? true;
+        unsubscribeCheckbox.checked = !wantsEmails;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Basic defensive validation to avoid weird display names
+    function validateDisplayName(name) {
+      const trimmed = name.trim();
+      if (trimmed.length > 25) return { ok: false, msg: "Display name is too long." };
+      if (!trimmed) return { ok: true, value: "" }; // allow blank
+      // Allow letters, numbers, space, _, -
+      const re = /^[A-Za-z0-9 _-]+$/;
+      if (!re.test(trimmed)) {
+        return { ok: false, msg: "Only letters, numbers, spaces, _ and - are allowed." };
+      }
+      return { ok: true, value: trimmed };
+    }
+
+    saveSettingsBtn.addEventListener("click", async () => {
+      if (!currentUser) {
+        setSettingsStatus("You must be signed in to update settings.", true);
+        return;
+      }
+
+      setSettingsStatus("Saving settings…", false);
+
+      const nameRaw = displayNameInput.value || "";
+      const validation = validateDisplayName(nameRaw);
+      if (!validation.ok) {
+        setSettingsStatus(validation.msg, true);
+        return;
+      }
+      const safeName = validation.value;
+      const wantsEmails = !unsubscribeCheckbox.checked;
+
+      try {
+        // --- Client-side uniqueness check (if a name is provided) ---
+        if (safeName) {
+          const { data: existing, error: checkError } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("display_name", safeName)
+            .neq("id", currentUser.id)
+            .maybeSingle();
+
+          if (checkError) {
+            console.error("Error checking display name uniqueness:", checkError);
+            setSettingsStatus("Error checking display name. Please try again.", true);
+            return;
+          }
+
+          if (existing) {
+            setSettingsStatus("That display name is already taken. Please choose another.", true);
+            return;
+          }
+        }
+
+        // Upsert profile
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .upsert(
+            {
+              id: currentUser.id,
+              display_name: safeName || null,
+            },
+            { onConflict: "id" }
+          );
+
+        if (profileError) {
+          console.error("Profile update error:", profileError);
+
+          // Handle DB uniqueness violation (postgreSQL code 23505)
+          if (profileError.code === "23505") {
+            setSettingsStatus("That display name is already taken. Please choose another.", true);
+          } else {
+            setSettingsStatus("Error saving profile.", true);
+          }
+          return;
+        }
+
+        // Upsert email preferences
+        const { error: prefsError } = await supabase
+          .from("user_email_preferences")
+          .upsert(
+            {
+              user_id: currentUser.id,
+              marketing_opt_in: wantsEmails,
+            },
+            { onConflict: "user_id" }
+          );
+
+        if (prefsError) {
+          console.error("Email preference update error:", prefsError);
+          setSettingsStatus("Error saving email preferences.", true);
+          return;
+        }
+
+        setSettingsStatus("Settings saved.", false);
+      } catch (e) {
+        console.error(e);
+        setSettingsStatus("Unexpected error saving settings.", true);
+      }
+    });
+
+    // ---------------------------
+    // 4. Load & Manage My Photos
+    // ---------------------------
+    function setPhotosStatus(message, isError = false) {
+      photosStatus.textContent = message || "";
+      photosStatus.className = "dash-status " + (isError ? "err" : "ok");
+    }
+
+    async function loadMyPhotos() {
+      if (!currentUser) return;
+      setPhotosStatus("Loading your photos…", false);
+      myPhotosList.innerHTML = "";
+
+      try {
+        const { data, error } = await supabase
+          .from("mug_photos")
+          .select(`
+            id,
+            public_url,
+            caption,
+            year,
+            like_count,
+            status,
+            created_at,
+            market_id,
+            markets (
+              market_name,
+              city,
+              country
+            )
+          `)
+          .eq("uploader_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error loading my photos:", error);
+          setPhotosStatus("Error loading your photos.", true);
+          return;
+        }
+
+        myPhotos = data || [];
+
+        if (!myPhotos.length) {
+          setPhotosStatus("You haven’t uploaded any photos yet.", false);
+          myPhotosList.innerHTML = "";
+          return;
+        }
+
+        setPhotosStatus("", false);
+        renderMyPhotos();
+      } catch (e) {
+        console.error(e);
+        setPhotosStatus("Unexpected error loading your photos.", true);
+      }
+    }
+
+    function renderMyPhotos() {
+      myPhotosList.innerHTML = "";
+
+      myPhotos.forEach((p) => {
+        const item = document.createElement("div");
+        item.className = "my-photo-item";
+
+        const thumb = document.createElement("div");
+        thumb.className = "my-photo-thumb";
+        const img = document.createElement("img");
+        img.src = p.public_url;
+        img.alt = "Mug photo";
+        thumb.appendChild(img);
+
+        const meta = document.createElement("div");
+        meta.className = "my-photo-meta";
+
+        const title = document.createElement("div");
+        title.className = "my-photo-title";
+        const mkt = p.markets;
+        title.textContent = mkt?.market_name || "Mug Photo";
+
+        const sub = document.createElement("div");
+        sub.className = "my-photo-sub";
+        const locText = mkt ? `${mkt.city}, ${mkt.country}` : "Location unknown";
+        const statusText = p.status ? p.status.toUpperCase() : "UNKNOWN";
+        sub.textContent = `${locText} · ${p.year || "Year N/A"} · ${statusText}`;
+
+        const tagsRow = document.createElement("div");
+        tagsRow.className = "my-photo-tags";
+
+        const likeTag = document.createElement("span");
+        likeTag.className = "my-photo-tag";
+        likeTag.textContent = `${p.like_count ?? 0} like${(p.like_count ?? 0) === 1 ? "" : "s"}`;
+        tagsRow.appendChild(likeTag);
+
+        const createdTag = document.createElement("span");
+        createdTag.className = "my-photo-tag";
+        createdTag.textContent = "Uploaded " + new Date(p.created_at).toLocaleDateString();
+        tagsRow.appendChild(createdTag);
+
+        meta.appendChild(title);
+        meta.appendChild(sub);
+        meta.appendChild(tagsRow);
+
+        const actions = document.createElement("div");
+        actions.className = "my-photo-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "dash-button";
+        editBtn.textContent = "✏️ Edit caption";
+        editBtn.addEventListener("click", () => editCaption(p));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "dash-button danger";
+        deleteBtn.textContent = "🗑 Delete";
+        deleteBtn.addEventListener("click", () => deletePhoto(p));
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        meta.appendChild(actions);
+        item.appendChild(thumb);
+        item.appendChild(meta);
+        myPhotosList.appendChild(item);
+      });
+    }
+
+    async function editCaption(photo) {
+      const newCaption = prompt("Edit caption:", photo.caption || "");
+      if (newCaption === null) return;
+
+      const safeCaption = (newCaption || "").trim();
+      if (safeCaption.length > 200) {
+        alert("Caption is too long (max 200 characters).");
+        return;
+      }
+
+      try {
+        const { error } = await supabase
+          .from("mug_photos")
+          .update({ caption: safeCaption || null })
+          .eq("id", photo.id);
+
+        if (error) {
+          console.error("Error updating caption:", error);
+          alert("Error updating caption.");
+          return;
+        }
+
+        photo.caption = safeCaption;
+        renderMyPhotos();
+      } catch (e) {
+        console.error(e);
+        alert("Unexpected error updating caption.");
+      }
+    }
+
+    async function deletePhoto(photo) {
+      const confirmDelete = confirm(
+        "Are you sure you want to delete this photo? This cannot be undone."
+      );
+      if (!confirmDelete) return;
+
+      try {
+        const { error } = await supabase
+          .from("mug_photos")
+          .delete()
+          .eq("id", photo.id);
+
+        if (error) {
+          console.error("Error deleting photo:", error);
+          alert("Error deleting photo.");
+          return;
+        }
+
+        myPhotos = myPhotos.filter((p) => p.id !== photo.id);
+        renderMyPhotos();
+        if (!myPhotos.length) {
+          setPhotosStatus("You haven’t uploaded any photos yet.", false);
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Unexpected error deleting photo.");
+      }
+    }
+
+    // ---------------------------
+    // 5. Init
+    // ---------------------------
+    await initAuth();
+  </script>
+
+</body>
+</html>
