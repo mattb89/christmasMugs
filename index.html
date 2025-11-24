@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mug Mapper – Map</title>
+  <title>Mug Mapper – 2025 Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- W3CSS + your styles -->
@@ -10,7 +10,10 @@
   <link rel="stylesheet" href="styles.css" />
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
   <style>
     body {
@@ -163,14 +166,16 @@
     const mmHamburger   = document.getElementById("mmHamburger");
     const mmNavOverlay  = document.getElementById("mmNavOverlay");
     const mmNavClose    = document.getElementById("mmNavClose");
-    const navLinks      = mmNavOverlay.querySelectorAll(".mm-nav-link");
+    const navLinks      = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
 
     function openNav() {
+      if (!mmNavOverlay) return;
       mmNavOverlay.style.display = "block";
       mmNavOverlay.setAttribute("aria-hidden", "false");
     }
 
     function closeNav() {
+      if (!mmNavOverlay) return;
       mmNavOverlay.style.display = "none";
       mmNavOverlay.setAttribute("aria-hidden", "true");
     }
@@ -180,7 +185,7 @@
     navLinks.forEach((link) => link.addEventListener("click", closeNav));
 
     // ------------------------------
-    // 2. Supabase Init + Auth (with avatar + admin badge)
+    // 2. Supabase Init + Auth (avatar + admin + dashboard link)
     // ------------------------------
     const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
     const SUPABASE_ANON_KEY =
@@ -188,12 +193,13 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const authUserLabel     = document.getElementById("authUserLabel");
-    const authAvatar        = document.getElementById("authAvatar");
-    const adminContainer    = document.getElementById("adminLinkContainer");
-    const loginGoogleButton = document.getElementById("loginGoogleButton");
-    const loginEmailButton  = document.getElementById("loginEmailButton");
-    const logoutButton      = document.getElementById("logoutButton");
+    const authUserLabel       = document.getElementById("authUserLabel");
+    const authAvatar          = document.getElementById("authAvatar");
+    const adminContainer      = document.getElementById("adminLinkContainer");
+    const dashboardContainer  = document.getElementById("dashboardLinkContainer");
+    const loginGoogleButton   = document.getElementById("loginGoogleButton");
+    const loginEmailButton    = document.getElementById("loginEmailButton");
+    const logoutButton        = document.getElementById("logoutButton");
 
     let currentUser = null;
     let isAdmin     = false;
@@ -209,6 +215,20 @@
         `;
       } else {
         adminContainer.innerHTML = "";
+      }
+    }
+
+    function renderDashboardLink() {
+      if (!dashboardContainer) return;
+
+      if (currentUser) {
+        dashboardContainer.innerHTML = `
+          <a href="dashboard.html" class="mm-nav-link" style="color:#a5f3fc;font-weight:600;">
+            👤 Dashboard
+          </a>
+        `;
+      } else {
+        dashboardContainer.innerHTML = "";
       }
     }
 
@@ -270,6 +290,9 @@
         loginEmailButton.style.display  = "block";
         logoutButton.style.display      = "none";
       }
+
+      // Update dashboard link whenever auth changes
+      renderDashboardLink();
     }
 
     async function checkAdmin() {
@@ -303,7 +326,7 @@
       } = await supabase.auth.getSession();
 
       currentUser = session?.user ?? null;
-      await checkAdmin();
+      await checkAdmin(); // this also calls updateAuthUI()
 
       supabase.auth.onAuthStateChange(async (_event, session) => {
         currentUser = session?.user ?? null;
@@ -357,6 +380,7 @@
     });
 
     async function loadActiveMarkets() {
+      // Get market_ids that have approved photos
       const { data: photoRows, error: photosError } = await supabase
         .from("mug_photos")
         .select("market_id")
