@@ -9,188 +9,248 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
   <link rel="stylesheet" href="styles.css" />
 
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
   <style>
     body {
       margin: 0;
-      background: #111827;
+      background: #020617;
       color: #f9fafb;
-      font-family: system-ui, -apple-system, sans-serif;
-
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       padding-top: 58px;   /* sticky header */
-      padding-bottom: 48px; /* sticky footer */
+      padding-bottom: 48px;/* sticky footer */
     }
 
     .admin-container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 18px 16px 60px;
-    }
-
-    .admin-card {
-      background: #1f2937;
-      border-radius: 14px;
-      border: 1px solid rgba(148,163,184,0.25);
-      padding: 16px 18px 22px;
-    }
-
-    .admin-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
+      padding: 16px 16px 80px;
     }
 
     .admin-title {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 600;
-    }
-
-    .admin-tabs {
-      display: inline-flex;
-      border-radius: 999px;
-      padding: 2px;
-      background: #030712;
-      border: 1px solid rgba(148,163,184,0.5);
-      gap: 2px;
-    }
-
-    .admin-tab {
-      padding: 6px 14px;
-      font-size: 0.9rem;
-      border-radius: 999px;
-      border: none;
-      background: transparent;
-      color: #e5e7eb;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .admin-tab.active {
-      background: #0ea5e9;
-      color: #0f172a;
-      font-weight: 600;
-    }
-
-    .admin-section {
-      margin-top: 12px;
-    }
-
-    .admin-info {
-      font-size: 0.82rem;
-      color: #9ca3af;
       margin-bottom: 8px;
     }
 
-    .admin-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    .admin-item {
-      display: grid;
-      grid-template-columns: 120px 1fr; /* wider thumb column */
-      gap: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      background: #020617;
-      border: 1px solid rgba(55,65,81,0.8);
-    }
-
-    .admin-thumb img {
-      width: 100%;
-      height: 200px; /* larger photo height */
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .admin-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.84rem;
-    }
-
-    .admin-meta-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .admin-meta-sub {
+    .admin-subtitle {
+      font-size: 0.85rem;
       color: #9ca3af;
+      margin-bottom: 12px;
     }
 
-    .admin-tags {
+    .tab-buttons {
       display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 2px;
     }
 
-    .admin-tag {
-      font-size: 0.72rem;
-      padding: 2px 8px;
+    .tab-btn {
+      font-size: 0.85rem;
+      padding: 6px 12px;
       border-radius: 999px;
-      background: #111827;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: #020617;
       color: #e5e7eb;
-    }
-
-    .admin-actions {
-      margin-top: 6px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .btn-approve,
-    .btn-reject {
-      padding: 6px 10px;
-      font-size: 0.78rem;
-      border-radius: 999px;
-      border: none;
       cursor: pointer;
     }
 
-    .btn-approve {
-      background: #22c55e;
-      color: #052e16;
+    .tab-btn.active {
+      background: rgba(234, 179, 8, 0.15);
+      border-color: #eab308;
+      color: #facc15;
+      font-weight: 600;
     }
 
-    .btn-approve:hover {
-      background: #4ade80;
+    .admin-card {
+      background: #0b1220;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.25);
+      padding: 14px 14px 16px;
+      margin-bottom: 16px;
     }
 
-    .btn-reject {
-      background: #f97373;
-      color: #450a0a;
+    .admin-status {
+      font-size: 0.8rem;
+      margin-bottom: 6px;
     }
 
-    .btn-reject:hover {
-      background: #fecaca;
-    }
-
-    .admin-empty {
-      font-size: 0.85rem;
-      color: #9ca3af;
-      padding: 8px 2px;
-    }
-
-    .admin-error {
+    .admin-status.err {
       color: #fecaca;
-      font-size: 0.85rem;
-      margin-top: 8px;
-      white-space: pre-line;
     }
 
-    .admin-pill-status {
+    .admin-status.ok {
+      color: #a7f3d0;
+    }
+
+    /* Photos tab */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .photo-card {
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid rgba(55,65,81,0.9);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-body {
+      padding: 8px 10px 10px;
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .photo-meta-main {
+      font-weight: 500;
+    }
+
+    .photo-meta-sub {
+      color: #9ca3af;
+    }
+
+    .photo-meta-tag {
+      display: inline-block;
       font-size: 0.72rem;
       padding: 2px 8px;
       border-radius: 999px;
-      background: #1d283a;
-      color: #fbbf24;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.9);
+      margin-right: 4px;
+      margin-top: 2px;
+    }
+
+    .photo-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .btn-approve,
+    .btn-reject,
+    .btn-secondary {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      cursor: pointer;
+      color: #e5e7eb;
+    }
+
+    .btn-approve {
+      background: #16a34a;
+    }
+    .btn-approve:hover {
+      background: #22c55e;
+    }
+
+    .btn-reject {
+      background: #b91c1c;
+    }
+    .btn-reject:hover {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      background: #0369a1;
+    }
+    .btn-secondary:hover {
+      background: #0284c7;
+    }
+
+    /* Markets tab */
+    .markets-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .markets-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .market-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .market-item {
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .market-item.selected {
+      border-color: #eab308;
+      box-shadow: 0 0 0 1px rgba(234,179,8,0.4);
+    }
+
+    .market-name {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .market-meta {
+      color: #9ca3af;
+      font-size: 0.78rem;
+    }
+
+    .market-email {
+      font-size: 0.75rem;
+      color: #a5b4fc;
+      margin-top: 2px;
+    }
+
+    .market-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .market-location-text {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    #adminMarketMap {
+      width: 100%;
+      height: 320px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .map-instructions {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 6px;
     }
 
     .mm-footer {
@@ -199,593 +259,746 @@
       left: 0;
       right: 0;
       height: 48px;
-      background: #1f2937;
+      background: #020617;
+      border-top: 1px solid rgba(30,64,175,0.7);
       color: #cbd5e1;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9980;
       font-size: 0.9rem;
-      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
-    }
-
-    .access-denied {
-      max-width: 650px;
-      margin: 40px auto;
-      text-align: center;
-      padding: 18px 16px;
-      background: #111827;
-      border-radius: 12px;
-      border: 1px dashed #4b5563;
-      color: #e5e7eb;
-      font-size: 0.95rem;
-    }
-
-    .access-denied span {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.82rem;
-      color: #9ca3af;
-    }
-
-    @media (max-width: 640px) {
-      .admin-item {
-        grid-template-columns: 1fr;
-      }
-      .admin-thumb img {
-        height: 200px; /* a bit taller on small screens */
-      }
     }
   </style>
 </head>
 
 <body>
 
-<!-- Sticky Header -->
-<div id="mm-header"></div>
+  <!-- Sticky header -->
+  <div id="mm-header"></div>
 
-<div class="admin-container">
+  <div class="admin-container">
+    <h2 class="admin-title">Admin Panel</h2>
+    <div class="admin-subtitle">
+      Approve mug photos and suggested markets. Only you (and other admins) can see this.
+    </div>
 
-  <!-- Shown if NOT admin -->
-  <div id="accessDenied" class="access-denied" style="display:none;">
-    🚫 Admin access required<br />
-    <span>You’re either not signed in, or your account is not configured as an admin.</span>
-  </div>
+    <div id="adminError" class="admin-status err" style="display:none;"></div>
 
-  <!-- Main admin content only visible for admins -->
-  <div id="adminWrapper" style="display:none;">
-    <div class="admin-card">
-      <div class="admin-header">
-        <div class="admin-title">Admin Panel</div>
-        <div class="admin-tabs">
-          <button id="tabPhotos" class="admin-tab active">Approve Photos</button>
-          <button id="tabMarkets" class="admin-tab">Approve Markets</button>
-        </div>
+    <div id="adminContent" style="display:none;">
+      <!-- Tabs -->
+      <div class="tab-buttons">
+        <button id="tabPhotosBtn" class="tab-btn active">📸 Photos</button>
+        <button id="tabMarketsBtn" class="tab-btn">🗺️ Markets</button>
       </div>
 
-      <div class="admin-section">
-        <div id="adminInfo" class="admin-info">
-          Loading pending items…
+      <!-- Photos Tab -->
+      <section id="tabPhotos" class="admin-card">
+        <div class="admin-status" id="photosStatus"></div>
+        <div id="photosGrid" class="photo-grid"></div>
+      </section>
+
+      <!-- Markets Tab -->
+      <section id="tabMarkets" class="admin-card" style="display:none;">
+        <div class="admin-status" id="marketsStatus"></div>
+
+        <div class="markets-layout">
+          <!-- Pending markets list -->
+          <div>
+            <h3 style="font-size:0.9rem;margin-bottom:6px;">Pending Markets</h3>
+            <div id="marketsList" class="market-list"></div>
+          </div>
+
+          <!-- Map & location info -->
+          <div>
+            <h3 style="font-size:0.9rem;margin-bottom:6px;">Set Market Location</h3>
+            <div id="adminMarketMap"></div>
+            <div class="map-instructions">
+              1) Click a market on the left to select it.<br/>
+              2) Either click on the map where the market is located <strong>or</strong> use the “City Centroid” button.<br/>
+              3) Then click <strong>Approve</strong> on that market.
+            </div>
+            <div id="selectedMarketCoords" class="market-location-text">
+              No market selected.
+            </div>
+          </div>
         </div>
-
-        <!-- Photos View -->
-        <div id="photosView" class="admin-list"></div>
-
-        <!-- Markets View -->
-        <div id="marketsView" class="admin-list" style="display:none;"></div>
-
-        <div id="adminError" class="admin-error"></div>
-      </div>
+      </section>
     </div>
   </div>
-</div>
 
-<!-- Sticky Footer -->
-<footer class="mm-footer">
-  <div class="mm-footer-inner">© 2025 Mug Mapper</div>
-</footer>
+  <!-- Sticky footer -->
+  <footer class="mm-footer">
+    <div class="mm-footer-inner">© 2025 Mug Mapper</div>
+  </footer>
 
-<script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  // ---------------------------
-  // 1. Load shared header
-  // ---------------------------
-  const headerHTML = await fetch("header.html").then((r) => r.text());
-  document.getElementById("mm-header").innerHTML = headerHTML;
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  // Hamburger / overlay wiring
-  const mmHamburger  = document.getElementById("mmHamburger");
-  const mmNavOverlay = document.getElementById("mmNavOverlay");
-  const mmNavClose   = document.getElementById("mmNavClose");
-  const navLinks     = mmNavOverlay.querySelectorAll(".mm-nav-link");
+    // -------------------------------------------------------
+    // 1. Load shared header
+    // -------------------------------------------------------
+    const headerHTML = await fetch("header.html").then((r) => r.text());
+    document.getElementById("mm-header").innerHTML = headerHTML;
 
-  function openNav() {
-    mmNavOverlay.style.display = "block";
-    mmNavOverlay.setAttribute("aria-hidden", "false");
-  }
-  function closeNav() {
-    mmNavOverlay.style.display = "none";
-    mmNavOverlay.setAttribute("aria-hidden", "true");
-  }
+    const mmHamburger   = document.getElementById("mmHamburger");
+    const mmNavOverlay  = document.getElementById("mmNavOverlay");
+    const mmNavClose    = document.getElementById("mmNavClose");
+    const navLinks      = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
 
-  mmHamburger?.addEventListener("click", openNav);
-  mmNavClose?.addEventListener("click", closeNav);
-  navLinks.forEach((link) => link.addEventListener("click", closeNav));
-
-  // ---------------------------
-  // 2. Supabase Init + Auth
-  // ---------------------------
-  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const authUserLabel     = document.getElementById("authUserLabel");
-  const loginGoogleButton = document.getElementById("loginGoogleButton");
-  const loginEmailButton  = document.getElementById("loginEmailButton");
-  const logoutButton      = document.getElementById("logoutButton");
-
-  const adminWrapper = document.getElementById("adminWrapper");
-  const accessDenied = document.getElementById("accessDenied");
-  const adminInfo    = document.getElementById("adminInfo");
-  const adminError   = document.getElementById("adminError");
-
-  const photosView   = document.getElementById("photosView");
-  const marketsView  = document.getElementById("marketsView");
-  const tabPhotos    = document.getElementById("tabPhotos");
-  const tabMarkets   = document.getElementById("tabMarkets");
-
-  let currentUser = null;
-  let isAdmin     = false;
-
-  function updateAuthUI() {
-    if (!authUserLabel) return;
-    if (currentUser) {
-      authUserLabel.textContent =
-        currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
-      loginGoogleButton.style.display = "none";
-      loginEmailButton.style.display  = "none";
-      logoutButton.style.display      = "block";
-    } else {
-      authUserLabel.textContent = "Not signed in";
-      loginGoogleButton.style.display = "block";
-      loginEmailButton.style.display  = "block";
-      logoutButton.style.display      = "none";
+    function openNav() {
+      if (!mmNavOverlay) return;
+      mmNavOverlay.style.display = "block";
+      mmNavOverlay.setAttribute("aria-hidden", "false");
     }
-  }
+    function closeNav() {
+      if (!mmNavOverlay) return;
+      mmNavOverlay.style.display = "none";
+      mmNavOverlay.setAttribute("aria-hidden", "true");
+    }
+    mmHamburger?.addEventListener("click", openNav);
+    mmNavClose?.addEventListener("click", closeNav);
+    navLinks.forEach((link) => link.addEventListener("click", closeNav));
 
-  async function checkAdmin() {
-    if (!currentUser) {
-      isAdmin = false;
-      return;
+
+    // -------------------------------------------------------
+    // 2. Supabase init + auth + admin check (null-safe)
+    // -------------------------------------------------------
+    const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const authUserLabel      = document.getElementById("authUserLabel") || null;
+    const authAvatar         = document.getElementById("authAvatar") || null;
+    const adminContainer     = document.getElementById("adminLinkContainer") || null;
+    const dashboardContainer = document.getElementById("dashboardLinkContainer") || null;
+    const loginGoogleButton  = document.getElementById("loginGoogleButton") || null;
+    const loginEmailButton   = document.getElementById("loginEmailButton") || null;
+    const logoutButton       = document.getElementById("logoutButton") || null;
+
+    let currentUser      = null;
+    let isAdmin          = false;
+    let adminInitialized = false;
+
+    function renderAdminLink() {
+      if (!adminContainer) return;
+      adminContainer.innerHTML = isAdmin
+        ? `<a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">🔧 Admin Panel</a>`
+        : "";
     }
 
-    const { data, error } = await supabase
-      .from("admin_users")
-      .select("user_id")
-      .eq("user_id", currentUser.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error checking admin:", error);
-      isAdmin = false;
-      return;
+    function renderDashboardLink() {
+      if (!dashboardContainer) return;
+      dashboardContainer.innerHTML = currentUser
+        ? `<a href="dashboard.html" class="mm-nav-link" style="color:#a5f3fc;font-weight:600;">👤 Dashboard</a>`
+        : "";
     }
 
-    isAdmin = !!data;
-  }
+    function updateAuthUI() {
+      if (!authUserLabel) return;
 
-  function showAdminUI() {
-    if (isAdmin) {
-      adminWrapper.style.display = "block";
-      accessDenied.style.display = "none";
-      adminInfo.textContent = "Loading pending photos…";
-      loadPendingPhotos();
-    } else {
-      adminWrapper.style.display = "none";
-      accessDenied.style.display = "block";
+      if (currentUser) {
+        const meta = currentUser.user_metadata || {};
+        const displayName = currentUser.email || meta.full_name || meta.name || currentUser.id;
+
+        const adminBadgeHTML = isAdmin
+          ? `<span style="
+              background:#f97316;
+              color:#111827;
+              font-size:0.7rem;
+              padding:2px 7px;
+              border-radius:999px;
+              font-weight:600;
+              letter-spacing:0.05em;
+            ">Admin</span>`
+          : "";
+
+        authUserLabel.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <span>${displayName}</span>
+            ${adminBadgeHTML}
+          </div>
+        `;
+
+        const avatarUrl = meta.avatar_url || meta.picture || null;
+        if (authAvatar) {
+          authAvatar.style.display = avatarUrl ? "block" : "none";
+          if (avatarUrl) authAvatar.src = avatarUrl;
+        }
+
+        if (loginGoogleButton) loginGoogleButton.style.display = "none";
+        if (loginEmailButton)  loginEmailButton.style.display  = "none";
+        if (logoutButton)      logoutButton.style.display      = "block";
+      } else {
+        authUserLabel.textContent = "Not signed in";
+
+        if (authAvatar) authAvatar.style.display = "none";
+        if (loginGoogleButton) loginGoogleButton.style.display = "block";
+        if (loginEmailButton)  loginEmailButton.style.display  = "block";
+        if (logoutButton)      logoutButton.style.display      = "none";
+      }
+
+      renderDashboardLink();
     }
-  }
 
-  async function initAuth() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    async function checkAdmin() {
+      const adminError   = document.getElementById("adminError");
+      const adminContent = document.getElementById("adminContent");
 
-    currentUser = session?.user ?? null;
-    updateAuthUI();
-    await checkAdmin();
-    showAdminUI();
+      if (!currentUser) {
+        isAdmin = false;
+        renderAdminLink();
+        updateAuthUI();
 
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      currentUser = session?.user ?? null;
+        adminError.style.display   = "block";
+        adminError.textContent     = "Admin access required. Please sign in.";
+        adminContent.style.display = "none";
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking admin_users:", error);
+      }
+
+      isAdmin = !!data;
+      renderAdminLink();
       updateAuthUI();
+
+      if (!isAdmin) {
+        adminError.style.display   = "block";
+        adminError.textContent     = "Admin access required.";
+        adminContent.style.display = "none";
+      } else {
+        adminError.style.display   = "none";
+        adminContent.style.display = "block";
+        if (!adminInitialized) {
+          adminInitialized = true;
+          initAdminUI();
+        }
+      }
+    }
+
+    async function initAuth() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      currentUser = session?.user ?? null;
       await checkAdmin();
-      showAdminUI();
-    });
-  }
 
-  loginGoogleButton?.addEventListener("click", async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.href },
-    });
-    if (error) alert("Google sign-in error: " + error.message);
-  });
-
-  loginEmailButton?.addEventListener("click", async () => {
-    const email = prompt("Enter your email for a sign-in link:");
-    if (!email) return;
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.href },
-    });
-    if (error) alert("Email sign-in error: " + error.message);
-  });
-
-  logoutButton?.addEventListener("click", async () => {
-    await supabase.auth.signOut();
-  });
-
-  await initAuth();
-
-  // ---------------------------
-  // 3. Tab switching
-  // ---------------------------
-  tabPhotos.addEventListener("click", () => {
-    tabPhotos.classList.add("active");
-    tabMarkets.classList.remove("active");
-    photosView.style.display  = "flex";
-    marketsView.style.display = "none";
-    adminError.textContent    = "";
-    adminInfo.textContent     = "Loading pending photos…";
-    loadPendingPhotos();
-  });
-
-  tabMarkets.addEventListener("click", () => {
-    tabMarkets.classList.add("active");
-    tabPhotos.classList.remove("active");
-    photosView.style.display  = "flex"; // list is flex-column
-    marketsView.style.display = "flex";
-    photosView.style.display  = "none";
-    adminError.textContent    = "";
-    adminInfo.textContent     = "Loading pending markets…";
-    loadPendingMarkets();
-  });
-
-  // ---------------------------
-  // 4. Load PENDING PHOTOS
-  // ---------------------------
-  async function loadPendingPhotos() {
-    if (!isAdmin) return;
-    photosView.innerHTML = "";
-    adminError.textContent = "";
-
-    const { data, error } = await supabase
-      .from("mug_photos")
-      .select(`
-        id,
-        public_url,
-        caption,
-        year,
-        status,
-        uploader_email,
-        created_at,
-        market_id,
-        markets (
-          market_name,
-          city,
-          country
-        )
-      `)
-      .eq("status", "pending")
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.error("Error loading pending photos:", error);
-      adminInfo.textContent = "";
-      adminError.textContent = "Error loading pending photos:\n" + error.message;
-      return;
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        currentUser = session?.user ?? null;
+        await checkAdmin();
+      });
     }
 
-    const photos = data || [];
-    if (!photos.length) {
-      adminInfo.textContent = "No pending photos. 🎉";
-      photosView.innerHTML = `<div class="admin-empty">Everything is approved right now.</div>`;
-      return;
+    if (loginGoogleButton) {
+      loginGoogleButton.addEventListener("click", async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: window.location.href },
+        });
+        if (error) alert("Google sign-in error: " + error.message);
+      });
     }
 
-    adminInfo.textContent = `${photos.length} pending photo(s).`;
+    if (loginEmailButton) {
+      loginEmailButton.addEventListener("click", async () => {
+        const email = prompt("Enter your email for a sign-in link:");
+        if (!email) return;
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: window.location.href },
+        });
+        if (error) alert("Email sign-in error: " + error.message);
+        else alert("Magic link sent. Check your inbox.");
+      });
+    }
 
-    photosView.innerHTML = "";
-    photos.forEach((p) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "admin-item";
+    if (logoutButton) {
+      logoutButton.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+      });
+    }
 
-      // Thumbnail (bigger now)
-      const thumbDiv = document.createElement("div");
-      thumbDiv.className = "admin-thumb";
-      const img = document.createElement("img");
-      img.src = p.public_url;
-      img.alt = "Pending mug photo";
-      img.loading = "lazy";
-      thumbDiv.appendChild(img);
 
-      // Meta
-      const meta = document.createElement("div");
-      meta.className = "admin-meta";
+    // -------------------------------------------------------
+    // 3. Admin UI: tabs, photos, markets, map
+    // -------------------------------------------------------
+    const tabPhotosBtn  = document.getElementById("tabPhotosBtn");
+    const tabMarketsBtn = document.getElementById("tabMarketsBtn");
+    const tabPhotos     = document.getElementById("tabPhotos");
+    const tabMarkets    = document.getElementById("tabMarkets");
 
-      const title = document.createElement("div");
-      title.className = "admin-meta-title";
-      const market = p.markets?.market_name || "Unknown market";
-      title.textContent = market;
+    const photosStatus  = document.getElementById("photosStatus");
+    const photosGrid    = document.getElementById("photosGrid");
+    const marketsStatus = document.getElementById("marketsStatus");
+    const marketsList   = document.getElementById("marketsList");
+    const coordsLabel   = document.getElementById("selectedMarketCoords");
 
-      const sub = document.createElement("div");
-      sub.className = "admin-meta-sub";
-      const loc = p.markets
-        ? `${p.markets.city}, ${p.markets.country}`
-        : "Location unknown";
-      sub.textContent = `${loc} · ${p.year || "Year n/a"}`;
+    let pendingMarkets      = [];
+    let selectedMarketId    = null;
+    let coordsByMarket      = {};
+    let adminMap            = null;
+    let adminMapMarker      = null;
+    let mapInitialized      = false;
 
-      const tagsRow = document.createElement("div");
-      tagsRow.className = "admin-tags";
+    function setStatus(el, msg, isError = false) {
+      if (!el) return;
+      el.textContent = msg || "";
+      el.className = "admin-status " + (isError ? "err" : "ok");
+    }
 
-      const statusTag = document.createElement("span");
-      statusTag.className = "admin-pill-status";
-      statusTag.textContent = p.status || "pending";
+    function showPhotosTab() {
+      tabPhotos.style.display  = "block";
+      tabMarkets.style.display = "none";
+      tabPhotosBtn.classList.add("active");
+      tabMarketsBtn.classList.remove("active");
+    }
 
-      tagsRow.appendChild(statusTag);
+    function showMarketsTab() {
+      tabPhotos.style.display  = "none";
+      tabMarkets.style.display = "block";
+      tabPhotosBtn.classList.remove("active");
+      tabMarketsBtn.classList.add("active");
 
-      if (p.uploader_email) {
-        const uploaderTag = document.createElement("span");
-        uploaderTag.className = "admin-tag";
-        uploaderTag.textContent = p.uploader_email;
-        tagsRow.appendChild(uploaderTag);
+      if (!mapInitialized) {
+        initAdminMap();
+        mapInitialized = true;
+      }
+      if (adminMap) {
+        setTimeout(() => adminMap.invalidateSize(), 100);
+      }
+    }
+
+    tabPhotosBtn.addEventListener("click", showPhotosTab);
+    tabMarketsBtn.addEventListener("click", showMarketsTab);
+
+
+    // ------------------ Photos ------------------
+    async function loadPendingPhotos() {
+      setStatus(photosStatus, "Loading pending photos…", false);
+      photosGrid.innerHTML = "";
+
+      const { data, error } = await supabase
+        .from("mug_photos")
+        .select(`
+          id,
+          public_url,
+          year,
+          caption,
+          status,
+          market_id,
+          uploader_email,
+          markets (
+            market_name,
+            city,
+            country
+          )
+        `)
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error loading pending photos:", error);
+        setStatus(photosStatus, "Error loading pending photos.", true);
+        return;
       }
 
-      const createdTag = document.createElement("span");
-      createdTag.className = "admin-tag";
-      createdTag.textContent =
-        "Submitted " + new Date(p.created_at).toLocaleString();
-      tagsRow.appendChild(createdTag);
-
-      // Caption
-      if (p.caption) {
-        const captionEl = document.createElement("div");
-        captionEl.style.fontSize = "0.82rem";
-        captionEl.style.marginTop = "2px";
-        captionEl.textContent = `"${p.caption}"`;
-        meta.appendChild(captionEl);
+      if (!data || !data.length) {
+        setStatus(photosStatus, "No pending photos. 🎉", false);
+        photosGrid.innerHTML = "";
+        return;
       }
 
-      // Actions
-      const actions = document.createElement("div");
-      actions.className = "admin-actions";
+      setStatus(photosStatus, "", false);
 
-      const approveBtn = document.createElement("button");
-      approveBtn.className = "btn-approve";
-      approveBtn.textContent = "Approve";
-      approveBtn.addEventListener("click", () => approvePhoto(p.id));
+      data.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "photo-card";
 
-      const rejectBtn = document.createElement("button");
-      rejectBtn.className = "btn-reject";
-      rejectBtn.textContent = "Reject";
-      rejectBtn.addEventListener("click", () => rejectPhoto(p.id));
+        const img = document.createElement("img");
+        img.src = p.public_url;
+        img.alt = "Pending mug photo";
 
-      actions.appendChild(approveBtn);
-      actions.appendChild(rejectBtn);
+        const body = document.createElement("div");
+        body.className = "photo-body";
 
-      meta.appendChild(title);
-      meta.appendChild(sub);
-      meta.appendChild(tagsRow);
-      meta.appendChild(actions);
+        const main = document.createElement("div");
+        main.className = "photo-meta-main";
+        const mkt = p.markets;
+        main.textContent = mkt
+          ? `${mkt.market_name} – ${mkt.city}, ${mkt.country}`
+          : "Unknown market";
 
-      wrapper.appendChild(thumbDiv);
-      wrapper.appendChild(meta);
+        const sub = document.createElement("div");
+        sub.className = "photo-meta-sub";
+        sub.textContent =
+          (p.caption ? `"${p.caption}" · ` : "") +
+          (p.uploader_email ? p.uploader_email : "Unknown uploader");
 
-      photosView.appendChild(wrapper);
-    });
-  }
+        const tags = document.createElement("div");
+        if (p.year) {
+          const t = document.createElement("span");
+          t.className = "photo-meta-tag";
+          t.textContent = `Year ${p.year}`;
+          tags.appendChild(t);
+        }
 
-  async function approvePhoto(photoId) {
-    if (!isAdmin) return;
-    const { error } = await supabase
-      .from("mug_photos")
-      .update({ status: "approved" })
-      .eq("id", photoId);
+        const actions = document.createElement("div");
+        actions.className = "photo-actions";
 
-    if (error) {
-      console.error("Error approving photo:", error);
-      adminError.textContent =
-        "Failed to approve photo:\n" + (error.message || "");
-      return;
-    }
-    adminError.textContent = "";
-    await loadPendingPhotos();
-  }
+        const approveBtn = document.createElement("button");
+        approveBtn.className = "btn-approve";
+        approveBtn.textContent = "Approve";
+        approveBtn.addEventListener("click", () => handlePhotoApproval(p.id, true));
 
-  async function rejectPhoto(photoId) {
-    if (!isAdmin) return;
-    const confirmed = confirm("Reject this photo? It will be marked as rejected.");
-    if (!confirmed) return;
+        const rejectBtn = document.createElement("button");
+        rejectBtn.className = "btn-reject";
+        rejectBtn.textContent = "Reject";
+        rejectBtn.addEventListener("click", () => handlePhotoApproval(p.id, false));
 
-    const { error } = await supabase
-      .from("mug_photos")
-      .update({ status: "rejected" })
-      .eq("id", photoId);
+        actions.appendChild(approveBtn);
+        actions.appendChild(rejectBtn);
 
-    if (error) {
-      console.error("Error rejecting photo:", error);
-      adminError.textContent =
-        "Failed to reject photo:\n" + (error.message || "");
-      return;
-    }
-    adminError.textContent = "";
-    await loadPendingPhotos();
-  }
+        body.appendChild(main);
+        body.appendChild(sub);
+        body.appendChild(tags);
+        body.appendChild(actions);
 
-  // ---------------------------
-  // 5. Load PENDING MARKETS
-  // ---------------------------
-  async function loadPendingMarkets() {
-    if (!isAdmin) return;
-    marketsView.innerHTML = "";
-    adminError.textContent = "";
-
-    const { data, error } = await supabase
-      .from("markets")
-      .select("id, market_name, city, country, status, description, created_at, created_by, created_by_email")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.error("Error loading pending markets:", error);
-      adminInfo.textContent = "";
-      adminError.textContent = "Error loading pending markets:\n" + error.message;
-      return;
+        card.appendChild(img);
+        card.appendChild(body);
+        photosGrid.appendChild(card);
+      });
     }
 
-    const markets = data || [];
-    if (!markets.length) {
-      adminInfo.textContent = "No pending markets. 🎉";
-      marketsView.innerHTML = `<div class="admin-empty">All markets are approved right now.</div>`;
-      return;
-    }
+    async function handlePhotoApproval(photoId, approve) {
+      const { error } = await supabase
+        .from("mug_photos")
+        .update({ status: approve ? "approved" : "rejected" })
+        .eq("id", photoId);
 
-    adminInfo.textContent = `${markets.length} pending market(s).`;
-
-    marketsView.innerHTML = "";
-    markets.forEach((m) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "admin-item";
-
-      // Left column: simple big icon (taller to match photo thumb)
-      const thumbDiv = document.createElement("div");
-      thumbDiv.className = "admin-thumb";
-      const icon = document.createElement("div");
-      icon.style.width = "100%";
-      icon.style.height = "130px";  // match photo height
-      icon.style.display = "flex";
-      icon.style.alignItems = "center";
-      icon.style.justifyContent = "center";
-      icon.style.borderRadius = "8px";
-      icon.style.background = "#020617";
-      icon.style.fontSize = "2rem";
-      icon.textContent = "🎄";
-      thumbDiv.appendChild(icon);
-
-      const meta = document.createElement("div");
-      meta.className = "admin-meta";
-
-      const title = document.createElement("div");
-      title.className = "admin-meta-title";
-      title.textContent = m.market_name;
-
-      const sub = document.createElement("div");
-      sub.className = "admin-meta-sub";
-      sub.textContent = `${m.city}, ${m.country}`;
-
-      const tagsRow = document.createElement("div");
-      tagsRow.className = "admin-tags";
-
-      const statusTag = document.createElement("span");
-      statusTag.className = "admin-pill-status";
-      statusTag.textContent = m.status || "pending";
-      tagsRow.appendChild(statusTag);
-
-      const createdTag = document.createElement("span");
-      createdTag.className = "admin-tag";
-      createdTag.textContent =
-        "Created " + new Date(m.created_at).toLocaleString();
-      tagsRow.appendChild(createdTag);
-
-      // Show user email if available, else fallback to user_id
-      if (m.created_by_email || m.created_by) {
-        const byTag = document.createElement("span");
-        byTag.className = "admin-tag";
-        byTag.textContent = m.created_by_email
-          ? `User: ${m.created_by_email}`
-          : `User: ${m.created_by}`;
-        tagsRow.appendChild(byTag);
+      if (error) {
+        console.error("Error updating mug_photos:", error);
+        alert("Error updating photo. See console.");
+        return;
       }
 
-      if (m.description) {
-        const descEl = document.createElement("div");
-        descEl.style.fontSize = "0.82rem";
-        descEl.style.marginTop = "2px";
-        descEl.textContent = m.description;
-        meta.appendChild(descEl);
+      await loadPendingPhotos();
+    }
+
+
+    // ------------------ Markets + Map ------------------
+    function initAdminMap() {
+      adminMap = L.map("adminMarketMap", {
+        center: [51.1657, 10.4515], // Central Europe-ish
+        zoom: 4,
+      });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(adminMap);
+
+      adminMap.on("click", (e) => {
+        if (!selectedMarketId) {
+          alert("Select a market from the list first.");
+          return;
+        }
+
+        const { lat, lng } = e.latlng;
+        coordsByMarket[selectedMarketId] = { lat, lng };
+
+        if (adminMapMarker) {
+          adminMapMarker.remove();
+        }
+        adminMapMarker = L.marker([lat, lng]).addTo(adminMap);
+
+        const m = pendingMarkets.find((m) => m.id === selectedMarketId);
+        if (m) {
+          updateCoordsLabel(m);
+        }
+      });
+    }
+
+    function updateCoordsLabel(market) {
+      const coords = coordsByMarket[market.id] || {
+        lat: market.lat,
+        lng: market.lng,
+      };
+
+      if (!coords || coords.lat == null || coords.lng == null) {
+        if (coordsLabel) {
+          coordsLabel.textContent =
+            `Selected market: ${market.market_name} (${market.city}, ${market.country}) – ` +
+            `no coordinates set yet. Click the map or use “City Centroid”.`;
+        }
+      } else {
+        if (coordsLabel) {
+          coordsLabel.textContent =
+            `Selected market: ${market.market_name} (${market.city}, ${market.country})` +
+            ` · lat: ${coords.lat.toFixed(5)}, lng: ${coords.lng.toFixed(5)}`;
+        }
+      }
+    }
+
+    async function loadPendingMarkets() {
+      setStatus(marketsStatus, "Loading pending markets…", false);
+      marketsList.innerHTML = "";
+      pendingMarkets = [];
+      selectedMarketId = null;
+      if (coordsLabel) coordsLabel.textContent = "No market selected.";
+
+      const { data, error } = await supabase
+        .from("markets")
+        .select("id, market_name, city, country, status, lat, lng, suggested_by_email")
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error loading pending markets:", error);
+        setStatus(marketsStatus, "Error loading pending markets.", true);
+        return;
       }
 
-      const actions = document.createElement("div");
-      actions.className = "admin-actions";
+      if (!data || !data.length) {
+        setStatus(marketsStatus, "No pending markets. 🎉", false);
+        marketsList.innerHTML = "";
+        return;
+      }
 
-      const approveBtn = document.createElement("button");
-      approveBtn.className = "btn-approve";
-      approveBtn.textContent = "Approve";
-      approveBtn.addEventListener("click", () => approveMarket(m.id));
+      pendingMarkets = data;
+      setStatus(marketsStatus, "", false);
 
-      const rejectBtn = document.createElement("button");
-      rejectBtn.className = "btn-reject";
-      rejectBtn.textContent = "Reject";
-      rejectBtn.addEventListener("click", () => rejectMarket(m.id));
+      data.forEach((m) => {
+        const item = document.createElement("div");
+        item.className = "market-item";
+        item.dataset.marketId = m.id;
 
-      actions.appendChild(approveBtn);
-      actions.appendChild(rejectBtn);
+        const name = document.createElement("div");
+        name.className = "market-name";
+        name.textContent = m.market_name;
 
-      meta.appendChild(title);
-      meta.appendChild(sub);
-      meta.appendChild(tagsRow);
-      meta.appendChild(actions);
+        const meta = document.createElement("div");
+        meta.className = "market-meta";
+        meta.textContent = `${m.city}, ${m.country}`;
 
-      wrapper.appendChild(thumbDiv);
-      wrapper.appendChild(meta);
+        const email = document.createElement("div");
+        email.className = "market-email";
+        email.textContent = m.suggested_by_email
+          ? `Suggested by: ${m.suggested_by_email}`
+          : "Suggested by: unknown";
 
-      marketsView.appendChild(wrapper);
-    });
-  }
+        const locText = document.createElement("div");
+        locText.className = "market-location-text";
+        if (m.lat != null && m.lng != null) {
+          locText.textContent =
+            `Current coordinates: lat ${m.lat.toFixed(5)}, lng ${m.lng.toFixed(5)}`;
+        } else {
+          locText.textContent = "No coordinates set yet.";
+        }
 
-  async function approveMarket(marketId) {
-    if (!isAdmin) return;
-    const { error } = await supabase
-      .from("markets")
-      .update({ status: "approved" })
-      .eq("id", marketId);
+        const actions = document.createElement("div");
+        actions.className = "market-actions";
 
-    if (error) {
-      console.error("Error approving market:", error);
-      adminError.textContent =
-        "Failed to approve market:\n" + (error.message || "");
-      return;
+        const centroidBtn = document.createElement("button");
+        centroidBtn.className = "btn-secondary";
+        centroidBtn.textContent = "Use City Centroid";
+        centroidBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          geocodeMarketCentroid(m.id, locText);
+        });
+
+        const approveBtn = document.createElement("button");
+        approveBtn.className = "btn-approve";
+        approveBtn.textContent = "Approve";
+        approveBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          handleMarketApproval(m.id, true);
+        });
+
+        const rejectBtn = document.createElement("button");
+        rejectBtn.className = "btn-reject";
+        rejectBtn.textContent = "Reject";
+        rejectBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          handleMarketApproval(m.id, false);
+        });
+
+        actions.appendChild(centroidBtn);
+        actions.appendChild(approveBtn);
+        actions.appendChild(rejectBtn);
+
+        item.appendChild(name);
+        item.appendChild(meta);
+        item.appendChild(email);
+        item.appendChild(locText);
+        item.appendChild(actions);
+
+        item.addEventListener("click", () => {
+          selectMarket(m.id, item, locText);
+        });
+
+        marketsList.appendChild(item);
+      });
     }
-    adminError.textContent = "";
-    await loadPendingMarkets();
-  }
 
-  async function rejectMarket(marketId) {
-    if (!isAdmin) return;
-    const confirmed = confirm(
-      "Reject this market? It will be marked as rejected (you can still keep the row if you want future reference)."
-    );
-    if (!confirmed) return;
+    function selectMarket(marketId, itemEl, locTextEl) {
+      selectedMarketId = marketId;
+      if (coordsLabel) coordsLabel.textContent = "";
 
-    const { error } = await supabase
-      .from("markets")
-      .update({ status: "rejected" })
-      .eq("id", marketId);
+      document
+        .querySelectorAll(".market-item")
+        .forEach((el) => el.classList.remove("selected"));
+      itemEl.classList.add("selected");
 
-    if (error) {
-      console.error("Error rejecting market:", error);
-      adminError.textContent =
-        "Failed to reject market:\n" + (error.message || "");
-      return;
+      const market = pendingMarkets.find((m) => m.id === marketId);
+      if (!market) return;
+
+      const coords = coordsByMarket[market.id] || {
+        lat: market.lat,
+        lng: market.lng,
+      };
+
+      if (coords && coords.lat != null && coords.lng != null && adminMap) {
+        if (adminMapMarker) adminMapMarker.remove();
+        adminMapMarker = L.marker([coords.lat, coords.lng]).addTo(adminMap);
+        adminMap.setView([coords.lat, coords.lng], 10);
+
+        locTextEl.textContent =
+          `Current coordinates: lat ${coords.lat.toFixed(5)}, lng ${coords.lng.toFixed(5)}`;
+      }
+
+      updateCoordsLabel(market);
     }
-    adminError.textContent = "";
-    await loadPendingMarkets();
-  }
-</script>
 
+    async function geocodeMarketCentroid(marketId, locTextEl) {
+      const market = pendingMarkets.find((m) => m.id === marketId);
+      if (!market) return;
+
+      const q = encodeURIComponent(`${market.city}, ${market.country}`);
+      locTextEl.textContent = "Looking up city centroid…";
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`,
+          {
+            headers: {
+              "Accept": "application/json"
+            }
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data || !data.length) {
+          locTextEl.textContent = "No centroid found for this city.";
+          return;
+        }
+
+        const hit = data[0];
+        const lat = parseFloat(hit.lat);
+        const lng = parseFloat(hit.lon);
+
+        coordsByMarket[marketId] = { lat, lng };
+
+        if (adminMap) {
+          if (adminMapMarker) adminMapMarker.remove();
+          adminMapMarker = L.marker([lat, lng]).addTo(adminMap);
+          adminMap.setView([lat, lng], 11);
+        }
+
+        locTextEl.textContent =
+          `City centroid: lat ${lat.toFixed(5)}, lng ${lng.toFixed(5)} (from OpenStreetMap)`;
+
+        if (marketId === selectedMarketId) {
+          updateCoordsLabel(market);
+        }
+      } catch (err) {
+        console.error("Error geocoding centroid:", err);
+        locTextEl.textContent = "Error fetching centroid. Try clicking on the map instead.";
+      }
+    }
+
+    async function handleMarketApproval(marketId, approve) {
+      const market = pendingMarkets.find((m) => m.id === marketId);
+      if (!market) return;
+
+      if (!approve) {
+        const { error } = await supabase
+          .from("markets")
+          .update({ status: "rejected" })
+          .eq("id", marketId);
+
+        if (error) {
+          console.error("Error rejecting market:", error);
+          alert("Error rejecting market. See console.");
+          return;
+        }
+        await loadPendingMarkets();
+        return;
+      }
+
+      const coords = coordsByMarket[marketId] || {
+        lat: market.lat,
+        lng: market.lng,
+      };
+
+      if (!coords || coords.lat == null || coords.lng == null) {
+        alert(
+          "This market doesn't have coordinates yet.\n\n" +
+          "Please either:\n" +
+          "• Click the market location on the map, or\n" +
+          "• Use the 'Use City Centroid' button,\n\n" +
+          "before approving."
+        );
+        return;
+      }
+
+      const updateData = {
+        status: "approved",
+        lat: coords.lat,
+        lng: coords.lng,
+      };
+
+      const { error } = await supabase
+        .from("markets")
+        .update(updateData)
+        .eq("id", marketId);
+
+      if (error) {
+        console.error("Error approving market:", error);
+        alert("Error approving market. See console.");
+        return;
+      }
+
+      await loadPendingMarkets();
+    }
+
+
+    // -------------------------------------------------------
+    // 4. Initialize admin data (after admin check)
+    // -------------------------------------------------------
+    async function initAdminUI() {
+      await loadPendingPhotos();
+      await loadPendingMarkets();
+      showPhotosTab();
+    }
+
+    // 🔚 Call initAuth only after everything is defined
+    await initAuth();
+  </script>
 </body>
 </html>
