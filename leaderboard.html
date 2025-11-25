@@ -1,605 +1,980 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mug Mapper – Leaderboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8" />
+<title>Mug Mapper – Leaderboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- W3CSS + global styles -->
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-  <link rel="stylesheet" href="styles.css" />
+<!-- W3CSS + global styles -->
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+<link rel="stylesheet" href="styles.css" />
 
-  <style>
-    body {
-      margin: 0;
-      background: #111827;
-      color: #f9fafb;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      padding-top: 58px;   /* sticky header */
-      padding-bottom: 48px;/* sticky footer */
-    }
+<style>
+body {
+margin: 0;
+background: #020617;
+color: #f9fafb;
+font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+padding-top: 58px; /* sticky header */
+padding-bottom: 48px;/* sticky footer */
+}
 
-    .leaderboard-container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 18px 16px 80px;
-    }
+.leaderboard-container {
+max-width: 1300px;
+margin: 0 auto;
+padding: 18px 16px 80px;
+}
 
-    .lb-card {
-      background: #1f2937;
-      border-radius: 14px;
-      border: 1px solid rgba(148,163,184,0.25);
-      padding: 18px 18px 22px;
-      margin-bottom: 16px;
-    }
+/* Filter bar */
+.lb-filters {
+background: #0f172a;
+border-radius: 14px;
+border: 1px solid rgba(148,163,184,0.3);
+padding: 10px 12px 12px;
+margin-bottom: 14px;
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+align-items: center;
+}
 
-    .lb-card-header {
-      margin-bottom: 10px;
-    }
+.lb-filters-title {
+font-size: 0.9rem;
+font-weight: 500;
+margin-right: 8px;
+white-space: nowrap;
+}
 
-    .lb-card-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
+.lb-filter-group {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+flex: 1;
+min-width: 200px;
+}
 
-    .lb-card-subtitle {
-      font-size: 0.8rem;
-      color: #9ca3af;
-    }
+.lb-select {
+border-radius: 999px;
+border: 1px solid #374151;
+background: #020617;
+color: #e5e7eb;
+padding: 4px 10px;
+font-size: 0.85rem;
+min-width: 140px;
+}
 
-    .lb-status {
-      font-size: 0.8rem;
-      margin-top: 4px;
-    }
+/* Stats row */
+.lb-stats-row {
+display: grid;
+grid-template-columns: repeat(3, minmax(0, 1fr));
+gap: 10px;
+margin-bottom: 14px;
+}
 
-    .lb-status.ok {
-      color: #a7f3d0;
-    }
+.lb-stat-card {
+background: #0f172a;
+border-radius: 14px;
+border: 1px solid rgba(148,163,184,0.3);
+padding: 10px 12px;
+display: flex;
+flex-direction: column;
+gap: 2px;
+}
 
-    .lb-status.err {
-      color: #fecaca;
-      white-space: pre-line;
-    }
+.lb-stat-label {
+font-size: 0.8rem;
+color: #9ca3af;
+}
 
-    /* Top uploaders list */
-    .lb-list {
-      list-style: none;
-      padding: 0;
-      margin: 10px 0 0;
-    }
+.lb-stat-value {
+font-size: 1.2rem;
+font-weight: 600;
+}
 
-    .lb-list-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(55,65,81,0.7);
-      font-size: 0.9rem;
-    }
+.lb-stat-pill {
+font-size: 0.7rem;
+color: #a5b4fc;
+}
 
-    .lb-list-item:last-child {
-      border-bottom: none;
-    }
+/* Two-column layout like an app dashboard */
+.leaderboard-layout {
+display: grid;
+grid-template-columns: minmax(0, 1fr);
+gap: 16px;
+}
 
-    .lb-rank-badge {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      font-weight: 600;
-      background: #020617;
-      border: 1px solid #4b5563;
-    }
+@media (min-width: 900px) {
+.leaderboard-layout {
+grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.1fr);
+}
+}
 
-    .lb-user-name {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+.lb-card {
+background: #020617;
+border-radius: 14px;
+border: 1px solid rgba(148,163,184,0.25);
+padding: 16px 16px 20px;
+}
 
-    .lb-user-display {
-      font-weight: 500;
-    }
+.lb-card-header {
+margin-bottom: 10px;
+}
 
-    .lb-count-pill {
-      font-size: 0.78rem;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: #020617;
-      border: 1px solid #4b5563;
-      color: #e5e7eb;
-      white-space: nowrap;
-    }
+.lb-card-title {
+font-size: 1.1rem;
+font-weight: 600;
+}
 
-    /* Top liked photos grid */
-    .lb-photos-grid {
-      margin-top: 10px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 10px;
-    }
+.lb-card-subtitle {
+font-size: 0.8rem;
+color: #9ca3af;
+}
 
-    .lb-photo-card {
-      background: #020617;
-      border-radius: 12px;
-      border: 1px solid rgba(55,65,81,0.85);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+.lb-status {
+font-size: 0.8rem;
+margin-top: 4px;
+}
 
-    .lb-photo-thumb img {
-      width: 100%;
-      height: 170px;
-      object-fit: cover;
-      display: block;
-    }
+.lb-status.ok {
+color: #a7f3d0;
+}
 
-    .lb-photo-body {
-      padding: 8px 10px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+.lb-status.err {
+color: #fecaca;
+white-space: pre-line;
+}
 
-    .lb-photo-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
+/* Top uploaders list */
+.lb-list {
+list-style: none;
+padding: 0;
+margin: 10px 0 0;
+}
 
-    .lb-photo-meta {
-      font-size: 0.78rem;
-      color: #9ca3af;
-    }
+.lb-list-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+padding: 8px 0;
+border-bottom: 1px solid rgba(55,65,81,0.7);
+font-size: 0.9rem;
+}
 
-    .lb-photo-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 2px;
-    }
+.lb-list-item:last-child {
+border-bottom: none;
+}
 
-    .lb-photo-tag {
-      font-size: 0.72rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: #111827;
-      color: #e5e7eb;
-    }
+.lb-rank-badge {
+width: 26px;
+height: 26px;
+border-radius: 999px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+font-size: 0.8rem;
+font-weight: 600;
+background: #0f172a;
+border: 1px solid #4b5563;
+}
 
-    .lb-photo-rank-pill {
-      font-size: 0.75rem;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: #fbbf24;
-      color: #111827;
-      font-weight: 600;
-      align-self: flex-start;
-      margin-bottom: 2px;
-    }
+.lb-user-name {
+display: flex;
+flex-direction: column;
+gap: 2px;
+}
 
-    .mm-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 48px;
-      background: #1f2937;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9980;
-      font-size: 0.9rem;
-      box-shadow: 0 -2px 4px rgba(15,23,42,0.4);
-    }
-  </style>
+.lb-user-display {
+font-weight: 500;
+}
+
+.lb-count-pill {
+font-size: 0.78rem;
+padding: 3px 10px;
+border-radius: 999px;
+background: #0f172a;
+border: 1px solid #4b5563;
+color: #e5e7eb;
+white-space: nowrap;
+}
+
+/* Top liked photos grid */
+.lb-photos-grid {
+margin-top: 10px;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+gap: 10px;
+}
+
+.lb-photo-card {
+background: #020617;
+border-radius: 12px;
+border: 1px solid rgba(55,65,81,0.85);
+overflow: hidden;
+display: flex;
+flex-direction: column;
+}
+
+.lb-photo-thumb img {
+width: 100%;
+height: 190px;
+object-fit: cover;
+display: block;
+}
+
+.lb-photo-body {
+padding: 8px 10px 10px;
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+
+.lb-photo-title {
+font-size: 0.9rem;
+font-weight: 600;
+}
+
+.lb-photo-meta {
+font-size: 0.78rem;
+color: #9ca3af;
+}
+
+.lb-photo-tags {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-top: 2px;
+}
+
+.lb-photo-tag {
+font-size: 0.72rem;
+padding: 2px 8px;
+border-radius: 999px;
+background: #111827;
+color: #e5e7eb;
+}
+
+.lb-photo-rank-pill {
+font-size: 0.75rem;
+padding: 2px 7px;
+border-radius: 999px;
+background: #fbbf24;
+color: #111827;
+font-weight: 600;
+align-self: flex-start;
+margin-bottom: 2px;
+}
+
+.mm-footer {
+position: fixed;
+bottom: 0;
+left: 0;
+right: 0;
+height: 48px;
+background: #020617;
+border-top: 1px solid rgba(30,64,175,0.7);
+color: #cbd5e1;
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 9980;
+font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+.lb-stats-row {
+grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+}
+</style>
 </head>
 
 <body>
 
-  <!-- Sticky header -->
-  <div id="mm-header"></div>
-
-  <div class="leaderboard-container">
-    <!-- Top uploaders -->
-    <section class="lb-card">
-      <div class="lb-card-header">
-        <div class="lb-card-title">Top Mug Uploaders</div>
-        <div class="lb-card-subtitle">Users with the most approved mug photos.</div>
-      </div>
-      <div id="topUploadersStatus" class="lb-status"></div>
-      <ul id="topUploadersList" class="lb-list"></ul>
-    </section>
-
-    <!-- Top liked photos -->
-    <section class="lb-card">
-      <div class="lb-card-header">
-        <div class="lb-card-title">Most Loved Mugs</div>
-        <div class="lb-card-subtitle">The most liked mug photos on Mug Mapper.</div>
-      </div>
-      <div id="topLikedStatus" class="lb-status"></div>
-      <div id="topLikedGrid" class="lb-photos-grid"></div>
-    </section>
-  </div>
-
-  <!-- Sticky footer -->
-  <footer class="mm-footer">
-    <div class="mm-footer-inner">© 2025 Mug Mapper</div>
-  </footer>
-
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-    /* ---------------------------------------------------------
-       1. Load shared header
-    --------------------------------------------------------- */
-    const headerHTML = await fetch("header.html").then((r) => r.text());
-    document.getElementById("mm-header").innerHTML = headerHTML;
-
-    // Wire menu
-    const mmHamburger   = document.getElementById("mmHamburger");
-    const mmNavOverlay  = document.getElementById("mmNavOverlay");
-    const mmNavClose    = document.getElementById("mmNavClose");
-    const navLinks      = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
-
-    function openNav() {
-      mmNavOverlay.style.display = "block";
-      mmNavOverlay.setAttribute("aria-hidden", "false");
-    }
-    function closeNav() {
-      mmNavOverlay.style.display = "none";
-      mmNavOverlay.setAttribute("aria-hidden", "true");
-    }
-
-    mmHamburger?.addEventListener("click", openNav);
-    mmNavClose?.addEventListener("click", closeNav);
-    navLinks.forEach((link) => link.addEventListener("click", closeNav));
-
-
-    /* ---------------------------------------------------------
-       2. Supabase Auth + Admin + Dashboard Link
-    --------------------------------------------------------- */
-    const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
-    const SUPABASE_ANON_KEY =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const authUserLabel      = document.getElementById("authUserLabel");
-    const authAvatar         = document.getElementById("authAvatar");
-    const adminContainer     = document.getElementById("adminLinkContainer");
-    const dashboardContainer = document.getElementById("dashboardLinkContainer");
-    const loginGoogleButton  = document.getElementById("loginGoogleButton");
-    const loginEmailButton   = document.getElementById("loginEmailButton");
-    const logoutButton       = document.getElementById("logoutButton");
-
-    let currentUser = null;
-    let isAdmin     = false;
-
-    function renderAdminLink() {
-      if (!adminContainer) return;
-      adminContainer.innerHTML = isAdmin
-        ? `<a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">🔧 Admin Panel</a>`
-        : "";
-    }
-
-    function renderDashboardLink() {
-      if (!dashboardContainer) return;
-      dashboardContainer.innerHTML = currentUser
-        ? `<a href="dashboard.html" class="mm-nav-link" style="color:#a5f3fc;font-weight:600;">👤 Dashboard</a>`
-        : "";
-    }
-
-    function updateAuthUI() {
-      if (!authUserLabel) return;
-
-      if (currentUser) {
-        const meta = currentUser.user_metadata || {};
-        const displayName = currentUser.email || meta.full_name || meta.name || currentUser.id;
-
-        const adminBadgeHTML = isAdmin
-          ? `<span style="
-              background:#f97316;
-              color:#111827;
-              font-size:0.7rem;
-              padding:2px 7px;
-              border-radius:999px;
-              font-weight:600;
-              letter-spacing:0.05em;
-            ">Admin</span>`
-          : "";
-
-        authUserLabel.innerHTML = `
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <span>${displayName}</span>
-            ${adminBadgeHTML}
-          </div>
-        `;
-
-        const avatarUrl = meta.avatar_url || meta.picture || null;
-        authAvatar.style.display = avatarUrl ? "block" : "none";
-        if (avatarUrl) authAvatar.src = avatarUrl;
-
-        loginGoogleButton.style.display = "none";
-        loginEmailButton.style.display  = "none";
-        logoutButton.style.display      = "block";
-      } else {
-        authUserLabel.textContent = "Not signed in";
-        authAvatar.style.display = "none";
-        loginGoogleButton.style.display = "block";
-        loginEmailButton.style.display  = "block";
-        logoutButton.style.display      = "none";
-      }
-
-      renderDashboardLink();
-    }
-
-    async function checkAdmin() {
-      if (!currentUser) {
-        isAdmin = false;
-        renderAdminLink();
-        updateAuthUI();
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("admin_users")
-        .select("user_id")
-        .eq("user_id", currentUser.id)
-        .maybeSingle();
-
-      isAdmin = !!data;
-      renderAdminLink();
-      updateAuthUI();
-    }
-
-    async function initAuth() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      currentUser = session?.user ?? null;
-      await checkAdmin();
-
-      supabase.auth.onAuthStateChange(async (_event, session) => {
-        currentUser = session?.user ?? null;
-        await checkAdmin();
-      });
-    }
-
-    loginGoogleButton?.addEventListener("click", async () => {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.href },
-      });
-      if (error) alert("Google sign-in error: " + error.message);
-    });
-
-    loginEmailButton?.addEventListener("click", async () => {
-      const email = prompt("Enter your email for a sign-in link:");
-      if (!email) return;
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.href },
-      });
-      if (error) alert("Email sign-in error: " + error.message);
-      else alert("Magic link sent. Check your inbox.");
-    });
-
-    logoutButton?.addEventListener("click", async () => {
-      await supabase.auth.signOut();
-    });
-
-    await initAuth();
-
-
-    /* ---------------------------------------------------------
-       3. Leaderboard logic
-    --------------------------------------------------------- */
-    const topUploadersList   = document.getElementById("topUploadersList");
-    const topUploadersStatus = document.getElementById("topUploadersStatus");
-    const topLikedGrid       = document.getElementById("topLikedGrid");
-    const topLikedStatus     = document.getElementById("topLikedStatus");
-
-    function setStatus(el, msg, isError = false) {
-      el.textContent = msg || "";
-      el.className = "lb-status " + (isError ? "err" : "ok");
-    }
-
-    function safeDisplayName(profile, fallbackEmail) {
-      if (profile?.display_name?.trim()) return profile.display_name;
-      if (fallbackEmail) {
-        const at = fallbackEmail.indexOf("@");
-        return at > 0 ? fallbackEmail.slice(0, at) : fallbackEmail;
-      }
-      return "Anonymous User";
-    }
-
-    async function loadTopUploaders() {
-      setStatus(topUploadersStatus, "Loading top uploaders…");
-
-      const { data: photos, error } = await supabase
-        .from("mug_photos")
-        .select("uploader_id, status")
-        .eq("status", "approved");
-
-      if (error) {
-        console.error(error);
-        return setStatus(topUploadersStatus, "Error loading uploaders.", true);
-      }
-
-      if (!photos?.length) {
-        return setStatus(topUploadersStatus, "No approved photos yet.");
-      }
-
-      const counts = new Map();
-      for (const row of photos) {
-        if (!row.uploader_id) continue;
-        counts.set(row.uploader_id, (counts.get(row.uploader_id) || 0) + 1);
-      }
-
-      const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-      const userIds = sorted.map(([id]) => id);
-
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", userIds);
-
-      const mapProfiles = new Map();
-      profiles?.forEach(p => mapProfiles.set(p.id, p));
-
-      topUploadersList.innerHTML = "";
-      sorted.forEach(([userId, count], i) => {
-        const li = document.createElement("li");
-        li.className = "lb-list-item";
-
-        const left = document.createElement("div");
-        left.style.display = "flex";
-        left.style.alignItems = "center";
-        left.style.gap = "8px";
-
-        const rank = document.createElement("div");
-        rank.className = "lb-rank-badge";
-        rank.textContent = i + 1;
-
-        const name = document.createElement("div");
-        name.className = "lb-user-name";
-
-        const displayName = safeDisplayName(mapProfiles.get(userId), null);
-
-        const displayEl = document.createElement("div");
-        displayEl.className = "lb-user-display";
-        displayEl.textContent = displayName;
-        name.appendChild(displayEl);
-
-        left.appendChild(rank);
-        left.appendChild(name);
-
-        const countEl = document.createElement("div");
-        countEl.className = "lb-count-pill";
-        countEl.textContent = `${count} approved photo${count === 1 ? "" : "s"}`;
-
-        li.appendChild(left);
-        li.appendChild(countEl);
-        topUploadersList.appendChild(li);
-      });
-
-      setStatus(topUploadersStatus, "");
-    }
-
-
-    async function loadTopLikedPhotos() {
-      setStatus(topLikedStatus, "Loading most loved mugs…");
-
-      const { data: photos, error } = await supabase
-        .from("mug_photos")
-        .select(`
-          id,
-          uploader_id,
-          public_url,
-          year,
-          like_count,
-          status,
-          created_at,
-          market_id,
-          markets (
-            market_name,
-            city,
-            country
-          )
-        `)
-        .eq("status", "approved")
-        .order("like_count", { ascending: false })
-        .order("created_at", { ascending: true })
-        .limit(20);
-
-      if (error) {
-        console.error(error);
-        return setStatus(topLikedStatus, "Error loading photos.", true);
-      }
-
-      if (!photos?.length) {
-        return setStatus(topLikedStatus, "No approved photos yet.");
-      }
-
-      const uploaderIds = [...new Set(photos.map(p => p.uploader_id))].filter(Boolean);
-
-      let profiles = [];
-      if (uploaderIds.length) {
-        const { data: profileRows } = await supabase
-          .from("profiles")
-          .select("id, display_name")
-          .in("id", uploaderIds);
-        profiles = profileRows || [];
-      }
-
-      const profMap = new Map();
-      profiles.forEach(p => profMap.set(p.id, p));
-
-      topLikedGrid.innerHTML = "";
-
-      photos.slice(0, 10).forEach((p, i) => {
-        const card = document.createElement("div");
-        card.className = "lb-photo-card";
-
-        const thumb = document.createElement("div");
-        thumb.className = "lb-photo-thumb";
-        const img = document.createElement("img");
-        img.src = p.public_url;
-        thumb.appendChild(img);
-
-        const body = document.createElement("div");
-        body.className = "lb-photo-body";
-
-        const rank = document.createElement("div");
-        rank.className = "lb-photo-rank-pill";
-        rank.textContent = `#${i + 1} Most Loved`;
-
-        const title = document.createElement("div");
-        title.className = "lb-photo-title";
-        title.textContent = p.markets?.market_name || "Mug Photo";
-
-        const meta = document.createElement("div");
-        meta.className = "lb-photo-meta";
-        const loc = p.markets ? `${p.markets.city}, ${p.markets.country}` : "Unknown";
-        meta.textContent = `${loc} · ${p.year || "Year N/A"}`;
-
-        const tags = document.createElement("div");
-        tags.className = "lb-photo-tags";
-
-        const likes = document.createElement("span");
-        likes.className = "lb-photo-tag";
-        likes.textContent = `${p.like_count} like${p.like_count === 1 ? "" : "s"}`;
-
-        const uploaderName = safeDisplayName(profMap.get(p.uploader_id), null);
-        const uploaderTag = document.createElement("span");
-        uploaderTag.className = "lb-photo-tag";
-        uploaderTag.textContent = `Uploaded by ${uploaderName}`;
-
-        tags.appendChild(likes);
-        tags.appendChild(uploaderTag);
-
-        body.appendChild(rank);
-        body.appendChild(title);
-        body.appendChild(meta);
-        body.appendChild(tags);
-
-        card.appendChild(thumb);
-        card.appendChild(body);
-        topLikedGrid.appendChild(card);
-      });
-
-      setStatus(topLikedStatus, "");
-    }
-
-    await Promise.all([loadTopUploaders(), loadTopLikedPhotos()]);
-  </script>
+<!-- Sticky header -->
+<div id="mm-header"></div>
+
+<div class="leaderboard-container">
+<!-- Filters bar -->
+<div class="lb-filters">
+<div class="lb-filters-title">Filters</div>
+<div class="lb-filter-group">
+<select id="filterCountry" class="lb-select">
+<option value="all">🌍 All countries</option>
+</select>
+<select id="filterYear" class="lb-select">
+<option value="all">📅 All years</option>
+</select>
+<select id="filterMarket" class="lb-select">
+<option value="all">🎪 All markets</option>
+</select>
+</div>
+</div>
+
+<!-- Stats row -->
+<div class="lb-stats-row">
+<div class="lb-stat-card">
+<div class="lb-stat-label">Approved photos</div>
+<div class="lb-stat-value" id="statPhotos">–</div>
+<div class="lb-stat-pill">After filters</div>
+</div>
+<div class="lb-stat-card">
+<div class="lb-stat-label">Active uploaders</div>
+<div class="lb-stat-value" id="statUploaders">–</div>
+<div class="lb-stat-pill">Unique users</div>
+</div>
+<div class="lb-stat-card">
+<div class="lb-stat-label">Markets</div>
+<div class="lb-stat-value" id="statMarkets">–</div>
+<div class="lb-stat-pill">With approved photos</div>
+</div>
+</div>
+
+<!-- Two-column "Instagram style" layout -->
+<div class="leaderboard-layout">
+<!-- Left: Top uploaders -->
+<section class="lb-card">
+<div class="lb-card-header">
+<div class="lb-card-title">Top Mug Uploaders</div>
+<div class="lb-card-subtitle">Users with the most approved mug photos.</div>
+</div>
+<div id="topUploadersStatus" class="lb-status"></div>
+<ul id="topUploadersList" class="lb-list"></ul>
+</section>
+
+<!-- Right: Top liked photos -->
+<section class="lb-card">
+<div class="lb-card-header">
+<div class="lb-card-title">Most Loved Mugs</div>
+<div class="lb-card-subtitle">The most liked mug photos on Mug Mapper.</div>
+</div>
+<div id="topLikedStatus" class="lb-status"></div>
+<div id="topLikedGrid" class="lb-photos-grid"></div>
+</section>
+</div>
+</div>
+
+<!-- Sticky footer -->
+<footer class="mm-footer">
+<div class="mm-footer-inner">© 2025 Mug Mapper</div>
+</footer>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+/* ---------------------------------------------------------
+1. Load shared header
+--------------------------------------------------------- */
+const headerHTML = await fetch("header.html").then((r) => r.text());
+document.getElementById("mm-header").innerHTML = headerHTML;
+
+const mmHamburger = document.getElementById("mmHamburger");
+const mmNavOverlay = document.getElementById("mmNavOverlay");
+const mmNavClose = document.getElementById("mmNavClose");
+const navLinks = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
+
+function openNav() {
+mmNavOverlay.style.display = "block";
+mmNavOverlay.setAttribute("aria-hidden", "false");
+}
+function closeNav() {
+mmNavOverlay.style.display = "none";
+mmNavOverlay.setAttribute("aria-hidden", "true");
+}
+mmHamburger?.addEventListener("click", openNav);
+mmNavClose?.addEventListener("click", closeNav);
+navLinks.forEach((link) => link.addEventListener("click", closeNav));
+
+
+/* ---------------------------------------------------------
+2. Supabase Auth + Admin + Dashboard Link
+--------------------------------------------------------- */
+const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+const SUPABASE_ANON_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const authUserLabel = document.getElementById("authUserLabel");
+const authAvatar = document.getElementById("authAvatar");
+const adminContainer = document.getElementById("adminLinkContainer");
+const dashboardContainer = document.getElementById("dashboardLinkContainer");
+const loginGoogleButton = document.getElementById("loginGoogleButton");
+const loginEmailButton = document.getElementById("loginEmailButton");
+const logoutButton = document.getElementById("logoutButton");
+
+let currentUser = null;
+let isAdmin = false;
+
+function renderAdminLink() {
+if (!adminContainer) return;
+adminContainer.innerHTML = isAdmin
+? `<a href="admin.html" class="mm-nav-link" style="color:#facc15;font-weight:600;">🔧 Admin Panel</a>`
+: "";
+}
+
+function renderDashboardLink() {
+if (!dashboardContainer) return;
+dashboardContainer.innerHTML = currentUser
+? `<a href="dashboard.html" class="mm-nav-link" style="color:#a5f3fc;font-weight:600;">👤 Dashboard</a>`
+: "";
+}
+
+function updateAuthUI() {
+if (!authUserLabel) return;
+
+if (currentUser) {
+const meta = currentUser.user_metadata || {};
+const displayName = currentUser.email || meta.full_name || meta.name || currentUser.id;
+
+const adminBadgeHTML = isAdmin
+? `<span style="
+background:#f97316;
+color:#111827;
+font-size:0.7rem;
+padding:2px 7px;
+border-radius:999px;
+font-weight:600;
+letter-spacing:0.05em;
+">Admin</span>`
+: "";
+
+authUserLabel.innerHTML = `
+<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+<span>${displayName}</span>
+${adminBadgeHTML}
+</div>
+`;
+
+const avatarUrl = meta.avatar_url || meta.picture || null;
+authAvatar.style.display = avatarUrl ? "block" : "none";
+if (avatarUrl) authAvatar.src = avatarUrl;
+
+loginGoogleButton.style.display = "none";
+loginEmailButton.style.display = "none";
+logoutButton.style.display = "block";
+} else {
+authUserLabel.textContent = "Not signed in";
+authAvatar.style.display = "none";
+loginGoogleButton.style.display = "block";
+loginEmailButton.style.display = "block";
+logoutButton.style.display = "none";
+}
+
+renderDashboardLink();
+}
+
+async function checkAdmin() {
+if (!currentUser) {
+isAdmin = false;
+renderAdminLink();
+updateAuthUI();
+return;
+}
+
+const { data, error } = await supabase
+.from("admin_users")
+.select("user_id")
+.eq("user_id", currentUser.id)
+.maybeSingle();
+
+isAdmin = !!data;
+renderAdminLink();
+updateAuthUI();
+}
+
+async function initAuth() {
+const {
+data: { session },
+} = await supabase.auth.getSession();
+
+currentUser = session?.user ?? null;
+await checkAdmin();
+
+supabase.auth.onAuthStateChange(async (_event, session) => {
+currentUser = session?.user ?? null;
+await checkAdmin();
+});
+}
+
+loginGoogleButton?.addEventListener("click", async () => {
+const { error } = await supabase.auth.signInWithOAuth({
+provider: "google",
+options: { redirectTo: window.location.href },
+});
+if (error) alert("Google sign-in error: " + error.message);
+});
+
+loginEmailButton?.addEventListener("click", async () => {
+const email = prompt("Enter your email for a sign-in link:");
+if (!email) return;
+const { error } = await supabase.auth.signInWithOtp({
+email,
+options: { emailRedirectTo: window.location.href },
+});
+if (error) alert("Email sign-in error: " + error.message);
+else alert("Magic link sent. Check your inbox.");
+});
+
+logoutButton?.addEventListener("click", async () => {
+await supabase.auth.signOut();
+});
+
+await initAuth();
+
+
+/* ---------------------------------------------------------
+3. Filters + Stats state
+--------------------------------------------------------- */
+const filterCountry = document.getElementById("filterCountry");
+const filterYear = document.getElementById("filterYear");
+const filterMarket = document.getElementById("filterMarket");
+
+const statPhotos = document.getElementById("statPhotos");
+const statUploaders = document.getElementById("statUploaders");
+const statMarkets = document.getElementById("statMarkets");
+
+const topUploadersList = document.getElementById("topUploadersList");
+const topUploadersStatus = document.getElementById("topUploadersStatus");
+const topLikedGrid = document.getElementById("topLikedGrid");
+const topLikedStatus = document.getElementById("topLikedStatus");
+
+let currentFilters = {
+country: "all",
+year: "all",
+marketId: "all",
+};
+
+let marketsCache = []; // markets that have at least one approved photo
+
+
+function setStatus(el, msg, isError = false) {
+el.textContent = msg || "";
+el.className = "lb-status " + (isError ? "err" : "ok");
+}
+
+function safeDisplayName(profile, fallbackEmail) {
+if (profile?.display_name?.trim()) return profile.display_name;
+if (fallbackEmail) {
+const at = fallbackEmail.indexOf("@");
+return at > 0 ? fallbackEmail.slice(0, at) : fallbackEmail;
+}
+return "Anonymous User";
+}
+
+
+/* ---------------------------------------------------------
+4. Load filter options
+--------------------------------------------------------- */
+async function loadFilterOptions() {
+try {
+// Markets that actually have approved photos
+const { data: photoRows, error: phErr } = await supabase
+.from("mug_photos")
+.select("market_id, status, year")
+.eq("status", "approved");
+
+if (phErr) {
+console.error(phErr);
+return;
+}
+
+if (!photoRows?.length) {
+// No approved photos yet
+marketsCache = [];
+// Years
+setYearOptions([]);
+// Countries/markets
+setCountryOptions([]);
+setMarketOptions([]);
+return;
+}
+
+// Years from mug_photos
+const yearSet = new Set(
+photoRows
+.map((p) => p.year)
+.filter((y) => y !== null && y !== undefined)
+);
+const years = [...yearSet].sort((a, b) => b - a);
+setYearOptions(years);
+
+// Distinct market_ids
+const marketIdSet = new Set(
+photoRows.map((p) => p.market_id).filter(Boolean)
+);
+const marketIds = [...marketIdSet];
+
+if (marketIds.length === 0) {
+marketsCache = [];
+setCountryOptions([]);
+setMarketOptions([]);
+return;
+}
+
+const { data: markets, error: mkErr } = await supabase
+.from("markets")
+.select("id, market_name, city, country, status")
+.in("id", marketIds)
+.eq("status", "approved");
+
+if (mkErr) {
+console.error(mkErr);
+return;
+}
+
+marketsCache = markets || [];
+
+const countrySet = new Set(
+marketsCache
+.map((m) => m.country)
+.filter((c) => !!c)
+);
+const countries = [...countrySet].sort((a, b) =>
+a.localeCompare(b, undefined, { sensitivity: "base" })
+);
+
+setCountryOptions(countries);
+setMarketOptions(marketsCache, currentFilters.country);
+} catch (e) {
+console.error("Error loading filter options:", e);
+}
+}
+
+function setYearOptions(years) {
+filterYear.innerHTML = `<option value="all">📅 All years</option>`;
+years.forEach((y) => {
+const opt = document.createElement("option");
+opt.value = String(y);
+opt.textContent = y;
+filterYear.appendChild(opt);
+});
+}
+
+function setCountryOptions(countries) {
+filterCountry.innerHTML = `<option value="all">🌍 All countries</option>`;
+countries.forEach((c) => {
+const opt = document.createElement("option");
+opt.value = c;
+opt.textContent = c;
+filterCountry.appendChild(opt);
+});
+}
+
+function setMarketOptions(markets, countryFilter = "all") {
+filterMarket.innerHTML = `<option value="all">🎪 All markets</option>`;
+
+const filtered =
+countryFilter === "all"
+? markets
+: markets.filter((m) => m.country === countryFilter);
+
+// Sort by country > city > market_name
+filtered
+.slice()
+.sort((a, b) => {
+const c = a.country.localeCompare(b.country, undefined, { sensitivity: "base" });
+if (c !== 0) return c;
+const city = a.city.localeCompare(b.city, undefined, { sensitivity: "base" });
+if (city !== 0) return city;
+return a.market_name.localeCompare(b.market_name, undefined, { sensitivity: "base" });
+})
+.forEach((m) => {
+const opt = document.createElement("option");
+opt.value = m.id;
+opt.textContent = `${m.market_name} (${m.city})`;
+filterMarket.appendChild(opt);
+});
+}
+
+
+/* ---------------------------------------------------------
+5. Filter change handlers
+--------------------------------------------------------- */
+filterCountry.addEventListener("change", () => {
+currentFilters.country = filterCountry.value;
+// Reset market when country changes
+setMarketOptions(marketsCache, currentFilters.country);
+currentFilters.marketId = "all";
+filterMarket.value = "all";
+reloadLeaderboards();
+});
+
+filterYear.addEventListener("change", () => {
+currentFilters.year = filterYear.value;
+reloadLeaderboards();
+});
+
+filterMarket.addEventListener("change", () => {
+currentFilters.marketId = filterMarket.value;
+reloadLeaderboards();
+});
+
+
+/* ---------------------------------------------------------
+6. Leaderboard logic (Top uploaders + Top liked)
+--------------------------------------------------------- */
+function updateStats({ totalPhotos, uploaderCount, marketCount }) {
+statPhotos.textContent = totalPhotos ?? "0";
+statUploaders.textContent = uploaderCount ?? "0";
+statMarkets.textContent = marketCount ?? "0";
+}
+
+function applyFiltersToQuery(queryBuilder) {
+const { country, year, marketId } = currentFilters;
+
+if (year !== "all") {
+queryBuilder = queryBuilder.eq("year", Number(year));
+}
+if (marketId !== "all") {
+queryBuilder = queryBuilder.eq("market_id", marketId);
+}
+if (country !== "all") {
+// filter via joined markets table
+queryBuilder = queryBuilder.eq("markets.country", country);
+}
+
+return queryBuilder;
+}
+
+async function loadTopUploaders() {
+setStatus(topUploadersStatus, "Loading top uploaders…");
+
+let query = supabase
+.from("mug_photos")
+.select(`
+uploader_id,
+status,
+year,
+market_id,
+markets (id, country)
+`)
+.eq("status", "approved");
+
+query = applyFiltersToQuery(query);
+
+const { data: photos, error } = await query;
+
+if (error) {
+console.error(error);
+setStatus(topUploadersStatus, "Error loading uploaders.", true);
+updateStats({ totalPhotos: 0, uploaderCount: 0, marketCount: 0 });
+topUploadersList.innerHTML = "";
+return;
+}
+
+if (!photos?.length) {
+setStatus(topUploadersStatus, "No approved photos match these filters.");
+updateStats({ totalPhotos: 0, uploaderCount: 0, marketCount: 0 });
+topUploadersList.innerHTML = "";
+return;
+}
+
+// Stats
+const totalPhotos = photos.length;
+const uploaderSet = new Set(
+photos.map((p) => p.uploader_id).filter(Boolean)
+);
+const marketSet = new Set(
+photos.map((p) => p.market_id).filter(Boolean)
+);
+updateStats({
+totalPhotos,
+uploaderCount: uploaderSet.size,
+marketCount: marketSet.size,
+});
+
+// Count uploads per uploader
+const counts = new Map();
+for (const row of photos) {
+if (!row.uploader_id) continue;
+counts.set(row.uploader_id, (counts.get(row.uploader_id) || 0) + 1);
+}
+
+const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+const userIds = sorted.map(([id]) => id);
+
+if (!userIds.length) {
+setStatus(topUploadersStatus, "No uploaders found.");
+topUploadersList.innerHTML = "";
+return;
+}
+
+const { data: profiles, error: pErr } = await supabase
+.from("profiles")
+.select("id, display_name")
+.in("id", userIds);
+
+if (pErr) {
+console.error(pErr);
+}
+
+const mapProfiles = new Map();
+profiles?.forEach((p) => mapProfiles.set(p.id, p));
+
+topUploadersList.innerHTML = "";
+sorted.forEach(([userId, count], i) => {
+const li = document.createElement("li");
+li.className = "lb-list-item";
+
+const left = document.createElement("div");
+left.style.display = "flex";
+left.style.alignItems = "center";
+left.style.gap = "8px";
+
+const rank = document.createElement("div");
+rank.className = "lb-rank-badge";
+rank.textContent = i + 1;
+
+const name = document.createElement("div");
+name.className = "lb-user-name";
+
+const displayName = safeDisplayName(mapProfiles.get(userId), null);
+const displayEl = document.createElement("div");
+displayEl.className = "lb-user-display";
+displayEl.textContent = displayName;
+name.appendChild(displayEl);
+
+left.appendChild(rank);
+left.appendChild(name);
+
+const countEl = document.createElement("div");
+countEl.className = "lb-count-pill";
+countEl.textContent = `${count} approved photo${count === 1 ? "" : "s"}`;
+
+li.appendChild(left);
+li.appendChild(countEl);
+topUploadersList.appendChild(li);
+});
+
+setStatus(topUploadersStatus, "");
+}
+
+async function loadTopLikedPhotos() {
+setStatus(topLikedStatus, "Loading most loved mugs…");
+topLikedGrid.innerHTML = "";
+
+let query = supabase
+.from("mug_photos")
+.select(`
+id,
+uploader_id,
+public_url,
+year,
+like_count,
+status,
+created_at,
+market_id,
+markets (
+market_name,
+city,
+country
+)
+`)
+.eq("status", "approved")
+.order("like_count", { ascending: false })
+.order("created_at", { ascending: true });
+
+query = applyFiltersToQuery(query);
+
+const { data: photos, error } = await query.limit(20);
+
+if (error) {
+console.error(error);
+setStatus(topLikedStatus, "Error loading photos.", true);
+return;
+}
+
+if (!photos?.length) {
+setStatus(topLikedStatus, "No approved photos match these filters.");
+return;
+}
+
+const uploaderIds = [...new Set(photos.map((p) => p.uploader_id))].filter(Boolean);
+
+let profMap = new Map();
+if (uploaderIds.length) {
+const { data: profileRows, error: pErr } = await supabase
+.from("profiles")
+.select("id, display_name")
+.in("id", uploaderIds);
+
+if (pErr) {
+console.error(pErr);
+} else {
+profileRows?.forEach((p) => profMap.set(p.id, p));
+}
+}
+
+const top = photos.slice(0, 10);
+topLikedGrid.innerHTML = "";
+
+top.forEach((p, i) => {
+const card = document.createElement("div");
+card.className = "lb-photo-card";
+
+const thumb = document.createElement("div");
+thumb.className = "lb-photo-thumb";
+const img = document.createElement("img");
+img.src = p.public_url;
+img.alt = "Mug photo";
+thumb.appendChild(img);
+
+const body = document.createElement("div");
+body.className = "lb-photo-body";
+
+const rank = document.createElement("div");
+rank.className = "lb-photo-rank-pill";
+rank.textContent = `#${i + 1} Most Loved`;
+
+const title = document.createElement("div");
+title.className = "lb-photo-title";
+title.textContent = p.markets?.market_name || "Mug Photo";
+
+const meta = document.createElement("div");
+meta.className = "lb-photo-meta";
+const loc = p.markets ? `${p.markets.city}, ${p.markets.country}` : "Unknown";
+meta.textContent = `${loc} · ${p.year || "Year N/A"}`;
+
+const tags = document.createElement("div");
+tags.className = "lb-photo-tags";
+
+const likes = document.createElement("span");
+likes.className = "lb-photo-tag";
+likes.textContent = `${p.like_count ?? 0} like${(p.like_count ?? 0) === 1 ? "" : "s"}`;
+
+const uploaderProfile = profMap.get(p.uploader_id);
+const uploaderName = safeDisplayName(uploaderProfile, null);
+const uploaderTag = document.createElement("span");
+uploaderTag.className = "lb-photo-tag";
+uploaderTag.textContent = `Uploaded by ${uploaderName}`;
+
+tags.appendChild(likes);
+tags.appendChild(uploaderTag);
+
+body.appendChild(rank);
+body.appendChild(title);
+body.appendChild(meta);
+body.appendChild(tags);
+
+card.appendChild(thumb);
+card.appendChild(body);
+topLikedGrid.appendChild(card);
+});
+
+setStatus(topLikedStatus, "");
+}
+
+async function reloadLeaderboards() {
+await Promise.all([loadTopUploaders(), loadTopLikedPhotos()]);
+}
+
+/* ---------------------------------------------------------
+7. Init
+--------------------------------------------------------- */
+await loadFilterOptions();
+await reloadLeaderboards();
+</script>
 
 </body>
 </html>
