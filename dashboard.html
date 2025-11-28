@@ -296,6 +296,33 @@
     // 1) Initialize header & auth
     await initHeader();
     await initAuth();
+
+    // Get logged-in user from global auth state
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const currentUser = session?.user ?? null;
+    const userEmailInput = document.getElementById("userEmail");
+    let isAdmin       = false;
+    let currentPrefs  = null;
+    let currentProfile = null;
+    let myPhotos      = [];
+
+    if (!currentUser) {
+      document.getElementById("photosStatus").textContent = "Please sign in to see your dashboard.";
+      document.getElementById("photosStatus").classList.add("err");
+      // Do not load anything else
+    } else {
+      // Load dashboard data
+      userEmailInput.value = currentUser.email || "";
+      await Promise.all([
+        loadProfile(),
+        loadEmailPreferences(),
+        loadMyPhotos(),
+      ]);
+    }
+
     // import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     // // ---------------------------
@@ -332,26 +359,26 @@
 
     // const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const authUserLabel     = document.getElementById("authUserLabel");
-    const authAvatar        = document.getElementById("authAvatar");
-    const adminContainer    = document.getElementById("adminLinkContainer");
-    const loginGoogleButton = document.getElementById("loginGoogleButton");
-    const loginEmailButton  = document.getElementById("loginEmailButton");
-    const logoutButton      = document.getElementById("logoutButton");
+    // const authUserLabel     = document.getElementById("authUserLabel");
+    // const authAvatar        = document.getElementById("authAvatar");
+    // const adminContainer    = document.getElementById("adminLinkContainer");
+    // const loginGoogleButton = document.getElementById("loginGoogleButton");
+    // const loginEmailButton  = document.getElementById("loginEmailButton");
+    // const logoutButton      = document.getElementById("logoutButton");
 
-    const userEmailInput       = document.getElementById("userEmail");
-    const displayNameInput     = document.getElementById("displayNameInput");
-    const unsubscribeCheckbox  = document.getElementById("unsubscribeCheckbox");
-    const saveSettingsBtn      = document.getElementById("saveSettingsBtn");
-    const settingsStatus       = document.getElementById("settingsStatus");
-    const myPhotosList         = document.getElementById("myPhotosList");
-    const photosStatus         = document.getElementById("photosStatus");
+    // const userEmailInput       = document.getElementById("userEmail");
+    // const displayNameInput     = document.getElementById("displayNameInput");
+    // const unsubscribeCheckbox  = document.getElementById("unsubscribeCheckbox");
+    // const saveSettingsBtn      = document.getElementById("saveSettingsBtn");
+    // const settingsStatus       = document.getElementById("settingsStatus");
+    // const myPhotosList         = document.getElementById("myPhotosList");
+    // const photosStatus         = document.getElementById("photosStatus");
 
-    let currentUser   = null;
-    let isAdmin       = false;
-    let currentPrefs  = null;
-    let currentProfile = null;
-    let myPhotos      = [];
+    // let currentUser   = null;
+    // let isAdmin       = false;
+    // let currentPrefs  = null;
+    // let currentProfile = null;
+    // let myPhotos      = [];
 
     // function renderAdminLink() {
     //   if (!adminContainer) return;
@@ -447,46 +474,46 @@
     //   updateAuthUI();
     // }
 
-    async function initAuth() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    // async function initAuth() {
+    //   const {
+    //     data: { session },
+    //   } = await supabase.auth.getSession();
 
-      currentUser = session?.user ?? null;
-      if (!currentUser) {
-        userEmailInput.value = "";
-      } else {
-        userEmailInput.value = currentUser.email || "";
-      }
+    //   currentUser = session?.user ?? null;
+    //   if (!currentUser) {
+    //     userEmailInput.value = "";
+    //   } else {
+    //     userEmailInput.value = currentUser.email || "";
+    //   }
 
-      await checkAdmin();
+    //   await checkAdmin();
 
-      if (currentUser) {
-        await Promise.all([
-          loadProfile(),
-          loadEmailPreferences(),
-          loadMyPhotos(),
-        ]);
-      }
+    //   if (currentUser) {
+    //     await Promise.all([
+    //       loadProfile(),
+    //       loadEmailPreferences(),
+    //       loadMyPhotos(),
+    //     ]);
+    //   }
 
-      supabase.auth.onAuthStateChange(async (_event, session) => {
-        currentUser = session?.user ?? null;
-        if (!currentUser) {
-          userEmailInput.value = "";
-          displayNameInput.value = "";
-          unsubscribeCheckbox.checked = false;
-          myPhotosList.innerHTML = "";
-        } else {
-          userEmailInput.value = currentUser.email || "";
-          await checkAdmin();
-          await Promise.all([
-            loadProfile(),
-            loadEmailPreferences(),
-            loadMyPhotos(),
-          ]);
-        }
-      });
-    }
+    //   supabase.auth.onAuthStateChange(async (_event, session) => {
+    //     currentUser = session?.user ?? null;
+    //     if (!currentUser) {
+    //       userEmailInput.value = "";
+    //       displayNameInput.value = "";
+    //       unsubscribeCheckbox.checked = false;
+    //       myPhotosList.innerHTML = "";
+    //     } else {
+    //       userEmailInput.value = currentUser.email || "";
+    //       await checkAdmin();
+    //       await Promise.all([
+    //         loadProfile(),
+    //         loadEmailPreferences(),
+    //         loadMyPhotos(),
+    //       ]);
+    //     }
+    //   });
+    // }
 
     // loginGoogleButton?.addEventListener("click", async () => {
     //   const { error } = await supabase.auth.signInWithOAuth({
