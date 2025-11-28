@@ -361,7 +361,7 @@ main {
 }
 
 .lightbox-close {
-  top: 0.8rem;
+  top: 3.0rem; 
   right: 0.8rem;
   transform: none;
 }
@@ -421,7 +421,11 @@ main {
 
 .mm-nav-overlay {
   position: fixed;
-  inset: 0;
+  /*inset: 0;*/
+  top: 58px; /* exact header height */
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(15, 23, 42, 0.96);
   display: none;
   z-index: 9998;
@@ -437,13 +441,14 @@ main {
 }
 
 .mm-nav-close {
-  align-self: flex-end;
+  position: absolute;
+  top: 0px;
+  right: 18px;
   background: transparent;
   border: none;
-  color: var(--text-main);
-  font-size: 1.6rem;
+  color: #f9fafb;
+  font-size: 28px;
   cursor: pointer;
-  margin-bottom: 0.6rem;
 }
 
 .mm-nav-link {

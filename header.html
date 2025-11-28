@@ -4,15 +4,31 @@
     <span class="mm-title"><a href="index.html">Mug Mapper</a></span>
   </div>
 
-  <div id="mmHamburger" class="mm-hamburger">
+  <!-- Hamburger (opens/closes nav overlay via page JS) -->
+  <button
+    id="mmHamburger"
+    class="mm-hamburger"
+    type="button"
+    aria-label="Open navigation"
+    aria-expanded="false"
+    aria-controls="mmNavOverlay"
+  >
     &#9776;
-  </div>
+  </button>
 </div>
 
 <!-- Fullscreen overlay menu -->
 <div id="mmNavOverlay" class="mm-nav-overlay" aria-hidden="true">
   <div class="mm-nav-content">
-    <button id="mmNavClose" class="mm-nav-close">&times;</button>
+    <!-- <button id="mmNavClose" class="mm-nav-close">&times;</button> -->
+    <button
+      id="mmNavClose"
+      class="mm-nav-close"
+      type="button"
+      aria-label="Close navigation"
+    >
+      &times;
+    </button>
 
         <a href="index.html" class="mm-nav-link">📌 2025 Map</a>
         <a href="upload.html" class="mm-nav-link">📸 Upload</a>

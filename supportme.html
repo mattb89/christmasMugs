@@ -17,13 +17,14 @@
       font-family: system-ui, -apple-system, sans-serif;
       padding-top: 58px;  /* sticky header space */
       padding-bottom: 48px; /* sticky footer space */
-      text-align: center;
+      /*text-align: center;*/
     }
 
     .support-container {
       max-width: 850px;
       margin: 0 auto;
       padding: 30px 18px 80px;
+      text-align: center;
     }
 
     h1 {
@@ -117,22 +118,13 @@
 <footer class="mm-footer">© 2025 Mug Mapper</footer>
 
 <script type="module">
-  // Load shared sticky header
-  const headerHTML = await fetch("header.html").then((r) => r.text());
-  document.getElementById("mm-header").innerHTML = headerHTML;
+    import { initHeader } from "./header.js";
+    import { initAuth } from "./auth.js";
+    import { supabase } from "./supabaseClient.js";
 
-  // Hook up header menu events
-  const mmHamburger  = document.getElementById("mmHamburger");
-  const mmNavOverlay = document.getElementById("mmNavOverlay");
-  const mmNavClose   = document.getElementById("mmNavClose");
-  const navLinks     = mmNavOverlay.querySelectorAll(".mm-nav-link");
-
-  function openNav() { mmNavOverlay.style.display = "block"; }
-  function closeNav() { mmNavOverlay.style.display = "none"; }
-
-  mmHamburger?.addEventListener("click", openNav);
-  mmNavClose?.addEventListener("click", closeNav);
-  navLinks.forEach(l => l.addEventListener("click", closeNav));
+    // 1) Initialize header & auth
+    await initHeader();
+    await initAuth();
 </script>
 
 </body>

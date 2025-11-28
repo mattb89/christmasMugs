@@ -251,41 +251,48 @@
 </footer>
 
 <script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  import { initHeader } from "./header.js";
+  import { initAuth } from "./auth.js";
+  import { supabase } from "./supabaseClient.js";
+
+  // 1) Initialize header & auth
+  await initHeader();
+  await initAuth();
+  // import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
   // ---------------------------
   // 1. Load shared header
   // ---------------------------
-  const headerHTML = await fetch("header.html").then((r) => r.text());
-  document.getElementById("mm-header").innerHTML = headerHTML;
+  // const headerHTML = await fetch("header.html").then((r) => r.text());
+  // document.getElementById("mm-header").innerHTML = headerHTML;
 
-  // Hamburger / overlay wiring
-  const mmHamburger  = document.getElementById("mmHamburger");
-  const mmNavOverlay = document.getElementById("mmNavOverlay");
-  const mmNavClose   = document.getElementById("mmNavClose");
-  const navLinks     = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
+  // // Hamburger / overlay wiring
+  // const mmHamburger  = document.getElementById("mmHamburger");
+  // const mmNavOverlay = document.getElementById("mmNavOverlay");
+  // const mmNavClose   = document.getElementById("mmNavClose");
+  // const navLinks     = mmNavOverlay?.querySelectorAll(".mm-nav-link") || [];
 
-  function openNav() {
-    mmNavOverlay.style.display = "block";
-    mmNavOverlay.setAttribute("aria-hidden", "false");
-  }
-  function closeNav() {
-    mmNavOverlay.style.display = "none";
-    mmNavOverlay.setAttribute("aria-hidden", "true");
-  }
+  // function openNav() {
+  //   mmNavOverlay.style.display = "block";
+  //   mmNavOverlay.setAttribute("aria-hidden", "false");
+  // }
+  // function closeNav() {
+  //   mmNavOverlay.style.display = "none";
+  //   mmNavOverlay.setAttribute("aria-hidden", "true");
+  // }
 
-  mmHamburger?.addEventListener("click", openNav);
-  mmNavClose?.addEventListener("click", closeNav);
-  navLinks.forEach((link) => link.addEventListener("click", closeNav));
+  // mmHamburger?.addEventListener("click", openNav);
+  // mmNavClose?.addEventListener("click", closeNav);
+  // navLinks.forEach((link) => link.addEventListener("click", closeNav));
 
   // ---------------------------
   // 2. Supabase Init + Auth
   // ---------------------------
-  const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
+  // const SUPABASE_URL = "https://tosyomhrxttlejwlqvsf.supabase.co";
+  // const SUPABASE_ANON_KEY =
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvc3lvbWhyeHR0bGVqd2xxdnNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTQzMDIsImV4cCI6MjA3OTA3MDMwMn0.YukJ7MFLra2aDgvNXRYFSTEsxdGFMWy0I-pOm9CtQ_8";
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const authUserLabel     = document.getElementById("authUserLabel");
   const loginGoogleButton = document.getElementById("loginGoogleButton");
@@ -303,21 +310,21 @@
   const popularError  = document.getElementById("popularError");
   const galleryGrid   = document.getElementById("galleryGrid");
 
-  function updateAuthUI() {
-    if (!authUserLabel) return;
-    if (currentUser) {
-      authUserLabel.textContent =
-        currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
-      loginGoogleButton.style.display = "none";
-      loginEmailButton.style.display  = "none";
-      logoutButton.style.display      = "block";
-    } else {
-      authUserLabel.textContent = "Not signed in";
-      loginGoogleButton.style.display = "block";
-      loginEmailButton.style.display  = "block";
-      logoutButton.style.display      = "none";
-    }
-  }
+  // function updateAuthUI() {
+  //   if (!authUserLabel) return;
+  //   if (currentUser) {
+  //     authUserLabel.textContent =
+  //       currentUser.email || currentUser.user_metadata?.full_name || currentUser.id;
+  //     loginGoogleButton.style.display = "none";
+  //     loginEmailButton.style.display  = "none";
+  //     logoutButton.style.display      = "block";
+  //   } else {
+  //     authUserLabel.textContent = "Not signed in";
+  //     loginGoogleButton.style.display = "block";
+  //     loginEmailButton.style.display  = "block";
+  //     logoutButton.style.display      = "none";
+  //   }
+  // }
 
   async function loadUserLikes() {
     if (!currentUser) {
@@ -339,44 +346,44 @@
     likedPhotoIds = new Set((data || []).map((row) => row.photo_id));
   }
 
-  async function initAuth() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    currentUser = session?.user ?? null;
-    updateAuthUI();
-    await loadUserLikes();
+  // async function initAuth() {
+  //   const {
+  //     data: { session },
+  //   } = await supabase.auth.getSession();
+  //   currentUser = session?.user ?? null;
+  //   updateAuthUI();
+  //   await loadUserLikes();
 
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      currentUser = session?.user ?? null;
-      updateAuthUI();
-      await loadUserLikes();
-      renderGallery();
-    });
-  }
+  //   supabase.auth.onAuthStateChange(async (_event, session) => {
+  //     currentUser = session?.user ?? null;
+  //     updateAuthUI();
+  //     await loadUserLikes();
+  //     renderGallery();
+  //   });
+  // }
 
-  loginGoogleButton?.addEventListener("click", async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.href },
-    });
-    if (error) alert("Google sign-in error: " + error.message);
-  });
+  // loginGoogleButton?.addEventListener("click", async () => {
+  //   const { error } = await supabase.auth.signInWithOAuth({
+  //     provider: "google",
+  //     options: { redirectTo: window.location.href },
+  //   });
+  //   if (error) alert("Google sign-in error: " + error.message);
+  // });
 
-  loginEmailButton?.addEventListener("click", async () => {
-    const email = prompt("Enter your email for a sign-in link:");
-    if (!email) return;
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.href },
-    });
-    if (error) alert("Email sign-in error: " + error.message);
-    else alert("Magic link sent. Check your inbox.");
-  });
+  // loginEmailButton?.addEventListener("click", async () => {
+  //   const email = prompt("Enter your email for a sign-in link:");
+  //   if (!email) return;
+  //   const { error } = await supabase.auth.signInWithOtp({
+  //     email,
+  //     options: { emailRedirectTo: window.location.href },
+  //   });
+  //   if (error) alert("Email sign-in error: " + error.message);
+  //   else alert("Magic link sent. Check your inbox.");
+  // });
 
-  logoutButton?.addEventListener("click", async () => {
-    await supabase.auth.signOut();
-  });
+  // logoutButton?.addEventListener("click", async () => {
+  //   await supabase.auth.signOut();
+  // });
 
   await initAuth();
 
